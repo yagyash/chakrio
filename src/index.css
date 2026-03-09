@@ -1,0 +1,231 @@
+/* ── Local fonts (fallback / offline) ─────────────────────────────────────── */
+@font-face {
+  font-family: 'Syne';
+  src: url('/fonts/Syne-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  src: url('/fonts/DMSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design system CSS variables ─────────────────────────────────────────── */
+:root {
+  --bg:       #0f0e17;
+  --surface:  #16151f;
+  --surface2: #1e1c2a;
+  --surface3: #252336;
+  --border:   rgba(255,255,255,0.07);
+  --accent:   #c8a96e;
+  --accent2:  #7c6af5;
+  --accent3:  #4ecdc4;
+  --text-1:   #f0eee8;
+  --text-2:   #8c8a9e;
+  --text-3:   #56546a;
+  --green:    #5cb88a;
+  --red:      #e07070;
+  --amber:    #e8a86a;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--text-1);
+    font-family: 'DM Sans', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+  }
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
+
+/* ── Global scrollbar ────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* ── Animation keyframes ─────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(92,184,138,0.4); }
+  50%       { opacity: 0.8; box-shadow: 0 0 0 5px rgba(92,184,138,0); }
+}
+
+@keyframes tealPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(78,205,196,0.5); }
+  50%       { box-shadow: 0 0 8px 3px rgba(78,205,196,0); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Animation utilities ─────────────────────────────────────────────────── */
+.animate-fade-in-up  { animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in     { animation: fadeIn 0.35s ease-out both; }
+.animate-scale-in    { animation: scaleIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-pulse-green { animation: pulse 2s infinite; }
+.animate-teal-pulse  { animation: tealPulse 2s infinite; }
+
+/* Stagger delays */
+.stagger-1  { animation-delay:  60ms; }
+.stagger-2  { animation-delay: 120ms; }
+.stagger-3  { animation-delay: 180ms; }
+.stagger-4  { animation-delay: 240ms; }
+.stagger-5  { animation-delay: 300ms; }
+.stagger-6  { animation-delay: 360ms; }
+.stagger-7  { animation-delay: 420ms; }
+.stagger-8  { animation-delay: 480ms; }
+
+/* KPI card stagger (fadeUp) */
+.kpi-card-1 { animation: fadeUp 0.4s ease forwards; animation-delay: 0s; }
+.kpi-card-2 { animation: fadeUp 0.4s ease forwards; animation-delay: 0.08s; }
+.kpi-card-3 { animation: fadeUp 0.4s ease forwards; animation-delay: 0.16s; }
+.kpi-sub-1  { animation: fadeUp 0.4s ease forwards; animation-delay: 0.24s; }
+.kpi-sub-2  { animation: fadeUp 0.4s ease forwards; animation-delay: 0.30s; }
+.kpi-sub-3  { animation: fadeUp 0.4s ease forwards; animation-delay: 0.36s; }
+.kpi-sub-4  { animation: fadeUp 0.4s ease forwards; animation-delay: 0.42s; }
+
+/* Table rows — staggered fade-in */
+.animate-rows tbody tr {
+  opacity: 0;
+  animation: fadeInUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.animate-rows tbody tr:nth-child(1)  { animation-delay:  40ms; }
+.animate-rows tbody tr:nth-child(2)  { animation-delay:  80ms; }
+.animate-rows tbody tr:nth-child(3)  { animation-delay: 120ms; }
+.animate-rows tbody tr:nth-child(4)  { animation-delay: 160ms; }
+.animate-rows tbody tr:nth-child(5)  { animation-delay: 200ms; }
+.animate-rows tbody tr:nth-child(6)  { animation-delay: 240ms; }
+.animate-rows tbody tr:nth-child(7)  { animation-delay: 280ms; }
+.animate-rows tbody tr:nth-child(8)  { animation-delay: 320ms; }
+.animate-rows tbody tr:nth-child(9)  { animation-delay: 360ms; }
+.animate-rows tbody tr:nth-child(10) { animation-delay: 400ms; }
+
+/* ── Card hover lift ─────────────────────────────────────────────────────── */
+.card-hover {
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(200,169,110,0.25) !important;
+}
+
+/* ── Sidebar helpers ─────────────────────────────────────────────────────── */
+.sidebar-glow {
+  position: relative;
+  overflow: hidden;
+}
+.sidebar-glow::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: -80px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(200,169,110,0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sidebar-nav-item {
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.sidebar-nav-item:hover {
+  background: var(--surface2) !important;
+  color: var(--text-1) !important;
+}
+.sidebar-user-card {
+  transition: border-color 0.2s ease;
+}
+.sidebar-user-card:hover {
+  border-color: rgba(200,169,110,0.3) !important;
+}
+
+/* ── Shimmer skeleton ────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 6px;
+}
+
+/* ── Login page dark overrides ───────────────────────────────────────────── */
+.login-input {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  color: var(--text-1) !important;
+  font-size: 14px;
+  width: 100%;
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: 'DM Sans', sans-serif;
+}
+.login-input::placeholder { color: var(--text-3); }
+.login-input:focus {
+  border-color: rgba(200,169,110,0.4) !important;
+  box-shadow: 0 0 0 3px rgba(200,169,110,0.08);
+}
+
+/* ── Dark table row states ───────────────────────────────────────────────── */
+.table-row-hover {
+  transition: background 0.12s ease;
+}
+.table-row-hover:hover {
+  background: rgba(124,106,245,0.06) !important;
+}
+.table-row-alt {
+  background: rgba(255,255,255,0.015);
+}
+.row-confirmed { background: rgba(124,106,245,0.06); }
+.row-confirmed:hover { background: rgba(124,106,245,0.1) !important; }
+.row-cancelled { background: rgba(224,112,112,0.06); }
+.row-cancelled:hover { background: rgba(224,112,112,0.1) !important; }
+.row-completed { background: rgba(86,84,106,0.08); }
+.row-completed:hover { background: rgba(86,84,106,0.12) !important; }
+
+/* ── Print styles ────────────────────────────────────────────────────────── */
+@media print {
+  .no-print  { display: none !important; }
+  .print-full { width: 100% !important; }
+}
