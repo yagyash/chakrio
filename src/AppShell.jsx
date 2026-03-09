@@ -23,6 +23,8 @@ export default function AppShell() {
   const { userProfile, selectedProperty, properties } = useAuthContext();
   const { pathname } = useLocation();
   const businessType = userProfile?.business_type ?? 'homestay';
+  const PROPERTY_TYPES = ['homestay', 'hotel', 'villa', 'dharmshala'];
+  const resolvedType = PROPERTY_TYPES.includes(businessType) ? 'homestay' : businessType;
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -47,7 +49,7 @@ export default function AppShell() {
         <TopBar onRefresh={handleRefresh} refreshing={refreshing} />
 
         <main className="flex-1 overflow-hidden flex flex-col animate-fade-in" key={`${pathname}-${refreshKey}`}>
-          {businessType === 'homestay' && (
+          {resolvedType === 'homestay' && (
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<HomestayDashboard />} />
@@ -58,7 +60,7 @@ export default function AppShell() {
             </Routes>
           )}
 
-          {businessType === 'bakery' && (
+          {resolvedType === 'bakery' && (
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<BakeryComingSoon />} />
@@ -69,7 +71,7 @@ export default function AppShell() {
             </Routes>
           )}
 
-          {businessType !== 'homestay' && businessType !== 'bakery' && (
+          {resolvedType !== 'homestay' && resolvedType !== 'bakery' && (
             <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
               Unknown business type: <code className="ml-1 bg-gray-100 px-1 rounded">{businessType}</code>
             </div>
