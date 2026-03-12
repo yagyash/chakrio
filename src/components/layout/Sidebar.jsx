@@ -188,7 +188,7 @@ export default function Sidebar() {
     <>
       {/* Mobile hamburger */}
       <button
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg text-white
+        className="lg:hidden fixed top-4 left-4 z-[110] p-2 rounded-lg text-white
           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6C63FF]"
         style={{ background: '#16151f', border: '1px solid rgba(255,255,255,0.07)' }}
         onClick={() => setMobileOpen((v) => !v)}

@@ -79,6 +79,28 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
+  // Idle logout — sign out after 10 minutes of no activity
+  useEffect(() => {
+    if (!firebaseUser) return;
+
+    const IDLE_MS = 10 * 60 * 1000;
+    let timer;
+
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => signOut(auth), IDLE_MS);
+    };
+
+    const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+    events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+    reset();
+
+    return () => {
+      clearTimeout(timer);
+      events.forEach(e => window.removeEventListener(e, reset));
+    };
+  }, [firebaseUser]);
+
   const logout = () => {
     setSelectedProperty(null);
     return signOut(auth);
