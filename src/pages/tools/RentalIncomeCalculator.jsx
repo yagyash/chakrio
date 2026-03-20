@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
@@ -46,6 +47,18 @@ export default function RentalIncomeCalculator() {
 
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
+      <Helmet>
+        <title>Rental Income Calculator for Property — Free Tool | Chakrio</title>
+        <meta name="description" content="Estimate gross and net rental income from your property. Enter rooms, nightly rate, and occupancy % — see your monthly or annual income instantly. Free tool." />
+        <link rel="canonical" href="https://chakrio.com/tools/rental-income-calculator" />
+        <meta property="og:title" content="Rental Income Calculator for Property — Free Tool | Chakrio" />
+        <meta property="og:description" content="Estimate gross and net rental income from your property. Enter rooms, nightly rate, and occupancy % — see your income instantly." />
+        <meta property="og:url" content="https://chakrio.com/tools/rental-income-calculator" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Rental Income Calculator for Property — Free Tool | Chakrio" />
+        <meta name="twitter:description" content="Estimate gross and net rental income from your property instantly. Free, no sign-up required." />
+      </Helmet>
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">

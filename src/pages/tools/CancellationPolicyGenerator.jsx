@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
@@ -80,6 +81,18 @@ export default function CancellationPolicyGenerator() {
 
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
+      <Helmet>
+        <title>Hotel Cancellation Policy Generator — Free Template | Chakrio</title>
+        <meta name="description" content="Generate a professional hotel cancellation policy in seconds. Customise refund windows, advance deposits, and no-show terms. Free, no sign-up needed." />
+        <link rel="canonical" href="https://chakrio.com/tools/cancellation-policy" />
+        <meta property="og:title" content="Hotel Cancellation Policy Generator — Free Template | Chakrio" />
+        <meta property="og:description" content="Generate a professional hotel cancellation policy in seconds. Customise refund windows, advance deposits, and no-show terms." />
+        <meta property="og:url" content="https://chakrio.com/tools/cancellation-policy" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Hotel Cancellation Policy Generator — Free Template | Chakrio" />
+        <meta name="twitter:description" content="Generate a professional hotel cancellation policy in seconds. Free, no sign-up needed." />
+      </Helmet>
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">

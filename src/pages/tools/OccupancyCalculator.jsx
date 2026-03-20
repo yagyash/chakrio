@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
@@ -32,6 +33,18 @@ export default function OccupancyCalculator() {
 
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
+      <Helmet>
+        <title>Hotel Occupancy Rate Calculator — Free Tool | Chakrio</title>
+        <meta name="description" content="Free hotel occupancy rate calculator. Enter your rooms, period, and booked nights — get your occupancy % instantly. No sign-up required." />
+        <link rel="canonical" href="https://chakrio.com/tools/occupancy-calculator" />
+        <meta property="og:title" content="Hotel Occupancy Rate Calculator — Free Tool | Chakrio" />
+        <meta property="og:description" content="Free hotel occupancy rate calculator. Enter your rooms, period, and booked nights — get your occupancy % instantly." />
+        <meta property="og:url" content="https://chakrio.com/tools/occupancy-calculator" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Hotel Occupancy Rate Calculator — Free Tool | Chakrio" />
+        <meta name="twitter:description" content="Free hotel occupancy rate calculator. Get your occupancy % instantly. No sign-up required." />
+      </Helmet>
       <Navbar />
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">

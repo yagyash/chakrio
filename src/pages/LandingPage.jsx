@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
@@ -49,6 +50,18 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
+      <Helmet>
+        <title>Chakrio — Manage Property Bookings via Telegram</title>
+        <meta name="description" content="Automate property bookings, cancellations & expenses via Telegram. Chakrio records everything in your Google Sheet automatically. Free tools for property managers." />
+        <link rel="canonical" href="https://chakrio.com/" />
+        <meta property="og:title" content="Chakrio — Manage Property Bookings via Telegram" />
+        <meta property="og:description" content="Automate property bookings, cancellations & expenses via Telegram. Chakrio records everything in your Google Sheet automatically." />
+        <meta property="og:url" content="https://chakrio.com/" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Chakrio — Manage Property Bookings via Telegram" />
+        <meta name="twitter:description" content="Automate property bookings, cancellations & expenses via Telegram." />
+      </Helmet>
       <Navbar />
 
       {/* Hero */}

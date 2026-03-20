@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginPage from './components/auth/LoginPage';
@@ -10,6 +11,7 @@ import CancellationPolicyGenerator from './pages/tools/CancellationPolicyGenerat
 
 export default function App() {
   return (
+    <HelmetProvider>
     <AuthProvider>
       <BrowserRouter>
         <Routes>
@@ -32,5 +34,6 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+    </HelmetProvider>
   );
 }
