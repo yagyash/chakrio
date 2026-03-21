@@ -158,7 +158,7 @@ export default function RentalIncomeCalculator() {
         {/* CTA */}
         <CTABox
           headline="Want your actual booking data in one place?"
-          body="Chakrio auto-records every booking your property receives via Telegram — so you can track real revenue, not estimates."
+          body="Chakrio auto-records every booking your property receives via chatbot — so you can track real revenue, not estimates."
           buttonText="Automate Your Booking Records →"
         />
 

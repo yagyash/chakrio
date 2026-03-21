@@ -14,12 +14,12 @@ const FEATURES = [
   {
     icon: '❌',
     title: 'Cancellation Tracking',
-    body: 'Chakrio extracts refund amounts and advance retained from cancellation messages and updates your sheet in real time.',
+    body: 'Chakrio extracts refund amounts and advance retained from cancellation messages and updates your records in real time.',
   },
   {
     icon: '💸',
     title: 'Expense Logging',
-    body: 'Log chlorine, maintenance, or staff costs via Telegram. No spreadsheet entry, no manual errors.',
+    body: 'Log chlorine, maintenance, or staff costs via chat. No manual entry, no errors.',
   },
   {
     icon: '📊',
@@ -29,9 +29,9 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { step: '01', title: 'Send a message', body: 'Your property manager types a booking or expense in plain language on Telegram.' },
+  { step: '01', title: 'Send a message', body: 'Your property manager types a booking or expense in plain language to the chatbot.' },
   { step: '02', title: 'AI parses it', body: "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed." },
-  { step: '03', title: 'Auto-recorded', body: 'The data is instantly written to your Google Sheet. Your dashboard updates in real time.' },
+  { step: '03', title: 'Auto-recorded', body: 'The data is recorded automatically and your dashboard updates in real time.' },
 ];
 
 const TOOLS = [
@@ -51,16 +51,16 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
-        <title>Chakrio — Manage Property Bookings via Telegram</title>
-        <meta name="description" content="Automate property bookings, cancellations & expenses via Telegram. Chakrio records everything in your Google Sheet automatically. Free tools for property managers." />
+        <title>Chakrio — Manage Property Bookings by Message</title>
+        <meta name="description" content="Automate property bookings, cancellations & expenses with an AI chatbot. Chakrio records everything in your dashboard automatically. Free tools for property managers." />
         <link rel="canonical" href="https://chakrio.com/" />
-        <meta property="og:title" content="Chakrio — Manage Property Bookings via Telegram" />
-        <meta property="og:description" content="Automate property bookings, cancellations & expenses via Telegram. Chakrio records everything in your Google Sheet automatically." />
+        <meta property="og:title" content="Chakrio — Manage Property Bookings by Message" />
+        <meta property="og:description" content="Automate property bookings, cancellations & expenses with an AI chatbot. Chakrio records everything in your dashboard automatically." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Chakrio — Manage Property Bookings via Telegram" />
-        <meta name="twitter:description" content="Automate property bookings, cancellations & expenses via Telegram." />
+        <meta name="twitter:title" content="Chakrio — Manage Property Bookings by Message" />
+        <meta name="twitter:description" content="Automate property bookings, cancellations & expenses with an AI chatbot." />
       </Helmet>
       <Navbar />
 
@@ -75,7 +75,7 @@ export default function LandingPage() {
         <div className="relative max-w-4xl mx-auto px-6 py-24 sm:py-32 text-center">
           <div className="inline-flex items-center gap-2 bg-surface2 border border-surface3 rounded-full px-4 py-1.5 text-xs text-text-2 mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-ch-green inline-block" />
-            Automate your property bookings via Telegram
+            Automate your property bookings with an AI chatbot
           </div>
 
           <h1 className="font-display font-extrabold text-4xl sm:text-6xl text-text-1 mb-6 tracking-tight leading-tight">
@@ -87,8 +87,8 @@ export default function LandingPage() {
           </h1>
 
           <p className="text-text-2 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-            Chakrio connects to Telegram and auto-records bookings, cancellations, and expenses
-            into your Google Sheet — no spreadsheet entry, no manual work.
+            Chakrio's AI chatbot records bookings, cancellations, and expenses straight to your
+            dashboard — no manual entry, no missed records.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -112,7 +112,7 @@ export default function LandingPage() {
       <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-20">
         <div className="text-center mb-12">
           <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">How it works</h2>
-          <p className="text-text-2 max-w-xl mx-auto">Three steps from a Telegram message to a recorded booking.</p>
+          <p className="text-text-2 max-w-xl mx-auto">Three steps from a chat message to a recorded booking.</p>
         </div>
         <div className="grid sm:grid-cols-3 gap-6">
           {STEPS.map(s => (
@@ -181,7 +181,7 @@ export default function LandingPage() {
             Ready to automate your bookings?
           </h2>
           <p className="text-text-2 mb-8 max-w-lg mx-auto">
-            Join property managers who run their bookings entirely via Telegram — no spreadsheet entry, no missed records.
+            Join property managers who run their bookings entirely via chatbot — no manual entry, no missed records.
           </p>
           <Link
             to="/login"

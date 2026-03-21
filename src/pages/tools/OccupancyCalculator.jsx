@@ -139,7 +139,7 @@ export default function OccupancyCalculator() {
         {/* CTA */}
         <CTABox
           headline="Still tracking bookings in a spreadsheet?"
-          body="Chakrio connects to Telegram and auto-records every booking, cancellation, and expense into your Google Sheet — so your occupancy data is always up to date."
+          body="Chakrio's AI chatbot auto-records every booking, cancellation, and expense straight to your dashboard — so your occupancy data is always up to date."
           buttonText="Track Bookings Automatically →"
         />
 

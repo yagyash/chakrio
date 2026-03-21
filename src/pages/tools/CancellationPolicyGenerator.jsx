@@ -210,8 +210,8 @@ export default function CancellationPolicyGenerator() {
 
         {/* CTA */}
         <CTABox
-          headline="Chakrio auto-handles cancellations via Telegram"
-          body="When a property manager sends a cancellation message, Chakrio's AI extracts the refund amount and advance retained — and records it in your Google Sheet automatically."
+          headline="Chakrio auto-handles cancellations for you"
+          body="When a cancellation comes in, Chakrio's AI extracts the refund amount and advance retained — and records it in your dashboard automatically."
           buttonText="See How Chakrio Works →"
           gold
         />
