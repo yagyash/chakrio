@@ -58,9 +58,63 @@ export default function LandingPage() {
         <meta property="og:description" content="Automate property bookings, cancellations & expenses with an AI chatbot. Chakrio records everything in your dashboard automatically." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="https://chakrio.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Chakrio — Manage Property Bookings by Message" />
         <meta name="twitter:description" content="Automate property bookings, cancellations & expenses with an AI chatbot." />
+        <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Chakrio",
+          "description": "Chakrio is an AI-powered property booking automation tool. Property managers send plain-language messages via chatbot and Chakrio automatically records bookings, cancellations, and expenses to a real-time dashboard.",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "url": "https://chakrio.com",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HowTo",
+          "name": "How Chakrio automates property booking records",
+          "description": "Three steps to automate your property booking records using Chakrio's AI chatbot.",
+          "step": [
+            { "@type": "HowToStep", "position": 1, "name": "Send a message", "text": "Your property manager types a booking or expense in plain language to the Chakrio chatbot." },
+            { "@type": "HowToStep", "position": 2, "name": "AI parses it", "text": "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed." },
+            { "@type": "HowToStep", "position": 3, "name": "Auto-recorded", "text": "The data is recorded automatically and your dashboard updates in real time." }
+          ]
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is Chakrio?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is a property booking automation tool for homestays, villas, and guesthouses. It lets property managers record bookings, cancellations, and expenses by sending plain-language chat messages. The AI extracts the details and logs everything automatically to a real-time dashboard." }
+            },
+            {
+              "@type": "Question",
+              "name": "How does Chakrio record bookings?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Your property manager sends a message like 'Rajan, 3 nights from 5th April, ₹4500 advance' to the Chakrio chatbot. The AI parses the guest name, dates, and amounts, then records the booking in your dashboard automatically — no manual data entry required." }
+            },
+            {
+              "@type": "Question",
+              "name": "What types of properties can use Chakrio?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is designed for small property managers running homestays, villas, guesthouses, and hotels. It works for single-property owners as well as managers handling multiple properties from one account." }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need technical knowledge to use Chakrio?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No technical knowledge is needed. If you can send a text message, you can use Chakrio. Your property manager simply types bookings in natural language — the AI handles the rest." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is Chakrio free to try?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can sign up for free and start automating your property booking records. Chakrio also offers free tools for property managers including an occupancy rate calculator, rental income calculator, and cancellation policy generator." }
+            }
+          ]
+        })}</script>
       </Helmet>
       <Navbar />
 
@@ -170,6 +224,46 @@ export default function LandingPage() {
               <p className="text-text-2 text-sm leading-relaxed mb-4">{t.desc}</p>
               <span className="text-sm font-medium" style={{ color: '#c8a96e' }}>Use free tool →</span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="max-w-3xl mx-auto px-6 py-20 w-full">
+        <div className="text-center mb-12">
+          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Frequently Asked Questions</h2>
+          <p className="text-text-2 max-w-xl mx-auto">Everything you need to know about Chakrio.</p>
+        </div>
+        <div className="space-y-3">
+          {[
+            {
+              q: 'What is Chakrio?',
+              a: 'Chakrio is a property booking automation tool for homestays, villas, and guesthouses. It lets property managers record bookings, cancellations, and expenses by sending plain-language chat messages. The AI extracts the details and logs everything automatically to a real-time dashboard.',
+            },
+            {
+              q: 'How does Chakrio record bookings?',
+              a: "Your property manager sends a message like 'Rajan, 3 nights from 5th April, ₹4500 advance' to the Chakrio chatbot. The AI parses the guest name, dates, and amounts, then records the booking in your dashboard automatically — no manual data entry required.",
+            },
+            {
+              q: 'What types of properties can use Chakrio?',
+              a: 'Chakrio is designed for small property managers running homestays, villas, guesthouses, and hotels. It works for single-property owners as well as managers handling multiple properties from one account.',
+            },
+            {
+              q: 'Do I need technical knowledge to use Chakrio?',
+              a: 'No technical knowledge is needed. If you can send a text message, you can use Chakrio. Your property manager simply types bookings in natural language — the AI handles the rest.',
+            },
+            {
+              q: 'Is Chakrio free to try?',
+              a: 'Yes. You can sign up for free and start automating your property booking records. Chakrio also offers free tools for property managers including an occupancy rate calculator, rental income calculator, and cancellation policy generator.',
+            },
+          ].map(({ q, a }) => (
+            <details key={q} className="bg-surface border border-surface3 rounded-2xl group">
+              <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none select-none">
+                <span className="font-medium text-text-1 pr-4">{q}</span>
+                <span className="text-text-3 text-lg flex-shrink-0 transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p className="px-6 pb-5 text-text-2 text-sm leading-relaxed">{a}</p>
+            </details>
           ))}
         </div>
       </section>

@@ -55,9 +55,41 @@ export default function RentalIncomeCalculator() {
         <meta property="og:description" content="Estimate gross and net rental income from your property. Enter rooms, nightly rate, and occupancy % — see your income instantly." />
         <meta property="og:url" content="https://chakrio.com/tools/rental-income-calculator" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="https://chakrio.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Rental Income Calculator for Property — Free Tool | Chakrio" />
         <meta name="twitter:description" content="Estimate gross and net rental income from your property instantly. Free, no sign-up required." />
+        <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chakrio.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Free Tools", "item": "https://chakrio.com/#tools" },
+            { "@type": "ListItem", "position": 3, "name": "Rental Income Calculator", "item": "https://chakrio.com/tools/rental-income-calculator" }
+          ]
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How do you calculate rental income from a property?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Gross rental income = Number of Rooms × Nightly Rate × Occupancy Rate × Number of Days. Net rental income = Gross Income − Operating Expenses. Operating expenses typically include staff wages, utilities, maintenance, cleaning, and platform fees — usually 25–40% of gross income for a managed property." }
+            },
+            {
+              "@type": "Question",
+              "name": "What expenses should I deduct from rental income?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Common rental property expenses include: staff wages, electricity and water, maintenance and repairs, cleaning supplies, property tax, insurance, platform/OTA fees (if listed on Booking.com or Airbnb), and internet. For a typical Indian homestay or villa, operating expenses run 25–35% of gross revenue." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is a good net rental yield for a property?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A good net rental yield for a holiday homestay or villa in India is typically 6–12% annually on the property value. Short-term rental properties (holiday lets) generally yield more than long-term rentals. Properties in high-tourism areas — hill stations, coastal destinations, heritage towns — often achieve yields at the higher end of this range." }
+            }
+          ]
+        })}</script>
       </Helmet>
       <Navbar />
 
@@ -153,6 +185,20 @@ export default function RentalIncomeCalculator() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Understanding rental income */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Understanding your rental income</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-3">
+            <strong className="text-text-1">Gross income</strong> = Rooms × Nightly Rate × Occupancy % × Days. This is your revenue before any expenses.
+          </p>
+          <p className="text-text-2 text-sm leading-relaxed mb-3">
+            <strong className="text-text-1">Net income</strong> = Gross − Operating Expenses. Typical operating expenses for an Indian homestay or villa run <strong className="text-text-1">25–35% of gross revenue</strong>, covering staff, utilities, maintenance, and cleaning.
+          </p>
+          <p className="text-text-2 text-sm leading-relaxed">
+            A healthy net rental yield for a short-term holiday property in India is <strong className="text-text-1">6–12% annually</strong> on the property value. Properties in high-demand locations (hill stations, coastal areas, heritage towns) tend to sit at the higher end.
+          </p>
         </div>
 
         {/* CTA */}

@@ -41,9 +41,41 @@ export default function OccupancyCalculator() {
         <meta property="og:description" content="Free hotel occupancy rate calculator. Enter your rooms, period, and booked nights — get your occupancy % instantly." />
         <meta property="og:url" content="https://chakrio.com/tools/occupancy-calculator" />
         <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="https://chakrio.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Hotel Occupancy Rate Calculator — Free Tool | Chakrio" />
         <meta name="twitter:description" content="Free hotel occupancy rate calculator. Get your occupancy % instantly. No sign-up required." />
+        <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chakrio.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Free Tools", "item": "https://chakrio.com/#tools" },
+            { "@type": "ListItem", "position": 3, "name": "Hotel Occupancy Rate Calculator", "item": "https://chakrio.com/tools/occupancy-calculator" }
+          ]
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "What is hotel occupancy rate?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Hotel occupancy rate is the percentage of available rooms that are occupied over a given period. It is calculated as: (Booked Room-Nights ÷ (Total Rooms × Days in Period)) × 100. A room-night means one room occupied for one night." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is a good hotel occupancy rate?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A good hotel occupancy rate is generally considered to be 65–80%. An occupancy rate above 80% is excellent and indicates strong demand. Rates below 50% suggest the property may be underperforming. Seasonal properties (hill stations, beach resorts) naturally see lower off-season occupancy." }
+            },
+            {
+              "@type": "Question",
+              "name": "How do you calculate hotel occupancy rate?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Hotel occupancy rate = (Booked Room-Nights ÷ Total Available Room-Nights) × 100. Total available room-nights = Number of rooms × Number of days in the period. For example, 10 rooms over 30 days = 300 available room-nights. If 210 were booked, occupancy = (210 ÷ 300) × 100 = 70%." }
+            }
+          ]
+        })}</script>
       </Helmet>
       <Navbar />
 
@@ -133,6 +165,17 @@ export default function OccupancyCalculator() {
           <p className="text-text-2 text-sm leading-relaxed">
             A "room-night" is one room occupied for one night. If you have 10 rooms and all are booked for 30 days,
             that's 300 room-nights = 100% occupancy.
+          </p>
+        </div>
+
+        {/* What is a good occupancy rate */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">What is a good hotel occupancy rate?</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-3">
+            A good occupancy rate for a hotel, homestay, or villa is generally <strong className="text-text-1">65–80%</strong>. Rates above 80% are considered excellent and indicate strong, consistent demand. Rates below 50% may suggest pricing, marketing, or availability issues.
+          </p>
+          <p className="text-text-2 text-sm leading-relaxed">
+            Seasonal properties (hill stations, beach resorts, pilgrim-route homestays) naturally see low off-season occupancy — compare your rate against the same period last year rather than an annual average for a more accurate picture.
           </p>
         </div>
 

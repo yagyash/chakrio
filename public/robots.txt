@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /login
+Disallow: /dashboard/
+Allow: /
+Allow: /tools/
+
+Sitemap: https://chakrio.com/sitemap.xml
