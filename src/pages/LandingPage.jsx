@@ -132,8 +132,8 @@ export default function LandingPage() {
             },
             {
               "@type": "Question",
-              "name": "Is Chakrio free to try?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can sign up for free and start automating your property booking records. Chakrio also offers free tools for property managers including an occupancy rate calculator, rental income calculator, and cancellation policy generator." }
+              "name": "How do I get started with Chakrio?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is currently in early access. Please contact our team on WhatsApp at +91 85530 71171 for onboarding. Chakrio also offers free tools for property managers — including an occupancy rate calculator, rental income calculator, and cancellation policy generator — available without sign-up." }
             }
           ]
         })}</script>
@@ -275,8 +275,8 @@ export default function LandingPage() {
               a: 'No technical knowledge is needed. If you can send a text message, you can use Chakrio. Your property manager simply types bookings in natural language — the AI handles the rest.',
             },
             {
-              q: 'Is Chakrio free to try?',
-              a: 'Yes. You can sign up for free and start automating your property booking records. Chakrio also offers free tools for property managers including an occupancy rate calculator, rental income calculator, and cancellation policy generator.',
+              q: 'How do I get started with Chakrio?',
+              a: 'Chakrio is currently in early access. Please contact our team on WhatsApp at +91 85530 71171 for onboarding. Chakrio also offers free tools for property managers — including an occupancy rate calculator, rental income calculator, and cancellation policy generator — available without sign-up.',
             },
           ].map(({ q, a }) => (
             <details key={q} className="bg-surface border border-surface3 rounded-2xl group">
@@ -305,6 +305,19 @@ export default function LandingPage() {
           >
             Get Started →
           </Link>
+          <p className="text-text-3 text-sm mt-6">
+            Currently in early access —{' '}
+            <a
+              href="https://wa.me/918553071171"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#c8a96e' }}
+              className="hover:underline"
+            >
+              contact us on WhatsApp
+            </a>
+            {' '}to get onboarded.
+          </p>
         </div>
       </section>
 
