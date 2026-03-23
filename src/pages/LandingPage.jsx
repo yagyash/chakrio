@@ -65,6 +65,28 @@ export default function LandingPage() {
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Chakrio",
+          "url": "https://chakrio.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://chakrio.com/og-image.png",
+            "width": 1200,
+            "height": 630
+          },
+          "description": "Chakrio is an AI-powered property booking automation tool for homestays, villas, and guesthouses in India. Property managers record bookings, cancellations, and expenses by sending plain-language chat messages.",
+          "areaServed": "IN",
+          "serviceType": "Property Management Software"
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Chakrio",
+          "url": "https://chakrio.com",
+          "description": "AI-powered property booking automation for homestays, villas, and guesthouses"
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
           "@type": "SoftwareApplication",
           "name": "Chakrio",
           "description": "Chakrio is an AI-powered property booking automation tool. Property managers send plain-language messages via chatbot and Chakrio automatically records bookings, cancellations, and expenses to a real-time dashboard.",

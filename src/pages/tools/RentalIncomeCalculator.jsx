@@ -62,6 +62,18 @@ export default function RentalIncomeCalculator() {
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Rental Income Calculator for Property — Free Tool | Chakrio",
+          "url": "https://chakrio.com/tools/rental-income-calculator",
+          "description": "Estimate gross and net rental income from your property. Enter rooms, nightly rate, and occupancy % — see your monthly or annual income instantly. Free tool.",
+          "datePublished": "2025-01-01",
+          "dateModified": "2026-03-23",
+          "author": { "@type": "Organization", "name": "Chakrio", "url": "https://chakrio.com" },
+          "publisher": { "@type": "Organization", "name": "Chakrio", "logo": { "@type": "ImageObject", "url": "https://chakrio.com/og-image.png" } },
+          "isPartOf": { "@type": "WebSite", "name": "Chakrio", "url": "https://chakrio.com" }
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chakrio.com/" },
@@ -87,6 +99,31 @@ export default function RentalIncomeCalculator() {
               "@type": "Question",
               "name": "What is a good net rental yield for a property?",
               "acceptedAnswer": { "@type": "Answer", "text": "A good net rental yield for a holiday homestay or villa in India is typically 6–12% annually on the property value. Short-term rental properties (holiday lets) generally yield more than long-term rentals. Properties in high-tourism areas — hill stations, coastal destinations, heritage towns — often achieve yields at the higher end of this range." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is rental income from a homestay taxable in India?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes, rental income from a homestay or short-term rental property in India is taxable under 'Income from House Property' or 'Income from Business' depending on the level of services provided. If the property provides hotel-like services (meals, housekeeping), it is typically taxed as business income. You can deduct 30% of net annual value as a standard deduction, plus actual interest on home loans. Consult a CA for your specific situation." }
+            },
+            {
+              "@type": "Question",
+              "name": "How do OTA platform fees affect rental income?",
+              "acceptedAnswer": { "@type": "Answer", "text": "OTA platform fees typically reduce your gross rental income by 15–25%. Booking.com charges 15–18% commission, Airbnb charges hosts 3% plus guests 12–15%, and MakeMyTrip charges 15–20%. To calculate net income after OTA fees, reduce your gross income by the commission percentage before deducting operating expenses. Properties with high direct booking rates (repeat guests, own website) retain significantly more net income." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the difference between gross rental yield and net rental yield?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Gross rental yield = (Annual Gross Rental Income ÷ Property Value) × 100. Net rental yield = (Annual Net Rental Income after expenses ÷ Property Value) × 100. For example, a property worth ₹1 crore generating ₹10 lakh gross annual revenue has a gross yield of 10%. After 30% operating expenses (₹3 lakh), net income is ₹7 lakh — a net yield of 7%. Net yield is the more meaningful measure of actual investment return." }
+            },
+            {
+              "@type": "Question",
+              "name": "How can I increase net rental income from my property?",
+              "acceptedAnswer": { "@type": "Answer", "text": "To increase net rental income: (1) Increase occupancy through OTA listings and dynamic pricing. (2) Raise your ADR (Average Daily Rate) by improving reviews, photography, and amenities. (3) Reduce OTA dependency by building direct bookings — WhatsApp-based booking systems reduce commission costs. (4) Manage expenses: energy efficiency, staff optimisation, and preventive maintenance reduce operating costs. (5) Add revenue streams: airport transfers, meal packages, and local experiences add 10–20% to base room revenue." }
+            },
+            {
+              "@type": "Question",
+              "name": "What operating expenses should I budget for a homestay in India?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Typical operating expense breakdown for an Indian homestay (as % of gross revenue): Staff wages 10–15%, Electricity and water 5–8%, Cleaning and laundry 4–6%, Maintenance and repairs 3–5%, Platform/OTA commissions 15–20% (if OTA-heavy), Property tax and insurance 2–3%, Internet and cable 1–2%, Consumables (toiletries, cleaning supplies) 2–3%. Total operating expenses typically range 25–40% of gross revenue depending on staffing and OTA mix." }
             }
           ]
         })}</script>
@@ -198,6 +235,82 @@ export default function RentalIncomeCalculator() {
           </p>
           <p className="text-text-2 text-sm leading-relaxed">
             A healthy net rental yield for a short-term holiday property in India is <strong className="text-text-1">6–12% annually</strong> on the property value. Properties in high-demand locations (hill stations, coastal areas, heritage towns) tend to sit at the higher end.
+          </p>
+        </div>
+
+        {/* Expense breakdown */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Typical operating expense breakdown for Indian homestays</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-4">
+            Use these benchmarks to set your expense % slider above:
+          </p>
+          <div className="space-y-2">
+            {[
+              { category: 'Staff wages', range: '10–15%' },
+              { category: 'Electricity & water', range: '5–8%' },
+              { category: 'Cleaning & laundry', range: '4–6%' },
+              { category: 'Maintenance & repairs', range: '3–5%' },
+              { category: 'OTA commissions (if applicable)', range: '15–20%' },
+              { category: 'Property tax & insurance', range: '2–3%' },
+              { category: 'Consumables & toiletries', range: '2–3%' },
+            ].map(({ category, range }) => (
+              <div key={category} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
+                <span className="text-text-2 text-sm">{category}</span>
+                <span className="font-display font-extrabold text-sm" style={{ color: '#c8a96e' }}>{range}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-text-3 text-xs mt-3 leading-relaxed">
+            Total operating expenses typically range <strong className="text-text-2">25–40% of gross revenue</strong>. Properties with high OTA dependence sit at the upper end.
+          </p>
+        </div>
+
+        {/* OTA impact */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">How OTA fees affect your rental income</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-3">
+            Listing on OTAs dramatically increases occupancy, but the commission costs are significant. Typical rates:
+          </p>
+          <div className="space-y-2 mb-4">
+            {[
+              { ota: 'Booking.com', fee: '15–18% of booking value' },
+              { ota: 'Airbnb (host fee)', fee: '3% of booking subtotal' },
+              { ota: 'MakeMyTrip', fee: '15–20% of booking value' },
+              { ota: 'Goibibo', fee: '15–18% of booking value' },
+            ].map(({ ota, fee }) => (
+              <div key={ota} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
+                <span className="text-text-2 text-sm font-medium">{ota}</span>
+                <span className="text-text-2 text-sm">{fee}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-text-2 text-sm leading-relaxed">
+            <strong className="text-text-1">Strategy:</strong> Use OTAs to fill occupancy gaps and build reviews early on. As you accumulate repeat guests, shift bookings to direct channels (WhatsApp, phone) to capture the 15–20% you'd otherwise pay in commission.
+          </p>
+        </div>
+
+        {/* Rental yield context */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">What is a good rental yield in India?</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-3">
+            Net rental yield = (Annual Net Income ÷ Property Value) × 100. For short-term holiday rentals in India:
+          </p>
+          <div className="space-y-2 mb-4">
+            {[
+              { type: 'Hill station / mountain property', yield: '8–12%' },
+              { type: 'Coastal / beach property', yield: '7–10%' },
+              { type: 'Heritage / boutique property', yield: '6–9%' },
+              { type: 'City guesthouse', yield: '5–8%' },
+              { type: 'Long-term residential rental', yield: '2–4%' },
+            ].map(({ type, yield: y }) => (
+              <div key={type} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
+                <span className="text-text-2 text-sm">{type}</span>
+                <span className="font-display font-extrabold text-sm" style={{ color: '#c8a96e' }}>{y}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-text-2 text-sm leading-relaxed">
+            Short-term holiday rentals consistently outperform long-term residential rentals in yield — often by 3–5x — but require active management. Professional tools like Chakrio reduce the management overhead significantly.
           </p>
         </div>
 

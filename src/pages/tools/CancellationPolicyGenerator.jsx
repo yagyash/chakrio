@@ -96,6 +96,18 @@ export default function CancellationPolicyGenerator() {
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Hotel Cancellation Policy Generator — Free Template | Chakrio",
+          "url": "https://chakrio.com/tools/cancellation-policy",
+          "description": "Generate a professional hotel cancellation policy in seconds. Customise refund windows, advance deposits, and no-show terms. Free, no sign-up needed.",
+          "datePublished": "2025-01-01",
+          "dateModified": "2026-03-23",
+          "author": { "@type": "Organization", "name": "Chakrio", "url": "https://chakrio.com" },
+          "publisher": { "@type": "Organization", "name": "Chakrio", "logo": { "@type": "ImageObject", "url": "https://chakrio.com/og-image.png" } },
+          "isPartOf": { "@type": "WebSite", "name": "Chakrio", "url": "https://chakrio.com" }
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chakrio.com/" },
@@ -121,6 +133,31 @@ export default function CancellationPolicyGenerator() {
               "@type": "Question",
               "name": "What is a fair cancellation window for a hotel?",
               "acceptedAnswer": { "@type": "Answer", "text": "A fair cancellation window for a hotel, homestay, or villa is typically 7 days before check-in for a full refund, 3 days before for a partial refund (50%), and no refund within 48–72 hours of check-in. Stricter policies (shorter windows, lower refunds) are common during peak seasons and long weekends." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can a hotel change its cancellation policy after a booking is made?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. A hotel cannot change its cancellation policy for an existing confirmed booking. The policy that applied at the time of booking is the one that governs that reservation. However, a property can update its policy for all future bookings at any time. Always clearly communicate your current policy at the time of booking — via WhatsApp message, email confirmation, or booking platform listing." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is a non-refundable rate and when should hotels use it?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A non-refundable rate is a discounted booking price in exchange for no refund under any cancellation scenario. Hotels use non-refundable rates to guarantee revenue during high-demand periods (long weekends, festivals, peak season) and to fill rooms early. Typically offered at 10–20% below the standard rate, non-refundable bookings work well when demand is high and you're confident of alternative bookings if a guest no-shows." }
+            },
+            {
+              "@type": "Question",
+              "name": "How do Booking.com and Airbnb cancellation policies work?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Booking.com allows properties to set their own cancellation policy from predefined templates (Flexible: free cancellation up to 1 day before; Moderate: 5 days before; Strict: 14 days before). Airbnb offers Flexible, Moderate, Firm, and Strict policies with specific refund percentages. Your direct booking cancellation policy can be stricter or more lenient than your OTA policy — many properties use a more flexible policy on OTAs to improve search ranking and a stricter policy for direct bookings." }
+            },
+            {
+              "@type": "Question",
+              "name": "How should I communicate my cancellation policy to guests?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Communicate your cancellation policy at every touchpoint: (1) On your OTA listing in the policies section. (2) In your booking confirmation message (WhatsApp or email) — explicitly mention the advance deposit, refund windows, and no-show terms. (3) On your website or Instagram bio link. (4) At check-in as a reminder. Disputes over cancellations almost always arise from unclear communication at booking time — a written confirmation with policy terms protects both parties." }
+            },
+            {
+              "@type": "Question",
+              "name": "Should I have a stricter cancellation policy during peak season?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Applying stricter cancellation terms during peak season (long weekends, school holidays, festival periods, New Year) is standard industry practice and widely accepted by guests. During peak demand, a late cancellation leaves you with an empty room you could have filled. A tighter policy (e.g. 50% refund if cancelled 7+ days before, 0% within 7 days) protects your peak-season revenue. Guests booking during high-demand periods understand this and are rarely put off by stricter terms." }
             }
           ]
         })}</script>
@@ -252,6 +289,70 @@ export default function CancellationPolicyGenerator() {
           <p className="text-text-2 text-sm leading-relaxed">
             <strong className="text-text-1">Peak season tip:</strong> It is standard practice to apply stricter cancellation terms during long weekends, holidays, and festival seasons — shorter refund windows and lower refund percentages are widely accepted by guests booking during high-demand periods.
           </p>
+        </div>
+
+        {/* Policy types comparison */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Types of hotel cancellation policies</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-4">
+            Choose the right policy type based on your property's demand pattern and location:
+          </p>
+          <div className="space-y-3">
+            {[
+              {
+                name: 'Flexible',
+                desc: 'Full refund if cancelled 24–48 hours before check-in. Best for city guesthouses with high booking volumes and easy re-fill.',
+                advance: '10–20%',
+              },
+              {
+                name: 'Moderate',
+                desc: 'Full refund if cancelled 5–7 days before; 50% refund within 5 days. Standard for most homestays and villas.',
+                advance: '25–30%',
+              },
+              {
+                name: 'Strict',
+                desc: 'Full refund only if cancelled 14+ days before; 50% refund 7–13 days; no refund within 7 days. Suitable for high-demand or remote properties.',
+                advance: '30–50%',
+              },
+              {
+                name: 'Non-refundable',
+                desc: 'No refund under any scenario, offered at a 10–20% discount from the standard rate. Best for peak season bookings.',
+                advance: '100%',
+              },
+            ].map(({ name, desc, advance }) => (
+              <div key={name} className="bg-surface2 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="font-medium text-text-1 text-sm">{name}</span>
+                  <span className="text-xs text-text-3">Advance: <span style={{ color: '#c8a96e' }} className="font-medium">{advance}</span></span>
+                </div>
+                <p className="text-text-2 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* How to communicate policy */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">How to communicate your cancellation policy to guests</h2>
+          <p className="text-text-2 text-sm leading-relaxed mb-4">
+            Most cancellation disputes arise not from the policy itself, but from poor communication. Share your policy at every touchpoint:
+          </p>
+          <div className="space-y-3">
+            {[
+              { step: '01', title: 'At booking confirmation', body: 'Send a WhatsApp or email confirmation that explicitly mentions the advance deposit paid, the refund window, and no-show terms.' },
+              { step: '02', title: 'On your OTA listing', body: 'Keep your Booking.com, Airbnb, and MakeMyTrip policy settings in sync with your direct booking policy to avoid confusion.' },
+              { step: '03', title: '7 days before check-in', body: 'Send a reminder message confirming the booking and mentioning that the cancellation window is approaching — this reduces last-minute cancellations.' },
+              { step: '04', title: 'At check-in', body: 'Mention the no-show policy verbally at check-in for extended stays, so guests understand the consequences of early departure.' },
+            ].map(({ step, title, body }) => (
+              <div key={step} className="flex gap-4 bg-surface2 rounded-lg p-4">
+                <span className="font-display font-extrabold text-lg flex-shrink-0" style={{ color: 'rgba(200,169,110,0.4)' }}>{step}</span>
+                <div>
+                  <p className="font-medium text-text-1 text-sm mb-1">{title}</p>
+                  <p className="text-text-2 text-sm leading-relaxed">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* CTA */}
