@@ -19,17 +19,17 @@ const FEATURES = [
   {
     icon: '💸',
     title: 'Expense Logging',
-    body: 'Log chlorine, maintenance, or staff costs via chat. No manual entry, no errors.',
+    body: 'Type "chlorine ₹850" or "plumber ₹2200" — Chakrio logs the expense instantly. No dropdowns, no category hunting.',
   },
   {
     icon: '📊',
     title: 'Monthly Reports',
-    body: 'Get automated monthly P&L summaries — revenue, expenses, and net profit — sent directly to you.',
+    body: 'On the 1st of each month, get a full P&L — total revenue, all expenses, and net profit — sent straight to your phone.',
   },
 ];
 
 const STEPS = [
-  { step: '01', title: 'Send a message', body: 'Your property manager types a booking or expense in plain language to the chatbot.' },
+  { step: '01', title: 'Send a message', body: 'You type a booking or expense in plain language to the chatbot — exactly how you would say it out loud.' },
   { step: '02', title: 'AI parses it', body: "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed." },
   { step: '03', title: 'Auto-recorded', body: 'The data is recorded automatically and your dashboard updates in real time.' },
 ];
@@ -51,17 +51,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
-        <title>Chakrio — Manage Property Bookings by Message</title>
-        <meta name="description" content="Automate property bookings, cancellations & expenses with an AI chatbot. Chakrio records everything in your dashboard automatically. Free tools for property managers." />
+        <title>Chakrio — Property Bookings, Auto-Recorded</title>
+        <meta name="description" content="Send a message, your booking is logged. Chakrio's AI records bookings, cancellations, and expenses automatically. No spreadsheets, no manual entry. Free tools for property managers." />
         <link rel="canonical" href="https://chakrio.com/" />
-        <meta property="og:title" content="Chakrio — Manage Property Bookings by Message" />
-        <meta property="og:description" content="Automate property bookings, cancellations & expenses with an AI chatbot. Chakrio records everything in your dashboard automatically." />
+        <meta property="og:title" content="Chakrio — Property Bookings, Auto-Recorded" />
+        <meta property="og:description" content="Send a message, your booking is logged. Chakrio's AI records everything automatically — no spreadsheets, no manual entry." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://chakrio.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Chakrio — Manage Property Bookings by Message" />
-        <meta name="twitter:description" content="Automate property bookings, cancellations & expenses with an AI chatbot." />
+        <meta name="twitter:title" content="Chakrio — Property Bookings, Auto-Recorded" />
+        <meta name="twitter:description" content="Send a message, your booking is logged. Chakrio's AI records everything automatically." />
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -101,7 +101,7 @@ export default function LandingPage() {
           "name": "How Chakrio automates property booking records",
           "description": "Three steps to automate your property booking records using Chakrio's AI chatbot.",
           "step": [
-            { "@type": "HowToStep", "position": 1, "name": "Send a message", "text": "Your property manager types a booking or expense in plain language to the Chakrio chatbot." },
+            { "@type": "HowToStep", "position": 1, "name": "Send a message", "text": "You type a booking or expense in plain language to the Chakrio chatbot — exactly how you would say it out loud." },
             { "@type": "HowToStep", "position": 2, "name": "AI parses it", "text": "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed." },
             { "@type": "HowToStep", "position": 3, "name": "Auto-recorded", "text": "The data is recorded automatically and your dashboard updates in real time." }
           ]
@@ -112,28 +112,28 @@ export default function LandingPage() {
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "What is Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is a property booking automation tool for homestays, villas, and guesthouses. It lets property managers record bookings, cancellations, and expenses by sending plain-language chat messages. The AI extracts the details and logs everything automatically to a real-time dashboard." }
+              "name": "I already use a spreadsheet — why do I need Chakrio?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Spreadsheets require you to open them, find the right tab, and type every field manually for every booking. With Chakrio, you send a message in plain language and the record is created automatically — no switching apps, no formatting, no errors." }
             },
             {
               "@type": "Question",
-              "name": "How does Chakrio record bookings?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Your property manager sends a message like 'Rajan, 3 nights from 5th April, ₹4500 advance' to the Chakrio chatbot. The AI parses the guest name, dates, and amounts, then records the booking in your dashboard automatically — no manual data entry required." }
+              "name": "What if I have multiple properties?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio supports multiple properties under one account. Each property has its own booking records and dashboard. You can switch between them instantly from the same login." }
             },
             {
               "@type": "Question",
               "name": "What types of properties can use Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is designed for small property managers running homestays, villas, guesthouses, and hotels. It works for single-property owners as well as managers handling multiple properties from one account." }
+              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is built for owner-operators running homestays, villas, guesthouses, and small hotels. It works for single-property owners as well as those managing multiple properties." }
             },
             {
               "@type": "Question",
               "name": "Do I need technical knowledge to use Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "No technical knowledge is needed. If you can send a text message, you can use Chakrio. Your property manager simply types bookings in natural language — the AI handles the rest." }
+              "acceptedAnswer": { "@type": "Answer", "text": "None at all. If you can send a text message, you can use Chakrio. You simply type bookings in natural language — the AI handles the rest." }
             },
             {
               "@type": "Question",
               "name": "How do I get started with Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is currently in early access. Please contact our team on WhatsApp at +91 94618 88529 for onboarding. Chakrio also offers free tools for property managers — including an occupancy rate calculator, rental income calculator, and cancellation policy generator — available without sign-up." }
+              "acceptedAnswer": { "@type": "Answer", "text": "We onboard every property personally. WhatsApp us at +91 94618 88529 and we'll get your booking bot live — usually within 24 hours." }
             }
           ]
         })}</script>
@@ -155,16 +155,15 @@ export default function LandingPage() {
           </div>
 
           <h1 className="font-display font-extrabold text-4xl sm:text-6xl text-text-1 mb-6 tracking-tight leading-tight">
-            Manage your property
+            Your bookings.
             <br />
             <span style={{ background: 'linear-gradient(135deg, #c8a96e, #e8c98a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              bookings by message
+              Auto-recorded.
             </span>
           </h1>
 
           <p className="text-text-2 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-            Chakrio's AI chatbot records bookings, cancellations, and expenses straight to your
-            dashboard — no manual entry, no missed records.
+            Just send a message — <span className="text-text-1 font-medium">"Rajan, 3 nights from 5th April, ₹4500 advance"</span> — and Chakrio logs the booking instantly. No spreadsheets, no missed records.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -180,6 +179,37 @@ export default function LandingPage() {
             >
               See how it works
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Tools — trust builder, above the fold */}
+      <section id="tools" className="border-y border-surface3 bg-surface">
+        <div className="max-w-5xl mx-auto px-6 py-14">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Free resources</p>
+              <h2 className="font-display font-extrabold text-2xl text-text-1">Free Tools for Property Managers</h2>
+            </div>
+            <p className="text-text-3 text-sm">No sign-up required.</p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {TOOLS.map(t => (
+              <Link
+                key={t.href}
+                to={t.href}
+                className="bg-bg-app rounded-2xl border border-surface3 p-6 transition-colors group"
+                style={{ textDecoration: 'none' }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = ''}
+              >
+                <h3 className="font-display font-extrabold text-base text-text-1 mb-2 transition-colors group-hover:text-accent">
+                  {t.title}
+                </h3>
+                <p className="text-text-2 text-sm leading-relaxed mb-4">{t.desc}</p>
+                <span className="text-sm font-medium" style={{ color: '#c8a96e' }}>Use free tool →</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -222,34 +252,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Free Tools */}
-      <section id="tools" className="max-w-5xl mx-auto px-6 py-20">
-        <div className="text-center mb-12">
-          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Free Tools for Property Managers</h2>
-          <p className="text-text-2 max-w-xl mx-auto">
-            Handy calculators and generators — free, no sign-up required.
-          </p>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-6">
-          {TOOLS.map(t => (
-            <Link
-              key={t.href}
-              to={t.href}
-              className="bg-surface rounded-2xl border border-surface3 p-7 transition-colors group"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}
-            >
-              <h3 className="font-display font-extrabold text-base text-text-1 mb-2 transition-colors group-hover:text-accent">
-                {t.title}
-              </h3>
-              <p className="text-text-2 text-sm leading-relaxed mb-4">{t.desc}</p>
-              <span className="text-sm font-medium" style={{ color: '#c8a96e' }}>Use free tool →</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {/* FAQ */}
       <section id="faq" className="max-w-3xl mx-auto px-6 py-20 w-full">
         <div className="text-center mb-12">
@@ -259,24 +261,24 @@ export default function LandingPage() {
         <div className="space-y-3">
           {[
             {
-              q: 'What is Chakrio?',
-              a: 'Chakrio is a property booking automation tool for homestays, villas, and guesthouses. It lets property managers record bookings, cancellations, and expenses by sending plain-language chat messages. The AI extracts the details and logs everything automatically to a real-time dashboard.',
+              q: 'I already use a spreadsheet — why do I need this?',
+              a: 'Spreadsheets work, but they require you to open them, find the right tab, and type every field manually — every single booking. With Chakrio, you just send a message in plain language and the record is created automatically. No switching apps, no formatting, no errors from fat-fingering a date.',
             },
             {
-              q: 'How does Chakrio record bookings?',
-              a: "Your property manager sends a message like 'Rajan, 3 nights from 5th April, ₹4500 advance' to the Chakrio chatbot. The AI parses the guest name, dates, and amounts, then records the booking in your dashboard automatically — no manual data entry required.",
+              q: 'What if I have multiple properties?',
+              a: 'Chakrio supports multiple properties under one account. Each property has its own booking records and dashboard. You can switch between them instantly from the same login.',
             },
             {
               q: 'What types of properties can use Chakrio?',
-              a: 'Chakrio is designed for small property managers running homestays, villas, guesthouses, and hotels. It works for single-property owners as well as managers handling multiple properties from one account.',
+              a: 'Chakrio is built for owner-operators running homestays, villas, guesthouses, and small hotels. It works for single-property owners as well as those managing two or more properties.',
             },
             {
               q: 'Do I need technical knowledge to use Chakrio?',
-              a: 'No technical knowledge is needed. If you can send a text message, you can use Chakrio. Your property manager simply types bookings in natural language — the AI handles the rest.',
+              a: 'None at all. If you can send a text message, you can use Chakrio. You simply type bookings in natural language — the AI handles the rest.',
             },
             {
-              q: 'How do I get started with Chakrio?',
-              a: 'Chakrio is currently in early access. Please contact our team on WhatsApp at +91 94618 88529 for onboarding. Chakrio also offers free tools for property managers — including an occupancy rate calculator, rental income calculator, and cancellation policy generator — available without sign-up.',
+              q: 'How do I get started?',
+              a: 'We onboard every property personally. WhatsApp us at +91 94618 88529 and we\'ll get your booking bot live — usually within 24 hours.',
             },
           ].map(({ q, a }) => (
             <details key={q} className="bg-surface border border-surface3 rounded-2xl group">
@@ -294,29 +296,29 @@ export default function LandingPage() {
       <section className="max-w-4xl mx-auto px-6 pb-20 w-full">
         <div className="rounded-2xl p-12 text-center border" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.12) 0%, transparent 70%), #16151f', borderColor: 'rgba(200,169,110,0.2)' }}>
           <h2 className="font-display font-extrabold text-3xl text-text-1 mb-4">
-            Ready to automate your bookings?
+            We onboard every property personally.
           </h2>
           <p className="text-text-2 mb-8 max-w-lg mx-auto">
-            Join property managers who run their bookings entirely via chatbot — no manual entry, no missed records.
+            WhatsApp us and we'll have your booking bot live within 24 hours — no setup on your end.
           </p>
-          <Link
-            to="/login"
+          <a
+            href="https://wa.me/919461888529"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', fontWeight: 600, padding: '14px 32px', borderRadius: '12px', fontSize: '14px', textDecoration: 'none', display: 'inline-block' }}
           >
-            Get Started →
-          </Link>
+            WhatsApp us to get set up →
+          </a>
           <p className="text-text-3 text-sm mt-6">
-            Currently in early access —{' '}
-            <a
-              href="https://wa.me/919461888529"
-              target="_blank"
-              rel="noopener noreferrer"
+            Or{' '}
+            <Link
+              to="/login"
               style={{ color: '#c8a96e' }}
               className="hover:underline"
             >
-              contact us on WhatsApp
-            </a>
-            {' '}to get onboarded.
+              sign in
+            </Link>
+            {' '}if you already have an account.
           </p>
         </div>
       </section>
