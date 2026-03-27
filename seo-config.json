@@ -1,0 +1,79 @@
+{
+  "type": "saas",
+  "domain": "https://chakrio.com",
+  "site_name": "Chakrio",
+  "description": "AI-powered property booking automation for homestays, villas, and guesthouses. Record bookings, expenses, and cancellations by sending a chat message. Dashboard updates automatically.",
+  "public_routes": [
+    "/",
+    "/tools/occupancy-calculator",
+    "/tools/rental-income-calculator",
+    "/tools/cancellation-policy"
+  ],
+  "routes_meta": {
+    "/": {
+      "title": "Chakrio — Manage Property Bookings by Message",
+      "description": "Automate property bookings, cancellations and expenses with an AI chatbot. Chakrio records everything to your dashboard automatically. Free tools for property managers."
+    },
+    "/tools/occupancy-calculator": {
+      "title": "Hotel Occupancy Rate Calculator — Free Tool | Chakrio",
+      "description": "Calculate your hotel or homestay occupancy rate for any period. Free online tool for property managers — no sign-up required."
+    },
+    "/tools/rental-income-calculator": {
+      "title": "Rental Income Calculator for Property — Free Tool | Chakrio",
+      "description": "Estimate gross and net rental income from your property. Enter rooms, nightly rate, occupancy and expenses to see your profit. Free tool for property managers."
+    },
+    "/tools/cancellation-policy": {
+      "title": "Hotel Cancellation Policy Generator — Free Template | Chakrio",
+      "description": "Generate a professional hotel cancellation policy in seconds. Customise deposit %, refund windows, and no-show rules. Free template for property managers."
+    }
+  },
+  "faq": [
+    {
+      "q": "I already use a spreadsheet — why do I need this?",
+      "a": "Spreadsheets work, but they require you to open them, find the right tab, and type every field manually — every single booking. With Chakrio, you just send a message in plain language and the record is created automatically. No switching apps, no formatting, no errors from fat-fingering a date."
+    },
+    {
+      "q": "What if I have multiple properties?",
+      "a": "Chakrio supports multiple properties under one account. Each property has its own booking records and dashboard. You can switch between them instantly from the same login."
+    },
+    {
+      "q": "What types of properties can use Chakrio?",
+      "a": "Chakrio is built for owner-operators running homestays, villas, guesthouses, and small hotels. It works for single-property owners as well as those managing two or more properties."
+    },
+    {
+      "q": "Do I need technical knowledge to use Chakrio?",
+      "a": "None at all. If you can send a text message, you can use Chakrio. You simply type bookings in natural language — the AI handles the rest."
+    },
+    {
+      "q": "How do I get started?",
+      "a": "We onboard every property personally. WhatsApp us at +91 94618 88529 and we'll get your booking bot live — usually within 24 hours."
+    }
+  ],
+  "how_to": {
+    "name": "How to record a property booking with Chakrio",
+    "description": "Record a booking in seconds by sending a plain-language message — no spreadsheets, no forms.",
+    "steps": [
+      {
+        "name": "Send a message",
+        "text": "Type a booking or expense in plain language to the chatbot — exactly how you would say it out loud. Example: 'Rajan, 3 nights from 5th April, Rs 4500 advance'."
+      },
+      {
+        "name": "AI parses it",
+        "text": "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed."
+      },
+      {
+        "name": "Auto-recorded",
+        "text": "The data is recorded automatically and your dashboard updates in real time. Revenue, expenses, and reports stay current without any manual entry."
+      }
+    ]
+  },
+  "contact": {
+    "whatsapp": "+919461888529"
+  },
+  "social": {},
+  "pricing": {
+    "display": "Free to start",
+    "price": "0",
+    "currency": "INR"
+  }
+}
