@@ -18,6 +18,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Prevent search engines from indexing the login page
+  useEffect(() => {
+    const meta = document.createElement('meta');
+    meta.name = 'robots';
+    meta.content = 'noindex, nofollow';
+    document.head.appendChild(meta);
+    return () => document.head.removeChild(meta);
+  }, []);
+
   // Redirect to dashboard if already logged in
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
