@@ -19,6 +19,7 @@ function normaliseProperties(profile) {
       id: 'default',
       property_name: profile.property_name ?? 'My Property',
       sheet_id: profile.sheet_id,
+      ...(profile.supabase_property_id && { supabase_property_id: profile.supabase_property_id }),
     }];
   }
   return [];
