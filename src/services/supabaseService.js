@@ -15,15 +15,33 @@ const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const MAX_ROWS = 2000;
 
 async function supabaseFetch(table, params = '') {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    throw new Error(
+      `Supabase env vars missing — check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel settings. ` +
+      `URL=${SUPABASE_URL ? 'set' : 'MISSING'} KEY=${SUPABASE_ANON_KEY ? 'set' : 'MISSING'}`
+    );
+  }
   const url = `${SUPABASE_URL}/rest/v1/${table}${params}&limit=${MAX_ROWS}`;
-  const res = await fetch(url, {
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-    },
-  });
+  // eslint-disable-next-line no-console
+  console.debug('[supabase] GET', url);
+  let res;
+  try {
+    res = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+    });
+  } catch (networkErr) {
+    // eslint-disable-next-line no-console
+    console.error('[supabase] Network error fetching', url, networkErr);
+    throw new Error(`Network error — could not reach Supabase (${url.split('/rest')[0]}). Check VITE_SUPABASE_URL is correct.`);
+  }
   if (!res.ok) {
-    throw new Error(`Supabase ${res.status}: ${res.statusText || 'request failed'}`);
+    const body = await res.text().catch(() => '');
+    // eslint-disable-next-line no-console
+    console.error('[supabase] HTTP error', res.status, url, body);
+    throw new Error(`Supabase ${res.status}: ${body || res.statusText || 'request failed'}`);
   }
   return res.json();
 }
