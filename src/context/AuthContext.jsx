@@ -13,12 +13,12 @@ function normaliseProperties(profile) {
   if (Array.isArray(profile.properties) && profile.properties.length > 0) {
     return profile.properties;
   }
-  // Backward compat: old single-property structure
-  if (profile.sheet_id) {
+  // Backward compat: old single-property structure (sheet_id OR supabase_property_id at top level)
+  if (profile.sheet_id || profile.supabase_property_id) {
     return [{
       id: 'default',
       property_name: profile.property_name ?? 'My Property',
-      sheet_id: profile.sheet_id,
+      sheet_id: profile.sheet_id ?? '',
       ...(profile.supabase_property_id && { supabase_property_id: profile.supabase_property_id }),
     }];
   }

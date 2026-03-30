@@ -1,48 +1,49 @@
 /**
- * Supabase read-only data service for the Chakrio dashboard.
+ * Supabase data service for the Chakrio dashboard.
  *
- * Uses the Supabase REST API directly (no SDK) with the anon key.
+ * All Supabase reads go through the /api/data backend route — the browser
+ * never contacts Supabase directly and never holds a Supabase key.
+ *
+ * The frontend sends a Firebase ID token; the backend verifies it server-side
+ * and fetches from Supabase using the service role key.
+ *
  * Returns rows with the same column names as googleSheets.js so all
  * existing table components and formatCell functions work unchanged.
- *
- * Only properties with a supabase_property_id in their Firestore profile
- * use this service — all others still go through googleSheets.js.
  */
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { auth } from './firebase';
+import { getIdToken } from 'firebase/auth';
 
-const MAX_ROWS = 2000;
+// ------------------------------------------------------------------
+// Internal fetch — calls the Vercel API route with a Firebase token
+// ------------------------------------------------------------------
 
-async function supabaseFetch(table, params = '') {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    throw new Error(
-      `Supabase env vars missing — check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel settings. ` +
-      `URL=${SUPABASE_URL ? 'set' : 'MISSING'} KEY=${SUPABASE_ANON_KEY ? 'set' : 'MISSING'}`
-    );
+async function apiFetch(propertyUuid, tab) {
+  if (!auth.currentUser) {
+    throw new Error('Unable to load data. Please sign in again.');
   }
-  const url = `${SUPABASE_URL}/rest/v1/${table}${params}&limit=${MAX_ROWS}`;
-  // eslint-disable-next-line no-console
-  console.debug('[supabase] GET', url);
+
+  let token;
+  try {
+    token = await getIdToken(auth.currentUser);
+  } catch {
+    throw new Error('Unable to load data. Please sign in again.');
+  }
+
   let res;
   try {
-    res = await fetch(url, {
-      headers: {
-        apikey: SUPABASE_ANON_KEY,
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-      },
-    });
-  } catch (networkErr) {
-    // eslint-disable-next-line no-console
-    console.error('[supabase] Network error fetching', url, networkErr);
-    throw new Error(`Network error — could not reach Supabase (${url.split('/rest')[0]}). Check VITE_SUPABASE_URL is correct.`);
+    res = await fetch(
+      `/api/data?propertyId=${encodeURIComponent(propertyUuid)}&tab=${encodeURIComponent(tab)}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+  } catch {
+    throw new Error('Unable to load data. Please try again.');
   }
+
   if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    // eslint-disable-next-line no-console
-    console.error('[supabase] HTTP error', res.status, url, body);
-    throw new Error(`Supabase ${res.status}: ${body || res.statusText || 'request failed'}`);
+    throw new Error('Unable to load data. Please try again.');
   }
+
   return res.json();
 }
 
@@ -94,7 +95,7 @@ function toSheetSummary(row) {
 // ------------------------------------------------------------------
 
 /**
- * Fetch data for a given tab name from Supabase.
+ * Fetch data for a given tab via the backend API.
  * Tab name is matched case-insensitively so custom tab name overrides still work.
  *
  * @param {string} propertyUuid  - Supabase property UUID (from Firestore supabase_property_id)
@@ -105,26 +106,17 @@ export async function fetchSupabaseTab(propertyUuid, tabName) {
   const tab = tabName.toLowerCase();
 
   if (tab.includes('booking')) {
-    const rows = await supabaseFetch(
-      'bookings',
-      `?property_id=eq.${propertyUuid}&select=*&order=check_in.desc`
-    );
+    const rows = await apiFetch(propertyUuid, 'bookings');
     return rows.map(toSheetBooking);
   }
 
   if (tab.includes('expense')) {
-    const rows = await supabaseFetch(
-      'expenses',
-      `?property_id=eq.${propertyUuid}&select=*&order=date.desc`
-    );
+    const rows = await apiFetch(propertyUuid, 'expenses');
     return rows.map(toSheetExpense);
   }
 
   if (tab.includes('summary') || tab.includes('report')) {
-    const rows = await supabaseFetch(
-      'monthly_summary',
-      `?property_id=eq.${propertyUuid}&select=*&order=year.desc,month.desc`
-    );
+    const rows = await apiFetch(propertyUuid, 'summary');
     return rows.map(toSheetSummary);
   }
 
@@ -132,7 +124,7 @@ export async function fetchSupabaseTab(propertyUuid, tabName) {
   return [];
 }
 
-/** Returns true when Supabase env vars are configured */
+/** Always true — backend API is always available when deployed */
 export function isSupabaseConfigured() {
-  return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+  return true;
 }
