@@ -243,6 +243,19 @@ export default function InvoiceGenerator() {
         source_page: 'invoice-generator',
         submitted_at: serverTimestamp(),
       });
+
+      // Telegram notification to admin — fire and forget
+      const botToken  = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+      const adminChat = import.meta.env.VITE_TELEGRAM_ADMIN_CHAT_ID;
+      if (botToken && adminChat) {
+        const msg = `🔔 New Invoice Lead!\n\nName: ${leadName.trim()}\nWhatsApp: ${leadWA.trim()}\nProperty: ${leadProp.trim()}\nSource: Invoice Generator`;
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: adminChat, text: msg }),
+        }).catch(() => {}); // silent fail — never block PDF download
+      }
+
       localStorage.setItem('chakrio_lead_captured', '1');
       setShowModal(false);
       generatePDF(buildInvoice());
