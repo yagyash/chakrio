@@ -8,6 +8,7 @@ import LandingPage from './pages/LandingPage';
 import OccupancyCalculator from './pages/tools/OccupancyCalculator';
 import RentalIncomeCalculator from './pages/tools/RentalIncomeCalculator';
 import CancellationPolicyGenerator from './pages/tools/CancellationPolicyGenerator';
+import InvoiceGenerator from './pages/tools/InvoiceGenerator';
 import MenuPage from './pages/MenuPage';
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/tools/occupancy-calculator" element={<OccupancyCalculator />} />
           <Route path="/tools/rental-income-calculator" element={<RentalIncomeCalculator />} />
           <Route path="/tools/cancellation-policy" element={<CancellationPolicyGenerator />} />
+          <Route path="/tools/invoice-generator" element={<InvoiceGenerator />} />
           <Route path="/menu/:propertyId" element={<MenuPage />} />
 
           {/* Protected routes */}
