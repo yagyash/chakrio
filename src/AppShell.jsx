@@ -10,6 +10,8 @@ import HomestayDashboard from './templates/homestay/Dashboard';
 import Bookings from './templates/homestay/Bookings';
 import Expenses from './templates/homestay/Expenses';
 import Reports from './templates/homestay/Reports';
+import OccupancyCalendar from './templates/homestay/OccupancyCalendar';
+import DigitalMenu from './templates/homestay/DigitalMenu';
 
 // Bakery placeholder
 import BakeryComingSoon from './templates/bakery/index';
@@ -54,8 +56,10 @@ export default function AppShell() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<HomestayDashboard />} />
               <Route path="/bookings" element={<Bookings />} />
+              <Route path="/calendar" element={<OccupancyCalendar />} />
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/menu" element={<DigitalMenu />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           )}
