@@ -21,7 +21,7 @@
  */
 
 import { createRemoteJWKSet, jwtVerify } from 'jose';
-import pdfParse from 'pdf-parse/lib/pdf-parse.js';
+import { PDFParse } from 'pdf-parse';
 
 const FIREBASE_JWKS = createRemoteJWKSet(
   new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com')
@@ -238,7 +238,9 @@ export default async function handler(req, res) {
     // Extract text from PDF, send as plain text to GPT-4o
     let pdfText;
     try {
-      const result = await pdfParse(fileBytes);
+      const parser = new PDFParse({ data: fileBytes });
+      const result = await parser.getText();
+      await parser.destroy();
       pdfText = result.text?.trim();
     } catch (e) {
       return res.status(400).json({ error: 'Could not read PDF. Try uploading a JPG or PNG photo of the menu instead.' });
