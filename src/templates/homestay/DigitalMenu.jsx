@@ -16,7 +16,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { QRCodeSVG } from 'qrcode.react';
-import { Plus, Trash2, X, QrCode, Download, Edit2, Check } from 'lucide-react';
+import { Plus, Trash2, X, QrCode, Download, Edit2, Check, Upload } from 'lucide-react';
 import { db } from '../../services/firebase';
 import { useAuthContext } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -55,7 +55,7 @@ function groupByCategory(items) {
 // ---------------------------------------------------------------------------
 
 export default function DigitalMenu() {
-  const { selectedProperty } = useAuthContext();
+  const { selectedProperty, firebaseUser } = useAuthContext();
   const propertyId = selectedProperty?.id || selectedProperty?.supabase_property_id || 'default';
   const menuUrl = `${window.location.origin}/menu/${propertyId}`;
 
@@ -69,6 +69,18 @@ export default function DigitalMenu() {
   const [showQR, setShowQR]       = useState(false);
 
   const qrRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Upload Menu state
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [extractedItems,  setExtractedItems]  = useState([]);
+  const [uploading,       setUploading]       = useState(false);
+  const [publishing,      setPublishing]      = useState(false);
+  const [uploadError,     setUploadError]     = useState('');
+  const [publishError,    setPublishError]    = useState('');
+  const [selectedFile,    setSelectedFile]    = useState(null);
+  const [previewUrl,      setPreviewUrl]      = useState(null);
 
   // Real-time listener on Firestore
   useEffect(() => {
@@ -194,6 +206,114 @@ export default function DigitalMenu() {
   }
 
   // ---------------------------------------------------------------------------
+  // Upload Menu handlers
+  // ---------------------------------------------------------------------------
+
+  function openUploadModal() {
+    setSelectedFile(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setUploadError('');
+    setUploadModalOpen(true);
+  }
+
+  function closeUploadModal() {
+    setUploadModalOpen(false);
+    setSelectedFile(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+    setUploadError('');
+  }
+
+  function handleFileSelect(file) {
+    if (!file) return;
+    const ALLOWED = ['image/jpeg', 'image/png', 'application/pdf'];
+    if (!ALLOWED.includes(file.type)) {
+      setUploadError('Only JPG, PNG, or PDF files are supported.');
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setUploadError('File must be under 4 MB.');
+      return;
+    }
+    setUploadError('');
+    setSelectedFile(file);
+    if (file.type !== 'application/pdf') {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPreviewUrl(null);
+    }
+  }
+
+  async function handleExtract() {
+    if (!selectedFile) return;
+    setUploading(true);
+    setUploadError('');
+    try {
+      const token = await firebaseUser.getIdToken();
+      const fd = new FormData();
+      fd.append('file', selectedFile);
+      const res = await fetch('/api/extract-menu', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Extraction failed');
+      if (!data.items?.length) {
+        setUploadError('No menu items found in the image. Try a clearer photo.');
+        return;
+      }
+      setExtractedItems(data.items.map((item, idx) => ({ ...item, _key: idx })));
+      setUploadModalOpen(false);
+      setReviewModalOpen(true);
+    } catch (e) {
+      setUploadError(e.message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function updateExtractedItem(key, field, value) {
+    setExtractedItems(prev =>
+      prev.map(item => item._key === key ? { ...item, [field]: value } : item)
+    );
+  }
+
+  function removeExtractedItem(key) {
+    setExtractedItems(prev => prev.filter(item => item._key !== key));
+  }
+
+  async function handlePublish() {
+    if (!extractedItems.length) return;
+    setPublishing(true);
+    setPublishError('');
+    const colRef = collection(db, 'menus', propertyId, 'items');
+    try {
+      await Promise.all(
+        extractedItems.map(item =>
+          addDoc(colRef, {
+            name:        item.name.trim(),
+            category:    CATEGORIES.includes(item.category) ? item.category : 'Specials',
+            price:       Number(item.price) || 0,
+            isVeg:       Boolean(item.isVeg),
+            description: (item.description ?? '').trim(),
+            available:   true,
+            createdAt:   serverTimestamp(),
+          })
+        )
+      );
+      setReviewModalOpen(false);
+      setExtractedItems([]);
+    } catch (e) {
+      setPublishError(`Failed to publish: ${e.message}`);
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Render
   // ---------------------------------------------------------------------------
 
@@ -216,13 +336,20 @@ export default function DigitalMenu() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <button
               onClick={() => setShowQR(true)}
               style={outlineBtn}
             >
               <QrCode size={15} />
               View QR
+            </button>
+            <button
+              onClick={openUploadModal}
+              style={outlineBtn}
+            >
+              <Upload size={15} />
+              Upload Menu
             </button>
             <button
               onClick={openAdd}
@@ -458,6 +585,204 @@ export default function DigitalMenu() {
               </button>
 
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Menu modal */}
+      {uploadModalOpen && (
+        <div
+          onClick={closeUploadModal}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#16151f', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', maxWidth: '480px', padding: '28px', position: 'relative' }}
+          >
+            <button onClick={closeUploadModal} style={closeBtn}><X size={16} /></button>
+
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#f0eee8', marginBottom: '6px' }}>
+              Upload Menu
+            </h3>
+            <p style={{ fontSize: '13px', color: '#56546a', marginBottom: '20px' }}>
+              Upload a photo or PDF of your menu. AI will extract all items for you to review.
+            </p>
+
+            {/* Drop zone */}
+            <div
+              onDragOver={e => e.preventDefault()}
+              onDrop={e => { e.preventDefault(); handleFileSelect(e.dataTransfer.files?.[0]); }}
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                border: `2px dashed ${selectedFile ? 'rgba(108,99,255,0.6)' : 'rgba(255,255,255,0.12)'}`,
+                borderRadius: '12px', padding: '32px 20px', textAlign: 'center',
+                cursor: 'pointer', marginBottom: '16px',
+                background: selectedFile ? 'rgba(108,99,255,0.06)' : 'transparent',
+                transition: 'border-color 0.2s, background 0.2s',
+              }}
+            >
+              {previewUrl && (
+                <img
+                  src={previewUrl}
+                  alt="Menu preview"
+                  style={{ maxHeight: '180px', maxWidth: '100%', borderRadius: '8px', objectFit: 'contain', marginBottom: '12px' }}
+                />
+              )}
+              {selectedFile && !previewUrl && (
+                <div style={{ fontSize: '13px', color: '#a896f8', marginBottom: '12px', wordBreak: 'break-all' }}>
+                  {selectedFile.name}
+                </div>
+              )}
+              <Upload size={24} style={{ color: '#56546a', margin: '0 auto 8px', display: 'block' }} />
+              <p style={{ fontSize: '13px', color: '#8c8a9e', margin: 0 }}>
+                {selectedFile ? 'Click or drag to replace' : 'Drag & drop or click to browse'}
+              </p>
+              <p style={{ fontSize: '11px', color: '#56546a', marginTop: '4px' }}>
+                JPG, PNG, or PDF — max 4 MB
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,application/pdf"
+                style={{ display: 'none' }}
+                onChange={e => handleFileSelect(e.target.files?.[0])}
+              />
+            </div>
+
+            {uploadError && (
+              <p style={{ fontSize: '12px', color: '#e07070', marginBottom: '12px' }}>{uploadError}</p>
+            )}
+
+            <button
+              onClick={handleExtract}
+              disabled={!selectedFile || uploading}
+              style={{
+                ...primaryBtn,
+                width: '100%', justifyContent: 'center',
+                opacity: (!selectedFile || uploading) ? 0.5 : 1,
+                cursor: (!selectedFile || uploading) ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {uploading
+                ? <><LoadingSpinner size="sm" color="white" />&nbsp;Extracting items…</>
+                : 'Extract Items'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Review Extracted Items modal */}
+      {reviewModalOpen && (
+        <div
+          onClick={() => { if (!publishing) setReviewModalOpen(false); }}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#16151f', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', maxWidth: '860px', padding: '28px', position: 'relative', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}
+          >
+            {!publishing && (
+              <button onClick={() => setReviewModalOpen(false)} style={closeBtn}><X size={16} /></button>
+            )}
+
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#f0eee8', marginBottom: '4px', flexShrink: 0 }}>
+              Review Extracted Items
+            </h3>
+            <p style={{ fontSize: '13px', color: '#56546a', marginBottom: '20px', flexShrink: 0 }}>
+              {extractedItems.length} item{extractedItems.length !== 1 ? 's' : ''} found. Edit or remove before publishing.
+            </p>
+
+            {/* Scrollable table */}
+            <div style={{ flex: 1, overflowY: 'auto', marginBottom: '16px' }}>
+              {extractedItems.length === 0 ? (
+                <p style={{ textAlign: 'center', color: '#56546a', padding: '40px 0', fontSize: '13px' }}>
+                  All items removed.
+                </p>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                      {['Name', 'Category', 'Price (₹)', 'Veg', 'Description', ''].map(h => (
+                        <th key={h} style={{ textAlign: 'left', padding: '8px 10px', color: '#56546a', fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {extractedItems.map(item => (
+                      <tr key={item._key} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <td style={{ padding: '6px 10px' }}>
+                          <input
+                            value={item.name}
+                            onChange={e => updateExtractedItem(item._key, 'name', e.target.value)}
+                            style={{ ...inputStyle, width: '140px' }}
+                          />
+                        </td>
+                        <td style={{ padding: '6px 10px' }}>
+                          <select
+                            value={item.category}
+                            onChange={e => updateExtractedItem(item._key, 'category', e.target.value)}
+                            style={{ ...inputStyle, width: '120px' }}
+                          >
+                            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </td>
+                        <td style={{ padding: '6px 10px' }}>
+                          <input
+                            type="number" min="0"
+                            value={item.price}
+                            onChange={e => updateExtractedItem(item._key, 'price', e.target.value)}
+                            style={{ ...inputStyle, width: '80px' }}
+                          />
+                        </td>
+                        <td style={{ padding: '6px 10px', textAlign: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={Boolean(item.isVeg)}
+                            onChange={e => updateExtractedItem(item._key, 'isVeg', e.target.checked)}
+                            style={{ accentColor: '#22c55e', width: '16px', height: '16px', cursor: 'pointer' }}
+                          />
+                        </td>
+                        <td style={{ padding: '6px 10px' }}>
+                          <input
+                            value={item.description}
+                            onChange={e => updateExtractedItem(item._key, 'description', e.target.value)}
+                            style={{ ...inputStyle, width: '200px' }}
+                          />
+                        </td>
+                        <td style={{ padding: '6px 10px' }}>
+                          <button
+                            onClick={() => removeExtractedItem(item._key)}
+                            style={{ ...iconBtn, color: '#e07070' }}
+                            title="Remove"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {publishError && (
+              <p style={{ fontSize: '12px', color: '#e07070', marginBottom: '12px', flexShrink: 0 }}>{publishError}</p>
+            )}
+
+            <button
+              onClick={handlePublish}
+              disabled={publishing || extractedItems.length === 0}
+              style={{
+                ...primaryBtn,
+                alignSelf: 'flex-end', flexShrink: 0,
+                opacity: (publishing || extractedItems.length === 0) ? 0.5 : 1,
+                cursor: (publishing || extractedItems.length === 0) ? 'not-allowed' : 'pointer',
+              }}
+            >
+              {publishing
+                ? <><LoadingSpinner size="sm" color="white" />&nbsp;Publishing…</>
+                : `Publish ${extractedItems.length} Item${extractedItems.length !== 1 ? 's' : ''}`}
+            </button>
           </div>
         </div>
       )}

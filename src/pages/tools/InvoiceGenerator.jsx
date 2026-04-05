@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { jsPDF } from 'jspdf';
@@ -279,9 +280,85 @@ export default function InvoiceGenerator() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
-        <title>Free Invoice Generator for Villa & Homestay — Chakrio</title>
-        <meta name="description" content="Generate professional guest invoices for your villa or homestay in seconds. Free, no sign-up required. Download as PDF instantly." />
-        <link rel="canonical" href="https://chakrio.in/tools/invoice-generator" />
+        <title>Free Villa &amp; Homestay Invoice Generator — PDF | Chakrio</title>
+        <meta name="description" content="Generate a professional guest invoice for your villa, homestay, or guesthouse in seconds. GST support included. Free PDF download — no sign-up required." />
+        <link rel="canonical" href="https://chakrio.com/tools/invoice-generator" />
+        <meta property="og:title" content="Free Villa & Homestay Invoice Generator — PDF | Chakrio" />
+        <meta property="og:description" content="Generate a professional guest invoice for your villa, homestay, or guesthouse in seconds. GST support included. Free PDF download — no sign-up required." />
+        <meta property="og:url" content="https://chakrio.com/tools/invoice-generator" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://chakrio.com/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Free Villa & Homestay Invoice Generator — PDF | Chakrio" />
+        <meta name="twitter:description" content="Generate a professional guest invoice for your villa or homestay in seconds. GST support. Free PDF — no sign-up." />
+        <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Free Villa & Homestay Invoice Generator — PDF | Chakrio",
+          "url": "https://chakrio.com/tools/invoice-generator",
+          "description": "Generate a professional guest invoice for your villa, homestay, or guesthouse in seconds. GST support included. Free PDF download — no sign-up required.",
+          "datePublished": "2025-01-01",
+          "dateModified": "2026-04-05",
+          "author": { "@type": "Organization", "name": "Chakrio", "url": "https://chakrio.com" },
+          "publisher": { "@type": "Organization", "name": "Chakrio", "logo": { "@type": "ImageObject", "url": "https://chakrio.com/og-image.png" } },
+          "isPartOf": { "@type": "WebSite", "name": "Chakrio", "url": "https://chakrio.com" }
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chakrio.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Free Tools", "item": "https://chakrio.com/#tools" },
+            { "@type": "ListItem", "position": 3, "name": "Villa & Homestay Invoice Generator", "item": "https://chakrio.com/tools/invoice-generator" }
+          ]
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How do I create an invoice for a villa or homestay stay?",
+              "acceptedAnswer": { "@type": "Answer", "text": "To create an invoice for a villa or homestay stay: (1) Enter your property name and address. (2) Add the guest's name and phone number. (3) Set the check-in and check-out dates — the tool calculates nights automatically. (4) Enter the stay charges and select a GST rate if applicable. (5) Add any extra charges (breakfast, transfers, etc.). (6) Enter the advance paid to show the balance due. (7) Click Download PDF Invoice. The invoice downloads instantly — no sign-up required." }
+            },
+            {
+              "@type": "Question",
+              "name": "Is GST applicable on villa and homestay stays in India?",
+              "acceptedAnswer": { "@type": "Answer", "text": "GST on hotel and homestay stays in India depends on the room tariff: (1) Rooms priced below ₹1,000/night — exempt from GST. (2) Rooms between ₹1,001 and ₹7,500/night — 12% GST. (3) Rooms above ₹7,500/night — 18% GST. GST registration is required if your annual turnover exceeds ₹20 lakhs. Small homestays and villas below this threshold are not required to charge GST. Consult a tax professional for your specific situation." }
+            },
+            {
+              "@type": "Question",
+              "name": "What should a villa or homestay invoice include?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A professional villa or homestay invoice should include: (1) Property name and address. (2) Guest name and contact details. (3) Invoice number and invoice date. (4) Check-in and check-out dates, and total nights stayed. (5) Stay charges per night or as a total. (6) Any extra charges (breakfast, airport transfer, housekeeping). (7) GST rate and GST amount (if applicable). (8) Total amount, advance paid, and balance due. This tool generates all of these in a clean PDF format." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I download a free hotel invoice PDF without signing up?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Chakrio's Villa & Homestay Invoice Generator is completely free to use with no sign-up or account required. Fill in the stay details, preview the totals, and download a clean PDF invoice instantly. There are no watermarks on the downloaded invoice." }
+            },
+            {
+              "@type": "Question",
+              "name": "What is the standard invoice format for a guesthouse in India?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A standard guesthouse invoice format in India includes: property details at the top (name, address, GSTIN if registered), guest details (name, phone), stay period (check-in, check-out, number of nights), an itemised list of charges (stay, extras, GST), and a summary showing total, advance paid, and balance due. The invoice should have a unique invoice number and the date of issue. This tool generates a ready-to-share PDF in this format for free." }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need to issue an invoice for every guest stay?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes, it is good practice — and often legally required — to issue an invoice for every guest stay. If you are GST-registered, you must issue a tax invoice for every transaction. Even if not GST-registered, an invoice protects you and your guest by documenting the agreed charges, advance paid, and balance due. It also reduces disputes at checkout and builds trust with corporate and OTA guests." }
+            },
+            {
+              "@type": "Question",
+              "name": "How is a homestay invoice different from a hotel invoice?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A homestay invoice is typically simpler than a hotel invoice. It usually covers: a flat stay charge for the entire period, optional extras (meals, activities, transport), and the advance deposit already paid. Large hotels may include room service, minibar, laundry, and other itemised charges. For most Indian homestays and villas, a clean invoice with stay charges, GST (if applicable), advance paid, and balance due is sufficient and professional." }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I use this invoice generator for multiple properties?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can use this invoice generator for any number of properties — simply enter a different property name and address each time. Each invoice generates a unique invoice number automatically. If you manage multiple properties and want to auto-record all bookings, expenses, and invoices in one place, Chakrio's property management tool does this automatically via a Telegram chatbot." }
+            }
+          ]
+        })}</script>
       </Helmet>
 
       <Navbar />
@@ -480,6 +557,37 @@ export default function InvoiceGenerator() {
             body="Chakrio auto-records every booking, payment, and expense via a simple Telegram message — and your dashboard stays up to date in real time."
             buttonText="Try Chakrio Free →"
           />
+        </div>
+
+        {/* Related tools */}
+        <div className="mt-10">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Link to="/tools/occupancy-calculator"
+              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+              <p className="font-medium text-text-1 mb-1">Hotel Occupancy Rate Calculator</p>
+              <p className="text-text-2 text-sm">Calculate your property's occupancy rate for any period.</p>
+            </Link>
+            <Link to="/tools/rental-income-calculator"
+              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+              <p className="font-medium text-text-1 mb-1">Rental Income Calculator</p>
+              <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
+            </Link>
+            <Link to="/tools/cancellation-policy"
+              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+              <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
+              <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
+            </Link>
+          </div>
         </div>
       </main>
 

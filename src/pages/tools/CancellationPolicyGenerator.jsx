@@ -366,7 +366,7 @@ export default function CancellationPolicyGenerator() {
         {/* Related tools */}
         <div className="mt-10">
           <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4">
             <Link to="/tools/occupancy-calculator" className="bg-surface rounded-xl border border-surface3 hover:border-accent/40 p-5 transition-colors group">
               <p className="font-medium text-text-1 group-hover:text-accent transition-colors mb-1">Occupancy Rate Calculator</p>
               <p className="text-text-2 text-sm">Calculate your property's occupancy rate for any period.</p>
@@ -374,6 +374,10 @@ export default function CancellationPolicyGenerator() {
             <Link to="/tools/rental-income-calculator" className="bg-surface rounded-xl border border-surface3 hover:border-accent/40 p-5 transition-colors group">
               <p className="font-medium text-text-1 group-hover:text-accent transition-colors mb-1">Rental Income Calculator</p>
               <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
+            </Link>
+            <Link to="/tools/invoice-generator" className="bg-surface rounded-xl border border-surface3 hover:border-accent/40 p-5 transition-colors group">
+              <p className="font-medium text-text-1 group-hover:text-accent transition-colors mb-1">Villa & Homestay Invoice Generator</p>
+              <p className="text-text-2 text-sm">Generate a professional PDF invoice for your guests. No sign-up required.</p>
             </Link>
           </div>
         </div>

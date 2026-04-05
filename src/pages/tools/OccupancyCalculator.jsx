@@ -290,13 +290,13 @@ export default function OccupancyCalculator() {
         {/* Related tools */}
         <div className="mt-10">
           <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4">
             <Link to="/tools/rental-income-calculator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors group"
               style={{ textDecoration: 'none' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1 transition-colors" style={{}}>Rental Income Calculator</p>
+              <p className="font-medium text-text-1 mb-1 transition-colors">Rental Income Calculator</p>
               <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
             </Link>
             <Link to="/tools/cancellation-policy"
@@ -306,6 +306,14 @@ export default function OccupancyCalculator() {
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
               <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
+            </Link>
+            <Link to="/tools/invoice-generator"
+              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors group"
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+              <p className="font-medium text-text-1 mb-1">Villa & Homestay Invoice Generator</p>
+              <p className="text-text-2 text-sm">Generate a professional PDF invoice for your guests. No sign-up required.</p>
             </Link>
           </div>
         </div>
