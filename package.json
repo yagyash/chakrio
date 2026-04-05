@@ -19,7 +19,7 @@
     "jose": "^6.0.0",
     "jspdf": "^4.2.1",
     "lucide-react": "^0.576.0",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
