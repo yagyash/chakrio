@@ -259,7 +259,12 @@ export default function DigitalMenu() {
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error('Server error — please try again. If the issue persists, contact support.');
+      }
       if (!res.ok) throw new Error(data.error ?? 'Extraction failed');
       if (!data.items?.length) {
         setUploadError('No menu items found in the image. Try a clearer photo.');
