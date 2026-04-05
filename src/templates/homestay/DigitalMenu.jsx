@@ -27,6 +27,13 @@ import LoadingSpinner from '../../components/shared/LoadingSpinner';
 
 const CATEGORIES = ['Breakfast', 'Lunch', 'Dinner', 'Snacks', 'Beverages', 'Desserts', 'Specials'];
 
+function toMenuSlug(name) {
+  return (name || 'menu')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
 const EMPTY_FORM = {
   name: '',
   category: 'Snacks',
@@ -57,7 +64,8 @@ function groupByCategory(items) {
 export default function DigitalMenu() {
   const { selectedProperty, firebaseUser } = useAuthContext();
   const propertyId = selectedProperty?.id || selectedProperty?.supabase_property_id || 'default';
-  const menuUrl = `${window.location.origin}/menu/${propertyId}`;
+  const menuSlug = toMenuSlug(selectedProperty?.property_name) || propertyId;
+  const menuUrl = `${window.location.origin}/menu/${menuSlug}`;
 
   const [items, setItems]         = useState([]);
   const [loading, setLoading]     = useState(true);
@@ -84,8 +92,8 @@ export default function DigitalMenu() {
 
   // Real-time listener on Firestore
   useEffect(() => {
-    if (!propertyId) return;
-    const colRef = collection(db, 'menus', propertyId, 'items');
+    if (!menuSlug) return;
+    const colRef = collection(db, 'menus', menuSlug, 'items');
     const unsub = onSnapshot(
       colRef,
       snap => {
@@ -98,7 +106,7 @@ export default function DigitalMenu() {
       }
     );
     return unsub;
-  }, [propertyId]);
+  }, [menuSlug]);
 
   // ---------------------------------------------------------------------------
   // Form handlers
@@ -146,9 +154,9 @@ export default function DigitalMenu() {
 
     try {
       if (editItem) {
-        await updateDoc(doc(db, 'menus', propertyId, 'items', editItem.id), payload);
+        await updateDoc(doc(db, 'menus', menuSlug, 'items', editItem.id), payload);
       } else {
-        await addDoc(collection(db, 'menus', propertyId, 'items'), {
+        await addDoc(collection(db, 'menus', menuSlug, 'items'), {
           ...payload,
           createdAt: serverTimestamp(),
         });
@@ -164,7 +172,7 @@ export default function DigitalMenu() {
   async function handleDelete(item) {
     if (!window.confirm(`Delete "${item.name}"?`)) return;
     try {
-      await deleteDoc(doc(db, 'menus', propertyId, 'items', item.id));
+      await deleteDoc(doc(db, 'menus', menuSlug, 'items', item.id));
     } catch (e) {
       alert(`Failed to delete: ${e.message}`);
     }
@@ -172,7 +180,7 @@ export default function DigitalMenu() {
 
   async function toggleAvailable(item) {
     try {
-      await updateDoc(doc(db, 'menus', propertyId, 'items', item.id), {
+      await updateDoc(doc(db, 'menus', menuSlug, 'items', item.id), {
         available: !item.available,
       });
     } catch (e) {
@@ -198,7 +206,7 @@ export default function DigitalMenu() {
     img.onload = () => {
       ctx.drawImage(img, 0, 0, size, size);
       const a = document.createElement('a');
-      a.download = `menu-qr-${propertyId}.png`;
+      a.download = `menu-qr-${menuSlug}.png`;
       a.href = canvas.toDataURL('image/png');
       a.click();
     };
@@ -294,7 +302,7 @@ export default function DigitalMenu() {
     if (!extractedItems.length) return;
     setPublishing(true);
     setPublishError('');
-    const colRef = collection(db, 'menus', propertyId, 'items');
+    const colRef = collection(db, 'menus', menuSlug, 'items');
     try {
       await Promise.all(
         extractedItems.map(item =>
