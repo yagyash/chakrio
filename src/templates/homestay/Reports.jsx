@@ -133,108 +133,94 @@ function computeOccupancy(bookings) {
 // ── main component ────────────────────────────────────────────────────────────
 
 export default function Reports() {
-  const { summaryTab, bookingsTab, expensesTab } = useTabNames();
-  const { data: summary,  loading: sLoading, error: sError, refetch: sRefetch } = useSheetData(summaryTab);
-  const { data: bookings, loading: bLoading }                                    = useSheetData(bookingsTab);
-  const { data: expenses, loading: eLoading }                                    = useSheetData(expensesTab);
+  const { bookingsTab, expensesTab } = useTabNames();
+  const { data: bookings, loading: bLoading, error: bError, refetch: bRefetch } = useSheetData(bookingsTab);
+  const { data: expenses, loading: eLoading, error: eError, refetch: eRefetch } = useSheetData(expensesTab);
 
   const [selectedMonth, setSelectedMonth] = useState('');
 
-  // ── detect columns in Summary tab ────────────────────────────────────────
-  const cols = useMemo(() => numericCols(summary), [summary]);
-  const labelCol = useMemo(() => detectLabelCol(summary, cols), [summary, cols]);
-
-  const revenueCol   = useMemo(() => findCol(cols, ['revenue', 'income', 'receipt', 'collected', 'earning', 'booking amount']), [cols]);
-  const expenseCol   = useMemo(() => findCol(cols, ['expense', 'cost', 'spend', 'expenditure', 'payment', 'outgo']),             [cols]);
-  const profitCol    = useMemo(() => findCol(cols, ['profit', 'net', 'surplus', 'margin', 'p&l', 'pnl']),                       [cols]);
-  const occupancyCol = useMemo(() => findCol(cols, ['occupancy', 'occupied', 'utiliz', 'fill', 'occ %', 'occ%']),               [cols]);
-
-  // ── month options from summary label column ────────────────────────────────
+  // ── current month YYYY-MM ─────────────────────────────────────────────────
   const currentYM = useMemo(() => {
     const n = new Date();
     return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}`;
   }, []);
 
-  const monthOptions = useMemo(() => {
-    const base = labelCol ? summary.map((r) => r[labelCol]).filter(Boolean) : [];
-    // Always ensure the current month appears in the list even if the monthly
-    // summary hasn't been generated yet (month still in progress)
-    const alreadyHasCurrent = base.some((m) => toYearMonth(String(m)) === currentYM);
-    return alreadyHasCurrent ? base : [...base, currentYM];
-  }, [summary, labelCol, currentYM]);
+  // ── aggregate bookings + expenses by month ────────────────────────────────
+  const monthlyData = useMemo(() => {
+    const map = {};
 
-  const activeMonth = useMemo(() => {
-    if (selectedMonth) return selectedMonth;
-    // Prefer an exact match from the summary; fall back to the injected currentYM entry
-    const match = monthOptions.find((m) => toYearMonth(String(m)) === currentYM);
-    return match ?? currentYM;
-  }, [selectedMonth, monthOptions, currentYM]);
-
-  // ── hide all-zero rows in summary table ───────────────────────────────────
-  const nonEmptySummary = useMemo(
-    () => cols.length
-      ? summary.filter((row) => cols.some((c) => Number(row[c] || 0) !== 0))
-      : summary,
-    [summary, cols],
-  );
-
-  // ── selected month P&L row ─────────────────────────────────────────────────
-  const plRow = useMemo(() => {
-    if (!labelCol || !activeMonth) return null;
-    return summary.find((r) => r[labelCol] === activeMonth) ?? null;
-  }, [summary, labelCol, activeMonth]);
-
-  // ── live P&L for current month when no summary row exists yet ─────────────
-  // Computed directly from Supabase bookings + expenses tables
-  const livePL = useMemo(() => {
-    if (plRow) return null; // summary row exists — use it, no need for live calc
-    const activeYM = toYearMonth(String(activeMonth));
-    if (!activeYM) return null;
-
-    const filterByMonth = (rows, dateKeys) => rows.filter((r) => {
-      const val = dateKeys.map((k) => r[k]).find(Boolean);
-      return val && toYearMonth(String(val)) === activeYM;
+    bookings.forEach((r) => {
+      const ym = toYearMonth(String(r['Check-in'] ?? r['check_in'] ?? ''));
+      if (!ym) return;
+      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, bookingCount: 0 };
+      map[ym].revenue += Number(r['Total_Amount'] ?? 0);
+      map[ym].bookingCount += 1;
     });
 
-    const monthBookings = filterByMonth(bookings, ['Check-in', 'check_in', 'Check In', 'Date']);
-    const monthExpenses = filterByMonth(expenses, ['Date', 'date', 'created_at']);
+    expenses.forEach((r) => {
+      const ym = toYearMonth(String(r['Date'] ?? r['date'] ?? ''));
+      if (!ym) return;
+      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, bookingCount: 0 };
+      map[ym].expense += Number(r['Amount'] ?? 0);
+    });
 
-    const revenue = monthBookings.reduce((s, r) => {
-      const v = r['Total_Amount'] ?? r['total_amount'] ?? r['Total Amount'] ?? 0;
-      return s + Number(v || 0);
-    }, 0);
-    const expense = monthExpenses.reduce((s, r) => {
-      const v = r['Amount'] ?? r['amount'] ?? 0;
-      return s + Number(v || 0);
-    }, 0);
+    // Always include current month even if no data yet
+    if (!map[currentYM]) map[currentYM] = { revenue: 0, expense: 0, bookingCount: 0 };
 
-    return {
-      'Monthly Revenue': revenue,
-      'Monthly Expense': expense,
-      'Net Profit':      revenue - expense,
-      'Booking Count':   monthBookings.length,
-      _isLive: true,
-    };
-  }, [plRow, activeMonth, bookings, expenses]);
+    Object.keys(map).forEach((ym) => {
+      map[ym].profit = map[ym].revenue - map[ym].expense;
+    });
 
-  // ── chart series builders ──────────────────────────────────────────────────
-  const makeChartData = (col) =>
-    summary
-      .filter((r) => r[labelCol] !== undefined)
-      .map((r) => ({ label: r[labelCol], value: Number(r[col] || 0) }));
+    return map;
+  }, [bookings, expenses, currentYM]);
 
-  const revenueData   = useMemo(() => revenueCol   ? makeChartData(revenueCol)   : [], [summary, revenueCol,   labelCol]);
-  const expenseData   = useMemo(() => expenseCol   ? makeChartData(expenseCol)   : [], [summary, expenseCol,   labelCol]);
-  const profitData    = useMemo(() => profitCol    ? makeChartData(profitCol)    : [], [summary, profitCol,    labelCol]);
+  // ── sorted month list for picker ──────────────────────────────────────────
+  const monthOptions = useMemo(
+    () => Object.keys(monthlyData).sort(),
+    [monthlyData],
+  );
 
-  // ── occupancy: from Summary col OR computed from Bookings ─────────────────
-  const occupancyData = useMemo(() => {
-    if (occupancyCol && labelCol) return makeChartData(occupancyCol).map((d) => ({ ...d, value: Number(d.value) }));
-    return computeOccupancy(bookings);
-  }, [summary, occupancyCol, labelCol, bookings]);
+  const activeMonth = useMemo(() => {
+    if (selectedMonth && monthlyData[selectedMonth]) return selectedMonth;
+    return currentYM;
+  }, [selectedMonth, monthlyData, currentYM]);
+
+  // ── selected month P&L ────────────────────────────────────────────────────
+  const plData = useMemo(() => monthlyData[activeMonth] ?? { revenue: 0, expense: 0, profit: 0, bookingCount: 0 }, [monthlyData, activeMonth]);
+
+  // ── chart series (all months sorted) ─────────────────────────────────────
+  const sortedMonths = useMemo(() => monthOptions, [monthOptions]);
+
+  const revenueData = useMemo(
+    () => sortedMonths.map((ym) => ({ label: ym, value: monthlyData[ym]?.revenue ?? 0 })),
+    [sortedMonths, monthlyData],
+  );
+  const expenseData = useMemo(
+    () => sortedMonths.map((ym) => ({ label: ym, value: monthlyData[ym]?.expense ?? 0 })),
+    [sortedMonths, monthlyData],
+  );
+  const profitData = useMemo(
+    () => sortedMonths.map((ym) => ({ label: ym, value: monthlyData[ym]?.profit ?? 0 })),
+    [sortedMonths, monthlyData],
+  );
+
+  // ── occupancy computed from bookings ─────────────────────────────────────
+  const occupancyData = useMemo(() => computeOccupancy(bookings), [bookings]);
+
+  // ── full table — one row per month ────────────────────────────────────────
+  const tableRows = useMemo(
+    () => sortedMonths.map((ym) => ({
+      Month:   formatMonthLabel(ym),
+      Revenue: monthlyData[ym]?.revenue ?? 0,
+      Expenses: monthlyData[ym]?.expense ?? 0,
+      'Net Profit': monthlyData[ym]?.profit ?? 0,
+      Bookings: monthlyData[ym]?.bookingCount ?? 0,
+    })),
+    [sortedMonths, monthlyData],
+  );
 
   // ── loading / error ───────────────────────────────────────────────────────
-  if (sLoading || bLoading || eLoading) {
+  if (bLoading || eLoading) {
     return (
       <div className="flex-1 flex items-center justify-center py-20">
         <LoadingSpinner size="lg" />
@@ -242,12 +228,11 @@ export default function Reports() {
     );
   }
 
-  if (sError) {
+  if (bError || eError) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center py-20 gap-3 text-sm" style={{ color: '#56546a' }}>
-        <p>Failed to load <strong style={{ color: '#8c8a9e' }}>"{summaryTab}"</strong> tab.</p>
-        <p style={{ fontSize: '12px', color: '#56546a' }}>{sError}</p>
-        <button onClick={sRefetch} style={{ background: 'linear-gradient(135deg,#7c6af5,#a896f8)', color: '#fff', padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 500 }}>Retry</button>
+        <p>Failed to load data.</p>
+        <button onClick={() => { bRefetch(); eRefetch(); }} style={{ background: 'linear-gradient(135deg,#7c6af5,#a896f8)', color: '#fff', padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: 500 }}>Retry</button>
       </div>
     );
   }
@@ -260,62 +245,53 @@ export default function Reports() {
 
         {/* ── toolbar ─────────────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-end justify-between gap-3 no-print animate-fade-in-up">
-          {monthOptions.length > 0 && (
-            <div>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#56546a', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                Select Month
-              </label>
-              <select
-                value={activeMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                style={{
-                  padding: '8px 14px',
-                  background: '#1e1c2a',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  color: '#f0eee8',
-                  outline: 'none',
-                  cursor: 'pointer',
-                  transition: 'border-color 0.15s ease',
-                }}
-                onFocus={e => e.target.style.borderColor = 'rgba(200,169,110,0.4)'}
-                onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
-              >
-                {monthOptions.map((m) => (
-                  <option key={m} value={m}>{formatMonthLabel(m)}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div>
+            <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#56546a', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+              Select Month
+            </label>
+            <select
+              value={activeMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              style={{
+                padding: '8px 14px',
+                background: '#1e1c2a',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '10px',
+                fontSize: '14px',
+                color: '#f0eee8',
+                outline: 'none',
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease',
+              }}
+              onFocus={e => e.target.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+            >
+              {monthOptions.map((ym) => (
+                <option key={ym} value={ym}>{formatMonthLabel(ym)}</option>
+              ))}
+            </select>
+          </div>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            {summary.length > 0 && (
-              <button
-                onClick={() => {
-                  const rows = plRow ? [plRow] : summary;
-                  const name = activeMonth ? `${summaryTab}_${activeMonth}` : summaryTab;
-                  downloadCSV(rows, name);
-                }}
-                title={activeMonth ? `Download ${activeMonth} as CSV` : 'Download all months as CSV'}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '8px 16px',
-                  background: '#1e1c2a',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: '8px',
-                  color: '#8c8a9e',
-                  fontSize: '12px',
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  transition: 'border-color 0.15s ease, color 0.15s ease',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#f0eee8'; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#8c8a9e'; }}
-              >
-                <DownloadIcon />
-                {activeMonth ? `${formatMonthLabel(activeMonth)} CSV` : 'All months'}
-              </button>
-            )}
+            <button
+              onClick={() => downloadCSV(tableRows, `report_${activeMonth}`)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 16px',
+                background: '#1e1c2a',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                color: '#8c8a9e',
+                fontSize: '12px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'border-color 0.15s ease, color 0.15s ease',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; e.currentTarget.style.color = '#f0eee8'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#8c8a9e'; }}
+            >
+              <DownloadIcon />
+              {formatMonthLabel(activeMonth)} CSV
+            </button>
             <button
               onClick={() => window.print()}
               style={{
@@ -340,144 +316,74 @@ export default function Reports() {
         </div>
 
         {/* ── P&L summary strip for selected month ────────────────────────── */}
-        {(plRow || livePL) && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in-up stagger-2">
-            {livePL?._isLive && (
-              <div style={{ gridColumn: '1 / -1', fontSize: '11px', color: '#c8a96e', marginBottom: '-4px' }}>
-                Live data — monthly summary not yet generated for this period
-              </div>
-            )}
-            <PLCard
-              label="Revenue"
-              value={`₹${fmt(plRow ? plRow[revenueCol] : livePL?.['Monthly Revenue'])}`}
-              color="emerald"
-            />
-            <PLCard
-              label="Expenses"
-              value={`₹${fmt(plRow ? plRow[expenseCol] : livePL?.['Monthly Expense'])}`}
-              color="rose"
-            />
-            <PLCard
-              label="Net Profit"
-              value={`₹${fmt(plRow ? plRow[profitCol] : livePL?.['Net Profit'])}`}
-              color={(plRow ? Number(plRow[profitCol]) : livePL?.['Net Profit'] ?? 0) >= 0 ? 'emerald' : 'rose'}
-            />
-            {(occupancyCol || occupancyData.find((d) => d.label === activeMonth)) && (
-              <PLCard
-                label="Occupancy"
-                value={fmtPc(
-                  occupancyCol && plRow
-                    ? plRow[occupancyCol]
-                    : (occupancyData.find((d) => d.label === activeMonth)?.Occupancy ?? occupancyData.find((d) => d.label === activeMonth)?.value ?? 0)
-                )}
-                color="blue"
-              />
-            )}
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in-up stagger-2">
+          <PLCard label="Revenue"    value={`₹${fmt(plData.revenue)}`} color="emerald" />
+          <PLCard label="Expenses"   value={`₹${fmt(plData.expense)}`} color="rose" />
+          <PLCard label="Net Profit" value={`₹${fmt(plData.profit)}`}  color={plData.profit >= 0 ? 'emerald' : 'rose'} />
+          <PLCard label="Bookings"   value={plData.bookingCount}        color="blue" />
+        </div>
 
         {/* ── 4 chart panels ──────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
           {/* Revenue */}
-          <ChartCard
-            title="Monthly Revenue"
-            col={revenueCol}
-            hint="Add a column containing 'revenue' or 'income' to your Summary tab"
-            className="animate-fade-in-up stagger-3"
-          >
-            {revenueData.length > 0 && (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={revenueData} barGap={4} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltip prefix="₹" />} />
-                  <Bar dataKey="value" name={revenueCol} fill="#7c6af5" radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey="value" position="top"
-                      formatter={(v) => v > 0 ? `₹${(v/1000).toFixed(1)}k` : ''}
-                      style={{ fontSize: 9, fill: '#56546a' }} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+          <ChartCard title="Monthly Revenue" className="animate-fade-in-up stagger-3">
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={revenueData} barGap={4} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Bar dataKey="value" name="Revenue" fill="#7c6af5" radius={[4, 4, 0, 0]}>
+                  <LabelList dataKey="value" position="top"
+                    formatter={(v) => v > 0 ? `₹${(v/1000).toFixed(1)}k` : ''}
+                    style={{ fontSize: 9, fill: '#56546a' }} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </ChartCard>
 
           {/* Expenses */}
-          <ChartCard
-            title="Monthly Expenses"
-            col={expenseCol}
-            hint="Add a column containing 'expense' or 'cost' to your Summary tab"
-            className="animate-fade-in-up stagger-4"
-          >
-            {expenseData.length > 0 && (
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={expenseData} barGap={4} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltip prefix="₹" />} />
-                  <Bar dataKey="value" name={expenseCol} fill="#e07070" radius={[4, 4, 0, 0]}>
-                    <LabelList dataKey="value" position="top"
-                      formatter={(v) => v > 0 ? `₹${(v/1000).toFixed(1)}k` : ''}
-                      style={{ fontSize: 9, fill: '#56546a' }} />
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            )}
+          <ChartCard title="Monthly Expenses" className="animate-fade-in-up stagger-4">
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={expenseData} barGap={4} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Bar dataKey="value" name="Expenses" fill="#e07070" radius={[4, 4, 0, 0]}>
+                  <LabelList dataKey="value" position="top"
+                    formatter={(v) => v > 0 ? `₹${(v/1000).toFixed(1)}k` : ''}
+                    style={{ fontSize: 9, fill: '#56546a' }} />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </ChartCard>
 
-          {/* Net Profit — AreaChart with gradient fill */}
-          <ChartCard
-            title="Net Monthly Profit"
-            col={profitCol}
-            hint="Add a column containing 'profit' or 'net' to your Summary tab"
-            className="animate-fade-in-up stagger-5"
-          >
-            {profitData.length > 0 && (
-              <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={profitData} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="profitGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#7c6af5" stopOpacity={0.35}/>
-                      <stop offset="100%" stopColor="#7c6af5" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                  <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltip prefix="₹" />} />
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    name={profitCol}
-                    stroke="#7c6af5"
-                    strokeWidth={2.5}
-                    fill="url(#profitGrad)"
-                    dot={{ r: 4, fill: '#7c6af5', strokeWidth: 0 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            )}
+          {/* Net Profit */}
+          <ChartCard title="Net Monthly Profit" className="animate-fade-in-up stagger-5">
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={profitData} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="profitGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#7c6af5" stopOpacity={0.35}/>
+                    <stop offset="100%" stopColor="#7c6af5" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Area type="monotone" dataKey="value" name="Net Profit" stroke="#7c6af5" strokeWidth={2.5}
+                  fill="url(#profitGrad)" dot={{ r: 4, fill: '#7c6af5', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+              </AreaChart>
+            </ResponsiveContainer>
           </ChartCard>
 
           {/* Occupancy */}
           <ChartCard
             title="Monthly Occupancy %"
-            col={occupancyCol ?? (occupancyData.length > 0 ? 'computed' : null)}
-            hint={
-              occupancyData.length === 0
-                ? `Add an 'Occupancy' column to your ${summaryTab} tab, or add a date + nights column in ${bookingsTab}`
-                : null
-            }
-            subtitle={
-              !occupancyCol && occupancyData.length > 0
-                ? `Auto-computed from ${bookingsTab} tab`
-                : occupancyCol
-                ? `From "${occupancyCol}" column`
-                : null
-            }
+            subtitle={occupancyData.length > 0 ? `Computed from ${bookingsTab}` : null}
             className="animate-fade-in-up stagger-6"
           >
             {occupancyData.length > 0 && (
@@ -485,20 +391,9 @@ export default function Reports() {
                 <BarChart data={occupancyData} barGap={4} margin={{ top: 18, right: 8, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                   <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
-                  <YAxis
-                    tick={{ fontSize: 10, fill: '#56546a' }}
-                    tickFormatter={(v) => `${v}%`}
-                    domain={[0, 100]}
-                    axisLine={false}
-                    tickLine={false}
-                  />
+                  <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} axisLine={false} tickLine={false} />
                   <Tooltip content={<ChartTooltip prefix="" suffix="%" />} />
-                  <Bar
-                    dataKey={occupancyCol ? 'value' : 'Occupancy'}
-                    name="Occupancy"
-                    fill="#4ecdc4"
-                    radius={[4, 4, 0, 0]}
-                  />
+                  <Bar dataKey="Occupancy" name="Occupancy" fill="#4ecdc4" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -506,25 +401,22 @@ export default function Reports() {
 
         </div>
 
-        {/* ── full data table ──────────────────────────────────────────────── */}
+        {/* ── full monthly summary table ───────────────────────────────────── */}
         <div className="animate-fade-in-up stagger-7">
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: '12px' }}>
-            {summaryTab} — all rows
+            All months — P&amp;L summary
           </p>
           <GenericTable
-            data={nonEmptySummary}
-            downloadFileName={summaryTab}
+            data={tableRows}
+            downloadFileName="monthly_report"
             formatCell={(col, val) => {
-              if (col === labelCol) return formatMonthLabel(val);
-              const c = col.toLowerCase().replace(/[\s_-]/g, '');
-              if (c.includes('profit') || c.includes('net')) {
-                const num = Number(String(val ?? '').replace(/[,₹\s]/g, ''));
-                if (!isNaN(num) && isFinite(num)) {
-                  if (num < 0) return <span style={{ color: '#e07070', fontWeight: 600 }}>{val}</span>;
-                  if (num > 0) return <span style={{ color: '#5cb88a', fontWeight: 600 }}>{val}</span>;
-                  return <span style={{ color: '#8c8a9e' }}>{val}</span>;
-                }
+              if (col === 'Net Profit') {
+                const num = Number(val);
+                if (num < 0) return <span style={{ color: '#e07070', fontWeight: 600 }}>₹{fmt(Math.abs(num))}</span>;
+                if (num > 0) return <span style={{ color: '#5cb88a', fontWeight: 600 }}>₹{fmt(num)}</span>;
+                return <span style={{ color: '#8c8a9e' }}>₹0</span>;
               }
+              if (col === 'Revenue' || col === 'Expenses') return `₹${fmt(val)}`;
               return val;
             }}
           />
@@ -591,30 +483,15 @@ function PLCard({ label, value, color }) {
   );
 }
 
-function ChartCard({ title, col, hint, subtitle, className, children }) {
+function ChartCard({ title, subtitle, className, children }) {
   return (
     <div
       style={{ background: '#16151f', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.07)', padding: '22px' }}
       className={`card-hover ${className ?? ''}`}
     >
       <h2 style={{ fontSize: '13px', fontWeight: 600, color: '#f0eee8', margin: 0 }}>{title}</h2>
-      {subtitle && <p style={{ fontSize: '12px', color: '#56546a', margin: '4px 0 12px' }}>{subtitle}</p>}
-      {!col && hint ? (
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: '8px',
-          marginTop: '12px', padding: '12px',
-          background: 'rgba(232,168,106,0.08)', border: '1px solid rgba(232,168,106,0.15)',
-          borderRadius: '8px',
-        }}>
-          <svg style={{ width: '14px', height: '14px', color: '#e8a86a', marginTop: '2px', flexShrink: 0 }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p style={{ fontSize: '12px', color: '#e8a86a', margin: 0 }}>{hint}</p>
-        </div>
-      ) : (
-        <div style={{ marginTop: subtitle ? 0 : '12px' }}>{children}</div>
-      )}
+      {subtitle && <p style={{ fontSize: '12px', color: '#56546a', margin: '4px 0 0' }}>{subtitle}</p>}
+      <div style={{ marginTop: '12px' }}>{children}</div>
     </div>
   );
 }
