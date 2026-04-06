@@ -116,9 +116,7 @@ function computeOccupancy(bookings, totalRooms) {
     monthMap[ym] = (monthMap[ym] ?? 0) + n;
   });
 
-  const currentYear = new Date().getFullYear();
   return Object.entries(monthMap)
-    .filter(([ym]) => parseInt(ym.split('-')[0]) <= currentYear)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([ym, roomNights]) => {
       const days = daysInMonth(ym);
@@ -150,6 +148,16 @@ export default function Reports() {
   const monthlyData = useMemo(() => {
     const map = {};
 
+    // Seed a rolling 6-month past + 3-month future window so charts always
+    // show a continuous range even when there's no data for those months
+    for (let offset = -6; offset <= 3; offset++) {
+      const d = new Date();
+      d.setDate(1);
+      d.setMonth(d.getMonth() + offset);
+      const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      map[ym] = { revenue: 0, expense: 0, bookingCount: 0 };
+    }
+
     bookings.forEach((r) => {
       const ym = toYearMonth(String(r['Check-in'] ?? r['check_in'] ?? ''));
       if (!ym) return;
@@ -165,15 +173,12 @@ export default function Reports() {
       map[ym].expense += Number(r['Amount'] ?? 0);
     });
 
-    // Always include current month even if no data yet
-    if (!map[currentYM]) map[currentYM] = { revenue: 0, expense: 0, bookingCount: 0 };
-
     Object.keys(map).forEach((ym) => {
       map[ym].profit = map[ym].revenue - map[ym].expense;
     });
 
     return map;
-  }, [bookings, expenses, currentYM]);
+  }, [bookings, expenses]);
 
   // ── sorted month list for picker ──────────────────────────────────────────
   const monthOptions = useMemo(
