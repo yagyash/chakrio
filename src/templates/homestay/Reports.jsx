@@ -149,21 +149,24 @@ export default function Reports() {
   const occupancyCol = useMemo(() => findCol(cols, ['occupancy', 'occupied', 'utiliz', 'fill', 'occ %', 'occ%']),               [cols]);
 
   // ── month options from summary label column ────────────────────────────────
-  const monthOptions = useMemo(() => {
-    if (!labelCol) return [];
-    return summary.map((r) => r[labelCol]).filter(Boolean);
-  }, [summary, labelCol]);
-
-  // ── default to current month ─────────────────────────────────────────────
   const currentYM = useMemo(() => {
     const n = new Date();
     return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}`;
   }, []);
 
+  const monthOptions = useMemo(() => {
+    const base = labelCol ? summary.map((r) => r[labelCol]).filter(Boolean) : [];
+    // Always ensure the current month appears in the list even if the Summary
+    // sheet hasn't been written yet (month in progress)
+    const alreadyHasCurrent = base.some((m) => toYearMonth(String(m)) === currentYM);
+    return alreadyHasCurrent ? base : [...base, currentYM];
+  }, [summary, labelCol, currentYM]);
+
   const activeMonth = useMemo(() => {
     if (selectedMonth) return selectedMonth;
+    // Prefer an exact match from the sheet; fall back to the injected currentYM entry
     const match = monthOptions.find((m) => toYearMonth(String(m)) === currentYM);
-    return match ?? monthOptions[monthOptions.length - 1] ?? '';
+    return match ?? currentYM;
   }, [selectedMonth, monthOptions, currentYM]);
 
   // ── hide all-zero rows in summary table ───────────────────────────────────
