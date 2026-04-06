@@ -20,6 +20,7 @@ function normaliseProperties(profile) {
       property_name: profile.property_name ?? 'My Property',
       sheet_id: profile.sheet_id ?? '',
       ...(profile.supabase_property_id && { supabase_property_id: profile.supabase_property_id }),
+      ...(profile.total_rooms != null && { total_rooms: Number(profile.total_rooms) }),
     }];
   }
   return [];
