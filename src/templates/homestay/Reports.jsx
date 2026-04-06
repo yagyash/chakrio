@@ -217,17 +217,14 @@ export default function Reports() {
     [bookings, totalRooms],
   );
 
-  // ── full table — one row per month ────────────────────────────────────────
-  const tableRows = useMemo(
-    () => sortedMonths.map((ym) => ({
-      Month:   formatMonthLabel(ym),
-      Revenue: monthlyData[ym]?.revenue ?? 0,
-      Expenses: monthlyData[ym]?.expense ?? 0,
-      'Net Profit': monthlyData[ym]?.profit ?? 0,
-      Bookings: monthlyData[ym]?.bookingCount ?? 0,
-    })),
-    [sortedMonths, monthlyData],
-  );
+  // ── selected month table row ──────────────────────────────────────────────
+  const tableRows = useMemo(() => [{
+    Month:        formatMonthLabel(activeMonth),
+    Revenue:      plData.revenue,
+    Expenses:     plData.expense,
+    'Net Profit': plData.profit,
+    Bookings:     plData.bookingCount,
+  }], [activeMonth, plData]);
 
   // ── loading / error ───────────────────────────────────────────────────────
   if (bLoading || eLoading) {
@@ -414,7 +411,7 @@ export default function Reports() {
         {/* ── full monthly summary table ───────────────────────────────────── */}
         <div className="animate-fade-in-up stagger-7">
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: '12px' }}>
-            All months — P&amp;L summary
+            {formatMonthLabel(activeMonth)} — P&amp;L summary
           </p>
           <GenericTable
             data={tableRows}
