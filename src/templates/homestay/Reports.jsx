@@ -133,9 +133,10 @@ function computeOccupancy(bookings) {
 // ── main component ────────────────────────────────────────────────────────────
 
 export default function Reports() {
-  const { summaryTab, bookingsTab } = useTabNames();
+  const { summaryTab, bookingsTab, expensesTab } = useTabNames();
   const { data: summary,  loading: sLoading, error: sError, refetch: sRefetch } = useSheetData(summaryTab);
   const { data: bookings, loading: bLoading }                                    = useSheetData(bookingsTab);
+  const { data: expenses, loading: eLoading }                                    = useSheetData(expensesTab);
 
   const [selectedMonth, setSelectedMonth] = useState('');
 
@@ -156,15 +157,15 @@ export default function Reports() {
 
   const monthOptions = useMemo(() => {
     const base = labelCol ? summary.map((r) => r[labelCol]).filter(Boolean) : [];
-    // Always ensure the current month appears in the list even if the Summary
-    // sheet hasn't been written yet (month in progress)
+    // Always ensure the current month appears in the list even if the monthly
+    // summary hasn't been generated yet (month still in progress)
     const alreadyHasCurrent = base.some((m) => toYearMonth(String(m)) === currentYM);
     return alreadyHasCurrent ? base : [...base, currentYM];
   }, [summary, labelCol, currentYM]);
 
   const activeMonth = useMemo(() => {
     if (selectedMonth) return selectedMonth;
-    // Prefer an exact match from the sheet; fall back to the injected currentYM entry
+    // Prefer an exact match from the summary; fall back to the injected currentYM entry
     const match = monthOptions.find((m) => toYearMonth(String(m)) === currentYM);
     return match ?? currentYM;
   }, [selectedMonth, monthOptions, currentYM]);
@@ -183,6 +184,39 @@ export default function Reports() {
     return summary.find((r) => r[labelCol] === activeMonth) ?? null;
   }, [summary, labelCol, activeMonth]);
 
+  // ── live P&L for current month when no summary row exists yet ─────────────
+  // Computed directly from Supabase bookings + expenses tables
+  const livePL = useMemo(() => {
+    if (plRow) return null; // summary row exists — use it, no need for live calc
+    const activeYM = toYearMonth(String(activeMonth));
+    if (!activeYM) return null;
+
+    const filterByMonth = (rows, dateKeys) => rows.filter((r) => {
+      const val = dateKeys.map((k) => r[k]).find(Boolean);
+      return val && toYearMonth(String(val)) === activeYM;
+    });
+
+    const monthBookings = filterByMonth(bookings, ['Check-in', 'check_in', 'Check In', 'Date']);
+    const monthExpenses = filterByMonth(expenses, ['Date', 'date', 'created_at']);
+
+    const revenue = monthBookings.reduce((s, r) => {
+      const v = r['Total_Amount'] ?? r['total_amount'] ?? r['Total Amount'] ?? 0;
+      return s + Number(v || 0);
+    }, 0);
+    const expense = monthExpenses.reduce((s, r) => {
+      const v = r['Amount'] ?? r['amount'] ?? 0;
+      return s + Number(v || 0);
+    }, 0);
+
+    return {
+      'Monthly Revenue': revenue,
+      'Monthly Expense': expense,
+      'Net Profit':      revenue - expense,
+      'Booking Count':   monthBookings.length,
+      _isLive: true,
+    };
+  }, [plRow, activeMonth, bookings, expenses]);
+
   // ── chart series builders ──────────────────────────────────────────────────
   const makeChartData = (col) =>
     summary
@@ -200,7 +234,7 @@ export default function Reports() {
   }, [summary, occupancyCol, labelCol, bookings]);
 
   // ── loading / error ───────────────────────────────────────────────────────
-  if (sLoading || bLoading) {
+  if (sLoading || bLoading || eLoading) {
     return (
       <div className="flex-1 flex items-center justify-center py-20">
         <LoadingSpinner size="lg" />
@@ -306,26 +340,33 @@ export default function Reports() {
         </div>
 
         {/* ── P&L summary strip for selected month ────────────────────────── */}
-        {plRow && (revenueCol || expenseCol || profitCol) && (
+        {(plRow || livePL) && (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in-up stagger-2">
-            {revenueCol && (
-              <PLCard label="Revenue" value={`₹${fmt(plRow[revenueCol])}`} color="emerald" />
+            {livePL?._isLive && (
+              <div style={{ gridColumn: '1 / -1', fontSize: '11px', color: '#c8a96e', marginBottom: '-4px' }}>
+                Live data — monthly summary not yet generated for this period
+              </div>
             )}
-            {expenseCol && (
-              <PLCard label="Expenses" value={`₹${fmt(plRow[expenseCol])}`} color="rose" />
-            )}
-            {profitCol && (
-              <PLCard
-                label="Net Profit"
-                value={`₹${fmt(plRow[profitCol])}`}
-                color={Number(plRow[profitCol]) >= 0 ? 'emerald' : 'rose'}
-              />
-            )}
+            <PLCard
+              label="Revenue"
+              value={`₹${fmt(plRow ? plRow[revenueCol] : livePL?.['Monthly Revenue'])}`}
+              color="emerald"
+            />
+            <PLCard
+              label="Expenses"
+              value={`₹${fmt(plRow ? plRow[expenseCol] : livePL?.['Monthly Expense'])}`}
+              color="rose"
+            />
+            <PLCard
+              label="Net Profit"
+              value={`₹${fmt(plRow ? plRow[profitCol] : livePL?.['Net Profit'])}`}
+              color={(plRow ? Number(plRow[profitCol]) : livePL?.['Net Profit'] ?? 0) >= 0 ? 'emerald' : 'rose'}
+            />
             {(occupancyCol || occupancyData.find((d) => d.label === activeMonth)) && (
               <PLCard
                 label="Occupancy"
                 value={fmtPc(
-                  occupancyCol
+                  occupancyCol && plRow
                     ? plRow[occupancyCol]
                     : (occupancyData.find((d) => d.label === activeMonth)?.Occupancy ?? occupancyData.find((d) => d.label === activeMonth)?.value ?? 0)
                 )}
