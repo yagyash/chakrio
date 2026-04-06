@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useSheetData } from '../../hooks/useSheetData';
 import { useTabNames } from '../../hooks/useTabNames';
+import { useAuthContext } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import DemoBanner from '../../components/shared/DemoBanner';
 import GenericTable from '../../components/shared/GenericTable';
@@ -94,29 +95,24 @@ function daysInMonth(ym) {
 
 // ── occupancy from bookings tab ───────────────────────────────────────────────
 
-function computeOccupancy(bookings) {
+/**
+ * @param {Array}       bookings   - raw booking rows
+ * @param {number|null} totalRooms - from Firestore property config
+ *   null  → villa formula:  nights_booked / days_in_month
+ *   number → hotel formula: room_nights_sold / (totalRooms × days_in_month)
+ */
+function computeOccupancy(bookings, totalRooms) {
   if (!bookings.length) return [];
 
-  const cols    = Object.keys(bookings[0]);
-  const numCols_  = new Set(numericCols(bookings));
-  // find date col
-  const dateCol = cols.find((c) => {
-    const sample = bookings.slice(0, 20).map((r) => r[c]).filter(Boolean);
-    return sample.length > 0 &&
-      sample.filter((v) => /(\d{4}[-/]\d{2}[-/]\d{2}|\d{2}[-/]\d{2}[-/]\d{4})/.test(String(v))).length >= sample.length * 0.5;
-  }) ?? null;
+  const numCols_ = new Set(numericCols(bookings));
+  const nightsCol = findCol([...numCols_], ['night', 'nights', 'duration', 'stay', 'no. of night', 'no of night']);
 
-  if (!dateCol) return [];
-
-  // find a "nights" / "duration" column
-  const nightsCol = findCol([...numCols_], ['night', 'nights', 'duration', 'stay', 'days', 'no. of night', 'no of night']);
-
-  // sum nights (or count 1 per row) grouped by month
+  // Group room-nights sold by month using Check-in date
   const monthMap = {};
   bookings.forEach((row) => {
-    const ym = toYearMonth(row[dateCol]);
+    const ym = toYearMonth(String(row['Check-in'] ?? row['check_in'] ?? ''));
     if (!ym) return;
-    const n = nightsCol ? Number(row[nightsCol] || 0) : 1;
+    const n = nightsCol ? Number(row[nightsCol] || 1) : 1;
     monthMap[ym] = (monthMap[ym] ?? 0) + n;
   });
 
@@ -124,15 +120,20 @@ function computeOccupancy(bookings) {
   return Object.entries(monthMap)
     .filter(([ym]) => parseInt(ym.split('-')[0]) <= currentYear)
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([ym, nights]) => ({
-      label: ym,
-      Occupancy: Math.min(100, parseFloat(((nights / daysInMonth(ym)) * 100).toFixed(1))),
-    }));
+    .map(([ym, roomNights]) => {
+      const days = daysInMonth(ym);
+      const denominator = totalRooms ? totalRooms * days : days;
+      return {
+        label: ym,
+        Occupancy: Math.min(100, parseFloat(((roomNights / denominator) * 100).toFixed(1))),
+      };
+    });
 }
 
 // ── main component ────────────────────────────────────────────────────────────
 
 export default function Reports() {
+  const { selectedProperty } = useAuthContext();
   const { bookingsTab, expensesTab } = useTabNames();
   const { data: bookings, loading: bLoading, error: bError, refetch: bRefetch } = useSheetData(bookingsTab);
   const { data: expenses, loading: eLoading, error: eError, refetch: eRefetch } = useSheetData(expensesTab);
@@ -205,7 +206,11 @@ export default function Reports() {
   );
 
   // ── occupancy computed from bookings ─────────────────────────────────────
-  const occupancyData = useMemo(() => computeOccupancy(bookings), [bookings]);
+  const totalRooms = selectedProperty?.total_rooms ?? null;
+  const occupancyData = useMemo(
+    () => computeOccupancy(bookings, totalRooms),
+    [bookings, totalRooms],
+  );
 
   // ── full table — one row per month ────────────────────────────────────────
   const tableRows = useMemo(
