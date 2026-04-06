@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { useSheetData } from '../../hooks/useSheetData';
 import { useTabNames } from '../../hooks/useTabNames';
+import { useAuthContext } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import DemoBanner from '../../components/shared/DemoBanner';
 import GenericTable from '../../components/shared/GenericTable';
@@ -181,6 +182,7 @@ function getCurrentYM() {
 
 export default function HomestayDashboard() {
   const { bookingsTab, expensesTab } = useTabNames();
+  const { selectedProperty } = useAuthContext();
   const { data: bookings, loading: bLoading, error: bError } = useSheetData(bookingsTab);
   const { data: expenses, loading: eLoading }                = useSheetData(expensesTab);
 
@@ -229,6 +231,44 @@ export default function HomestayDashboard() {
     const expense = expCol ? activeExpenses.reduce((s,  r) => s + Number(r[expCol]  || 0), 0) : 0;
     return revenue - expense;
   }, [activeBookings, activeExpenses]);
+
+  // ── occupancy rate (current month only) ──────────────────────────────────
+  const occupancy = useMemo(() => {
+    const totalRooms = selectedProperty?.total_rooms ?? null;
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+    // Only count confirmed bookings in the current month (not future)
+    const dc = detectDateCol(bookings);
+    const currentMonthBookings = bookings.filter((r) => {
+      const v = String(r[dc ? dc : ''] || '').trim();
+      return toYearMonth(v) === currentYM;
+    });
+
+    if (totalRooms) {
+      // Hotel/resort/dharamshala: room-nights sold / (total_rooms × days_in_month)
+      const nightsCol = numericCols(currentMonthBookings).find((col) => {
+        const c = col.toLowerCase().replace(/[_\s-]/g, '');
+        return c.includes('night') || c.includes('num') || c.includes('nights');
+      });
+      const roomNightsSold = nightsCol
+        ? currentMonthBookings.reduce((s, r) => s + Number(r[nightsCol] || 0), 0)
+        : currentMonthBookings.length; // fallback: count bookings × 1 night each
+      const rate = (roomNightsSold / (totalRooms * daysInMonth)) * 100;
+      return { rate: Math.min(rate, 100), label: `${totalRooms} rooms`, isRoomBased: true };
+    } else {
+      // Villa: booked nights / days in month
+      const nightsCol = numericCols(currentMonthBookings).find((col) => {
+        const c = col.toLowerCase().replace(/[_\s-]/g, '');
+        return c.includes('night') || c.includes('nights');
+      });
+      const nightsBooked = nightsCol
+        ? currentMonthBookings.reduce((s, r) => s + Number(r[nightsCol] || 0), 0)
+        : currentMonthBookings.length;
+      const rate = (nightsBooked / daysInMonth) * 100;
+      return { rate: Math.min(rate, 100), label: 'villa', isRoomBased: false };
+    }
+  }, [bookings, currentYM, selectedProperty]);
 
   // ── time-series chart ─────────────────────────────────────────────────────
   const { dateCol, numCols: bookingNumCols, trendData } = useMemo(() => {
@@ -359,7 +399,7 @@ export default function HomestayDashboard() {
         </div>
 
         {/* ── Row count cards ─────────────────────────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="animate-fade-in-up stagger-1">
             <CountCard
               count={confirmedBookings.length}
@@ -376,6 +416,9 @@ export default function HomestayDashboard() {
           </div>
           <div className="animate-fade-in-up stagger-3">
             <NetProfitCard value={netProfit} />
+          </div>
+          <div className="animate-fade-in-up stagger-4">
+            <OccupancyCard rate={occupancy.rate} label={occupancy.label} isRoomBased={occupancy.isRoomBased} />
           </div>
         </div>
 
@@ -592,6 +635,34 @@ function NetProfitCard({ value }) {
           </span>
         </div>
         <p style={{ fontSize: '11px', color: '#56546a', margin: '6px 0 0' }}>Net Profit (current &amp; upcoming)</p>
+      </div>
+    </div>
+  );
+}
+
+function OccupancyCard({ rate, label, isRoomBased }) {
+  const pct = isNaN(rate) ? 0 : Math.round(rate * 10) / 10;
+  const color = pct >= 70 ? '#5cb88a' : pct >= 40 ? '#e8a86a' : '#e07070';
+  const subLabel = isRoomBased ? `room-based · ${label}` : 'villa · whole property';
+  return (
+    <div style={{ background: '#16151f', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }} className="card-hover cursor-default">
+      <div style={{ width: '40px', height: '40px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'rgba(78,205,196,0.1)' }}>
+        <svg style={{ width: '20px', height: '20px', color: '#4ecdc4' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
+          <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: '28px', fontWeight: 400, letterSpacing: '-1px', color, margin: 0, lineHeight: 1 }}>
+            {pct}%
+          </p>
+          <span style={{ fontSize: '11px', fontWeight: 500, padding: '3px 8px', borderRadius: '20px', background: 'rgba(78,205,196,0.1)', color: '#4ecdc4', whiteSpace: 'nowrap' }}>
+            this month
+          </span>
+        </div>
+        <p style={{ fontSize: '11px', color: '#56546a', margin: '6px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          Occupancy · {subLabel}
+        </p>
       </div>
     </div>
   );
