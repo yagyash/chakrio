@@ -233,7 +233,7 @@ export default function HomestayDashboard() {
   // ── time-series chart ─────────────────────────────────────────────────────
   const { dateCol, numCols: bookingNumCols, trendData } = useMemo(() => {
     const dc   = detectDateCol(activeBookings);
-    const nums = numericCols(activeBookings);
+    const nums = numericCols(activeBookings).filter((col) => !isIdCol(col));
     if (!dc || !nums.length) return { dateCol: null, numCols: [], trendData: [] };
     const currentYear = String(new Date().getFullYear());
     const grouped = groupByMonth(activeBookings, dc, nums);
