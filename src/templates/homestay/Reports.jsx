@@ -390,7 +390,11 @@ export default function Reports() {
           {/* Occupancy */}
           <ChartCard
             title="Monthly Occupancy %"
-            subtitle={occupancyData.length > 0 ? `Computed from ${bookingsTab}` : null}
+            subtitle={occupancyData.length > 0
+              ? totalRooms
+                ? `Room-based · ${totalRooms} rooms · (room-nights ÷ ${totalRooms} × days)`
+                : `Villa formula · no total_rooms set in Firestore`
+              : null}
             className="animate-fade-in-up stagger-6"
           >
             {occupancyData.length > 0 && (
