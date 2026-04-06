@@ -58,10 +58,17 @@ function formatColumnLabel(col) {
 }
 
 /** Returns true if the column is a count (nights, guests, days…) not a currency amount */
-const COUNT_KEYWORDS = ['night', 'guest', 'day', 'count', 'qty', 'quantity', 'num', 'pax', 'person', 'people', 'room'];
+const COUNT_KEYWORDS = ['night', 'guest', 'day', 'count', 'qty', 'quantity', 'num', 'pax', 'person', 'people'];
 function isCountCol(col) {
   const c = String(col).toLowerCase().replace(/[_\s-]/g, '');
   return COUNT_KEYWORDS.some((kw) => c.includes(kw));
+}
+
+/** Returns true if the column is an identifier/reference number that should not be summed */
+const ID_KEYWORDS = ['room_no', 'roomno', 'room_number', 'roomnumber', '_id', 'booking_id', 'bookingid', 'invoice_no', 'ref'];
+function isIdCol(col) {
+  const c = String(col).toLowerCase().replace(/[\s-]/g, '_');
+  return ID_KEYWORDS.some((kw) => c === kw || c.endsWith(kw));
 }
 
 /** Format a chart value — ₹ for amounts, plain for counts */
@@ -191,7 +198,7 @@ export default function HomestayDashboard() {
 
   // ── stat card totals ──────────────────────────────────────────────────────
   const bookingTotals = useMemo(() => {
-    const cols = numericCols(activeBookings);
+    const cols = numericCols(activeBookings).filter((col) => !isIdCol(col));
     return cols.map((col) => ({
       label: col,
       value: activeBookings.reduce((s, r) => s + Number(r[col] || 0), 0),
