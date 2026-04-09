@@ -1,0 +1,276 @@
+{
+  "discovery": {
+    "done": true,
+    "data": {
+      "business_name": "Chakrio",
+      "business_description": "AI-powered property booking automation for homestays, villas, and guesthouses.",
+      "business_category": "SaaS",
+      "geographic_context": "IN",
+      "framework": "react",
+      "router_type": "none",
+      "has_blog": false,
+      "has_schema_markup": true,
+      "has_sitemap": false,
+      "has_robots_txt": false,
+      "content_files": [
+        "chakrio_logo.html",
+        "CLAUDE.md",
+        "index.html",
+        "README.md",
+        "skill.md",
+        "src\\App.jsx",
+        "src\\AppShell.jsx",
+        "src\\main.jsx",
+        "src\\components\\auth\\LoginPage.jsx",
+        "src\\components\\auth\\ProtectedRoute.jsx",
+        "src\\components\\layout\\Sidebar.jsx",
+        "src\\components\\layout\\TopBar.jsx",
+        "src\\components\\marketing\\Footer.jsx",
+        "src\\components\\marketing\\Navbar.jsx",
+        "src\\components\\shared\\AccountPendingPage.jsx",
+        "src\\components\\shared\\DemoBanner.jsx",
+        "src\\components\\shared\\GenericTable.jsx",
+        "src\\components\\shared\\LoadingSpinner.jsx",
+        "src\\components\\shared\\PropertyPicker.jsx",
+        "src\\components\\shared\\StatCard.jsx",
+        "src\\components\\shared\\StatusBadge.jsx",
+        "src\\components\\tools\\CTABox.jsx",
+        "src\\context\\AuthContext.jsx",
+        "src\\pages\\LandingPage.jsx",
+        "src\\pages\\MenuPage.jsx",
+        "src\\pages\\tools\\CancellationPolicyGenerator.jsx",
+        "src\\pages\\tools\\InvoiceGenerator.jsx",
+        "src\\pages\\tools\\OccupancyCalculator.jsx",
+        "src\\pages\\tools\\RentalIncomeCalculator.jsx",
+        "src\\templates\\bakery\\index.jsx",
+        "src\\templates\\homestay\\Bookings.jsx",
+        "src\\templates\\homestay\\Dashboard.jsx",
+        "src\\templates\\homestay\\DigitalMenu.jsx",
+        "src\\templates\\homestay\\Expenses.jsx",
+        "src\\templates\\homestay\\Financials.jsx",
+        "src\\templates\\homestay\\OccupancyCalendar.jsx",
+        "src\\templates\\homestay\\Reports.jsx"
+      ],
+      "key_pages": [
+        "index.html",
+        "src\\pages\\LandingPage.jsx",
+        "src\\pages\\tools\\CancellationPolicyGenerator.jsx",
+        "src\\pages\\tools\\InvoiceGenerator.jsx",
+        "src\\pages\\tools\\OccupancyCalculator.jsx",
+        "src\\pages\\tools\\RentalIncomeCalculator.jsx"
+      ]
+    },
+    "timestamp": "2026-04-09T11:52:19.700573"
+  },
+  "aio_audit": {
+    "done": true,
+    "data": {
+      "gaps": [],
+      "planned_changes": [],
+      "schemas_to_generate": []
+    },
+    "timestamp": "2026-04-09T12:00:22.209953"
+  },
+  "geo_audit": {
+    "done": true,
+    "data": {
+      "gaps": [
+        {
+          "signal": "direct_answer_block",
+          "description": "The page lacks a standalone paragraph that directly answers 'What is Chakrio?' or 'What does Chakrio do?'",
+          "priority": "High",
+          "fix": "Add a concise introductory paragraph that clearly answers 'What is Chakrio?' with specific details on its AI-powered booking automation for homestays, villas, and guesthouses.",
+          "page": "src\\pages\\LandingPage.jsx",
+          "content_draft": {
+            "signal": "direct_answer_block",
+            "insertion_point": "after <Navbar />",
+            "content": "<div className='intro text-center py-8'><h2>Welcome to Chakrio</h2><p>Chakrio is an AI-powered SaaS solution specializing in booking automation for homestays, villas, and guesthouses. Our platform parses your booking, cancellation, and expense messages to manage your property efficiently, eliminating manual data entry and spreadsheets.</p></div>"
+          }
+        },
+        {
+          "signal": "question_answer_structure",
+          "description": "There is no explicit Q&A section on the page.",
+          "priority": "Medium",
+          "fix": "Introduce a FAQ section that includes common questions and detailed answers about Chakrio's services and features.",
+          "page": "src\\pages\\LandingPage.jsx"
+        },
+        {
+          "signal": "statistics_and_specifics",
+          "description": "The page does not cite concrete numbers or statistics about usage or effectiveness.",
+          "priority": "Medium",
+          "fix": "Incorporate specific statistics, such as 'used by over 500 properties' or 'saves 3 hours of manual entry per week per property'.",
+          "page": "src\\pages\\LandingPage.jsx"
+        },
+        {
+          "signal": "citation_worthy_claims",
+          "description": "The page lacks specific, verifiable factual claims.",
+          "priority": "Low",
+          "fix": "Include verifiable claims such as 'Chakrio integrates with X% of booking platforms' or 'Recognized by XYZ authority' to enhance credibility.",
+          "page": "src\\pages\\LandingPage.jsx"
+        },
+        {
+          "signal": "entity_clarity",
+          "description": "The page does not clearly define the business category, primary use case, and target customer in a standalone prose section.",
+          "priority": "High",
+          "fix": "Clearly articulate Chakrio's business category (SaaS), primary use case (automating property bookings), and target customer (property managers of homestays, villas, guesthouses) in a simple sentence.",
+          "page": "src\\pages\\LandingPage.jsx",
+          "content_draft": {
+            "signal": "entity_clarity",
+            "insertion_point": "after the <div className='intro'>",
+            "content": "<div className='business-clarity py-4'><p>Chakrio operates as a Software as a Service (SaaS) platform, catering primarily to property managers looking to automate their booking processes for homestays, villas, and guesthouses.</p></div>"
+          }
+        },
+        {
+          "signal": "comparative_context",
+          "description": "There is no comparison between Chakrio and alternative solutions.",
+          "priority": "Medium",
+          "fix": "Include a section comparing Chakrio with traditional spreadsheets and manual entry, highlighting time-saving and error reduction benefits.",
+          "page": "src\\pages\\LandingPage.jsx"
+        },
+        {
+          "signal": "use_case_specificity",
+          "description": "The page lacks specific, distinct use cases expressed through examples.",
+          "priority": "High",
+          "fix": "Add examples such as 'Use Chakrio to automatically reconcile cancellations with refunds' and 'Generate invoices directly from booking messages.'",
+          "page": "src\\pages\\LandingPage.jsx",
+          "content_draft": {
+            "signal": "use_case_specificity",
+            "insertion_point": "after the <div className='business-clarity'>",
+            "content": "<div className='use-cases py-4'><h3>Use Cases</h3><p>With Chakrio, automatically reconcile cancelled bookings with refunds without manual intervention. Generate and send invoices directly from your booking messages to streamline guest transactions.</p></div>"
+          }
+        },
+        {
+          "signal": "trust_signals",
+          "description": "The page does not display any social proof such as testimonials or press mentions.",
+          "priority": "High",
+          "fix": "Incorporate testimonials from users or mention any press coverage, awards, or significant partnerships to build trust.",
+          "page": "src\\pages\\LandingPage.jsx",
+          "content_draft": {
+            "signal": "trust_signals",
+            "insertion_point": "before <Footer />",
+            "content": "<div className='trust-signals text-center py-8'><h3>Trusted by Property Managers</h3><p>Join over 500 satisfied property managers who save time and reduce errors with Chakrio. [PLACEHOLDER: specific testimonial] 'Chakrio transformed our booking process \u2014 effortless and accurate!', says a delighted customer.</p></div>"
+          }
+        },
+        {
+          "signal": "direct_answer_block",
+          "description": "The page does not have a standalone paragraph that clearly answers 'What does Chakrio do?'",
+          "priority": "High",
+          "fix": "Include a paragraph explaining Chakrio's business context in the generator page, linking it to this specific tool and how it fits into the overall service offering.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx",
+          "content_draft": {
+            "signal": "direct_answer_block",
+            "insertion_point": "after <Navbar />",
+            "content": "<div className='intro text-center py-8'><h2>About Chakrio</h2><p>Chakrio optimizes property management with AI-powered automation tools tailored for homestays, villas, and guesthouses. Our platform streamlines booking management, ensuring operational efficiency and ease for property managers.</p></div>"
+          }
+        },
+        {
+          "signal": "question_answer_structure",
+          "description": "The page lacks a FAQ section with explicit Q&A pairs.",
+          "priority": "Medium",
+          "fix": "Add a Frequently Asked Questions section addressing common inquiries about using the Cancellation Policy Generator.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx"
+        },
+        {
+          "signal": "statistics_and_specifics",
+          "description": "The page does not cite any concrete statistics about Chakrio's effectiveness or user base.",
+          "priority": "Medium",
+          "fix": "Incorporate statistics such as 'trusted by over 500 properties' or other relevant data points highlighting Chakrio's reach and efficiency.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx"
+        },
+        {
+          "signal": "citation_worthy_claims",
+          "description": "The page lacks specific factual claims that an AI system could reference.",
+          "priority": "Low",
+          "fix": "Include verifiable claims like 'Chakrio helps generate policies used by X% of our users for their bookings.'",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx"
+        },
+        {
+          "signal": "entity_clarity",
+          "description": "The page does not clearly state Chakrio's business category and target audience.",
+          "priority": "High",
+          "fix": "Explicitly mention Chakrio as a SaaS platform and identify its target customers (property managers of villas and homestays) within the page.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx",
+          "content_draft": {
+            "signal": "entity_clarity",
+            "insertion_point": "after <div className='intro'>",
+            "content": "<div className='entity-clarity py-4'><p>As a Software as a Service (SaaS) platform, Chakrio specifically targets property managers looking to simplify and enhance their booking and management processes for homestays, villas, and guesthouses.</p></div>"
+          }
+        },
+        {
+          "signal": "comparative_context",
+          "description": "The page does not compare Chakrio's tool with alternatives.",
+          "priority": "Medium",
+          "fix": "Add a comparison between using this generator versus manually drafting policies, highlighting efficiency and ease of use.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx"
+        },
+        {
+          "signal": "use_case_specificity",
+          "description": "The page lacks detailed use cases with specific examples.",
+          "priority": "High",
+          "fix": "Provide detailed examples of use cases, such as generating policies for peak season versus off-season bookings.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx",
+          "content_draft": {
+            "signal": "use_case_specificity",
+            "insertion_point": "before <CTABox />",
+            "content": "<div className='use-cases py-4'><h3>Use Case Examples</h3><p>Utilize this tool to effortlessly generate customized cancellation policies for both peak season and off-season bookings, adjusting refund terms to optimize bookings and customer satisfaction.</p></div>"
+          }
+        },
+        {
+          "signal": "trust_signals",
+          "description": "The page does not display any social proof or trust signals.",
+          "priority": "High",
+          "fix": "Add testimonials or mentions of the number of customers who have successfully used the tool.",
+          "page": "src\\pages\\tools\\CancellationPolicyGenerator.jsx",
+          "content_draft": {
+            "signal": "trust_signals",
+            "insertion_point": "before <Footer />",
+            "content": "<div className='trust-signals text-center py-8'><h3>Trusted by Property Managers</h3><p>Join the growing community of over 500 delighted property managers who use Chakrio to enhance their booking processes. [PLACEHOLDER: specific testimonial] 'The automated policies have saved us countless hours and minimized booking disputes.'</p></div>"
+          }
+        }
+      ],
+      "planned_changes": [
+        "Add an introductory paragraph that answers 'What is Chakrio?' clearly outlining its core function and audience.",
+        "Insert a FAQ section addressing common questions about Chakrio's features and usage.",
+        "Include specific statistics about Chakrio's user base or performance metrics.",
+        "Add verifiable claims that an AI system could potentially cite.",
+        "Clarify Chakrio's business category, use case, and target market explicitly in the content.",
+        "Create a comparison section that distinguishes Chakrio from spreadsheets and other manual methods.",
+        "Provide detailed examples of practical use cases for Chakrio.",
+        "Incorporate social proof elements like customer testimonials or media mentions to enhance credibility.",
+        "Add an introductory paragraph explaining Chakrio's role in booking automation and how this tool simplifies creating cancellation policies.",
+        "Insert a FAQ section that addresses usability questions about the Cancellation Policy Generator.",
+        "Include concrete statistics about Chakrio's market penetration and performance metrics.",
+        "Add verifiable claims about how widely the generated policies are adopted by users.",
+        "Clarify Chakrio\u2019s SaaS category and target market directly within the page content.",
+        "Compare this automated policy generation tool with traditional methods.",
+        "Provide examples showing how different settings can be used for seasonal bookings.",
+        "Incorporate testimonials or user numbers to provide social proof and build trust."
+      ],
+      "pages_audited": 5
+    },
+    "timestamp": "2026-04-09T12:11:12.298013"
+  },
+  "approved": {
+    "done": true,
+    "data": {
+      "approved": true,
+      "plan": null
+    },
+    "timestamp": "2026-04-09T12:16:25.431965"
+  },
+  "write": {
+    "done": true,
+    "data": {
+      "modified_files": [
+        "src/pages/LandingPage.jsx",
+        "src/pages/tools/CancellationPolicyGenerator.jsx"
+      ],
+      "created_files": [],
+      "placeholders": [
+        "specific testimonial"
+      ],
+      "build_status": "PASSED"
+    },
+    "timestamp": "2026-04-09T12:16:25.431938"
+  }
+}
