@@ -112,7 +112,7 @@ export default function LandingPage() {
       <div className='intro text-center py-8'><h2>Welcome to Chakrio</h2><p>Chakrio is an AI-powered SaaS solution specializing in booking automation for homestays, villas, and guesthouses. Our platform parses your booking, cancellation, and expense messages to manage your property efficiently, eliminating manual data entry and spreadsheets.</p></div>
       <div className='business-clarity py-4'><p>Chakrio operates as a Software as a Service (SaaS) platform, catering primarily to property managers looking to automate their booking processes for homestays, villas, and guesthouses.</p></div>
       <div className='use-cases py-4'><h3>Use Cases</h3><p>With Chakrio, automatically reconcile cancelled bookings with refunds without manual intervention. Generate and send invoices directly from your booking messages to streamline guest transactions.</p></div>
-      <div className='trust-signals text-center py-8'><h3>Trusted by Property Managers</h3><p>Join over 500 satisfied property managers who save time and reduce errors with Chakrio. [PLACEHOLDER: specific testimonial] 'Chakrio transformed our booking process — effortless and accurate!', says a delighted customer.</p></div>
+      <div className='trust-signals text-center py-8'><h3>Built for Indian Property Managers</h3><p>Chakrio is purpose-built for homestays, villas, and guesthouses in India — handling ₹-denominated bookings, Indian date formats, and the way property managers actually communicate. No English-only forms, no complex dashboards. Just send a message and your records are done.</p></div>
       <Footer />
     </div>
   );

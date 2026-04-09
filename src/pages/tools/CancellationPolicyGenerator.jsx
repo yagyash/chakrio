@@ -121,7 +121,27 @@ export default function CancellationPolicyGenerator() {
           "mainEntity": [
             {
               "@type": "Question",
-              "name": "[PLACEHOLDER: description]"
+              "name": "How do I create a cancellation policy for my homestay or villa?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Use Chakrio's free Cancellation Policy Generator — select your refund terms, notice period, and advance conditions, and the tool instantly generates a professional policy you can share with guests."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is this cancellation policy generator free to use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, the Cancellation Policy Generator is completely free. No sign-up required. Generate as many policies as you need."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I customise the refund terms and notice period?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. You can set your own cancellation window (e.g. 48 hours, 7 days), specify what percentage of the advance is refunded, and define conditions for peak vs off-season bookings."
+              }
             }
           ]
         })}</script>
@@ -132,7 +152,7 @@ export default function CancellationPolicyGenerator() {
       {/* Insertion point for content */}
       <div className='use-cases py-4'><h3>Use Case Examples</h3><p>Utilize this tool to effortlessly generate customized cancellation policies for both peak season and off-season bookings, adjusting refund terms to optimize bookings and customer satisfaction.</p></div>
       <CTABox />
-      <div className='trust-signals text-center py-8'><h3>Trusted by Property Managers</h3><p>Join the growing community of over 500 delighted property managers who use Chakrio to enhance their booking processes. [PLACEHOLDER: specific testimonial] 'The automated policies have saved us countless hours and minimized booking disputes.'</p></div>
+      <div className='trust-signals text-center py-8'><h3>Free to Use — No Sign-Up Required</h3><p>This tool is provided free by Chakrio for property managers across India. Generate a professional cancellation policy in seconds and paste it directly into your listing, guest messages, or booking confirmation. No account needed.</p></div>
       <Footer />
     </div>
   );
