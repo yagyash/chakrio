@@ -54,9 +54,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(friendlyError(err.code));
-    } finally {
       setLoading(false);
     }
   };

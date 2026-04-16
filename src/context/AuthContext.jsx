@@ -45,6 +45,7 @@ export function AuthProvider({ children }) {
         return;
       }
 
+      setProfileStatus('loading');
       try {
         const docRef = doc(db, 'users', user.uid);
         const docSnap = await getDoc(docRef);
