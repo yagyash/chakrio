@@ -5,9 +5,9 @@ import {
   signInWithRedirect,
   getRedirectResult,
   sendPasswordResetEmail,
-  onAuthStateChanged,
 } from 'firebase/auth';
 import { auth, googleProvider } from '../../services/firebase';
+import { useAuthContext } from '../../context/AuthContext';
 import LoadingSpinner from '../shared/LoadingSpinner';
 
 export default function LoginPage() {
@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { profileStatus } = useAuthContext();
 
   // Prevent search engines from indexing the login page
   useEffect(() => {
@@ -27,13 +28,12 @@ export default function LoginPage() {
     return () => document.head.removeChild(meta);
   }, []);
 
-  // Redirect to dashboard if already logged in
+  // Navigate to dashboard only after AuthContext has fully loaded the profile.
+  // This avoids the race condition where ProtectedRoute still sees
+  // profileStatus='unauthenticated' if we navigate too early.
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) navigate('/dashboard', { replace: true });
-    });
-    return unsubscribe;
-  }, [navigate]);
+    if (profileStatus === 'ready') navigate('/dashboard', { replace: true });
+  }, [profileStatus, navigate]);
 
   // Handle the result after Google redirect returns to this page.
   useEffect(() => {
