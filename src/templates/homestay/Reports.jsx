@@ -13,7 +13,7 @@ import DemoBanner from '../../components/shared/DemoBanner';
 import GenericTable from '../../components/shared/GenericTable';
 import { downloadCSV } from '../../utils/downloadCSV';
 
-const fmt   = (n) => Number(n || 0).toLocaleString('en-IN');
+const fmt   = (n) => Math.round(Number(n || 0)).toLocaleString('en-IN');
 const fmtPc = (n) => `${Number(n || 0).toFixed(1)}%`;
 
 const MONTH_NAMES = [
@@ -487,9 +487,9 @@ function PLCard({ label, value, color }) {
   };
   const { text, bg, border } = colorMap[color] ?? colorMap.emerald;
   return (
-    <div style={{ borderRadius: '16px', border: `1px solid ${border}`, background: bg, padding: '22px' }} className="card-hover">
-      <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: '36px', fontWeight: 400, letterSpacing: '-1px', color: text, margin: 0, lineHeight: 1 }}>{value}</p>
-      <p style={{ fontSize: '12px', color: '#56546a', margin: '8px 0 0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</p>
+    <div style={{ borderRadius: '16px', border: `1px solid ${border}`, background: bg, padding: 'clamp(12px, 3vw, 22px)' }} className="card-hover">
+      <p style={{ fontFamily: "'DM Serif Display', serif", fontSize: 'clamp(15px, 3.8vw, 32px)', fontWeight: 400, letterSpacing: '-0.5px', color: text, margin: 0, lineHeight: 1.1, wordBreak: 'break-all' }}>{value}</p>
+      <p style={{ fontSize: '11px', color: '#56546a', margin: '8px 0 0', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</p>
     </div>
   );
 }
