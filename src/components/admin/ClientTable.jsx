@@ -172,7 +172,16 @@ export default function ClientTable({ clients, onPropertyAction }) {
                 >
                   <td style={{ ...tdStyle, color: '#f0eee8', fontWeight: 500 }}>
                     <div>{client.name}</div>
-                    <div style={{ fontSize: 12, color: '#56546a', marginTop: 2 }}>{client.email}</div>
+                    {client.properties?.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                        {client.properties.map(p => (
+                          <span key={p.id} style={{ fontSize: 11, fontWeight: 600, color: '#6C63FF', background: 'rgba(108,99,255,0.12)', border: '1px solid rgba(108,99,255,0.2)', borderRadius: 4, padding: '1px 7px' }}>
+                            {p.property_name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div style={{ fontSize: 12, color: '#56546a', marginTop: 3 }}>{client.email}</div>
                   </td>
                   <td style={tdStyle}><PlanBadge plan={client.plan} /></td>
                   <td style={tdStyle}>{client.properties?.length ?? 0}</td>
