@@ -58,7 +58,7 @@ function findStatusCol(data) {
 function findPhoneCol(data) {
   if (!data?.length) return null;
   return Object.keys(data[0]).find(k =>
-    ['phone','mobile','contact','phoneno','mobileno'].includes(normalise(k))
+    normalise(k).includes('phone') || normalise(k).includes('mobile') || normalise(k) === 'contact'
   ) ?? null;
 }
 
