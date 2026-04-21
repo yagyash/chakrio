@@ -35,8 +35,7 @@ export default async function handler(req, res) {
   if (!token) return res.status(401).json({ error: 'Unauthorized' });
 
   const projectId = process.env.FIREBASE_PROJECT_ID;
-  const adminEmail = process.env.ADMIN_EMAIL;
-  if (!projectId || !adminEmail) return res.status(500).json({ error: 'Server configuration error' });
+  if (!projectId) return res.status(500).json({ error: 'Server configuration error' });
 
   let payload;
   try {
@@ -49,20 +48,31 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // ── 2. Admin-only gate ───────────────────────────────────────────
-  if (payload.email !== adminEmail) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
-
-  // ── 3. Fetch from Supabase ───────────────────────────────────────
+  // ── 2. Admin-only gate (Supabase admins table) ──────────────────
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!supabaseUrl || !supabaseKey) return res.status(500).json({ error: 'Server configuration error' });
 
+  const adminCheck = await fetch(
+    `${supabaseUrl}/rest/v1/admins?email=eq.${encodeURIComponent(payload.email)}&select=email&limit=1`,
+    {
+      headers: {
+        apikey:        supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+        Accept:        'application/json',
+      },
+    }
+  ).catch(() => null);
+  const adminRows = adminCheck?.ok ? await adminCheck.json().catch(() => []) : [];
+  if (!Array.isArray(adminRows) || adminRows.length === 0) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+
+  // ── 3. Fetch from Supabase ───────────────────────────────────────
   let supaRes;
   try {
     supaRes = await fetch(
-      `${supabaseUrl}/rest/v1/clients?select=id,name,plan,email,phone,is_active,created_at,properties(id,property_id,property_name,property_type,notification_channel,is_active,created_at)&order=created_at.desc&limit=500`,
+      `${supabaseUrl}/rest/v1/clients?select=id,name,plan,email,phone,is_active,created_at,properties(id,property_id,property_name,property_type,notification_channel,is_active,created_at,subscription_due_date,subscription_amount,subscription_status)&order=created_at.desc&limit=500`,
       {
         headers: {
           apikey:        supabaseKey,

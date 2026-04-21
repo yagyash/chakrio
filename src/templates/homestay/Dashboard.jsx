@@ -66,10 +66,10 @@ function isCountCol(col) {
 }
 
 /** Returns true if the column is an identifier/reference number that should not be summed */
-const ID_KEYWORDS = ['room_no', 'roomno', 'room_number', 'roomnumber', '_id', 'booking_id', 'bookingid', 'invoice_no', 'ref'];
+const ID_KEYWORDS = ['room_no', 'roomno', 'room_number', 'roomnumber', '_id', 'booking_id', 'bookingid', 'invoice_no', 'ref', 'phone', 'mobile', 'contact', 'whatsapp'];
 function isIdCol(col) {
   const c = String(col).toLowerCase().replace(/[\s-]/g, '_');
-  return ID_KEYWORDS.some((kw) => c === kw || c.endsWith(kw));
+  return ID_KEYWORDS.some((kw) => c === kw || c.endsWith(kw) || c.includes(kw));
 }
 
 /** Format a chart value — ₹ for amounts, plain for counts */
