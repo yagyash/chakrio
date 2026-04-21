@@ -235,6 +235,17 @@ export default function ClientTable({ clients, onPropertyAction }) {
                                 )}
                               </div>
 
+                              {/* Usage stats */}
+                              {p.usage ? (
+                                <div style={{ marginTop: 6, fontSize: 11, color: '#56546a', display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                                  <span>Recv: <span style={{ color: '#8c8a9e' }}>{p.usage.inbound_total} total · {p.usage.inbound_30d} this month</span></span>
+                                  <span>Sent: <span style={{ color: '#8c8a9e' }}>{p.usage.outbound_total} total · {p.usage.outbound_30d} this month</span></span>
+                                  <span>Tokens: <span style={{ color: '#8c8a9e' }}>{Number(p.usage.tokens_total).toLocaleString()}</span></span>
+                                </div>
+                              ) : (
+                                <div style={{ marginTop: 6, fontSize: 11, color: '#56546a' }}>No usage data yet</div>
+                              )}
+
                               {/* Action buttons */}
                               <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                                 {p.is_active ? (

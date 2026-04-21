@@ -90,5 +90,29 @@ export default async function handler(req, res) {
   }
 
   const clients = await supaRes.json();
+
+  // ── 4. Fetch usage counts per property ──────────────────────────
+  let usageCounts = {};
+  try {
+    const usageRes = await fetch(`${supabaseUrl}/rest/v1/rpc/get_usage_counts`, {
+      method:  'POST',
+      headers: {
+        apikey:          supabaseKey,
+        Authorization:   `Bearer ${supabaseKey}`,
+        'Content-Type':  'application/json',
+        Accept:          'application/json',
+      },
+      body: '{}',
+    });
+    if (usageRes.ok) {
+      const rows = await usageRes.json();
+      rows.forEach(r => { usageCounts[r.property_id] = r; });
+    }
+  } catch { /* non-fatal — usage counts are optional */ }
+
+  clients.forEach(c => c.properties?.forEach(p => {
+    p.usage = usageCounts[p.id] ?? null;
+  }));
+
   return res.status(200).json(clients);
 }
