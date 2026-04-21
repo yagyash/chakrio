@@ -65,6 +65,7 @@ function toSheetBooking(row) {
     'Room_No':        row.room_no        ?? '',
     'Room_Type':      row.room_type      ?? '',
     'Refund_Amount':  row.refund_amount  ?? '',
+    'Guest Phone':    row.guest_phone    ?? '',
     'updated_at':     row.updated_at     ?? '',
   };
 }
