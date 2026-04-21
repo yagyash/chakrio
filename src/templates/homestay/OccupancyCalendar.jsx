@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, Pencil, Check } from 'lucide-react';
 import { useSheetData } from '../../hooks/useSheetData';
 import { useTabNames } from '../../hooks/useTabNames';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -32,7 +32,6 @@ function normalise(s) {
   return String(s).toLowerCase().replace(/[\s_\-]/g, '');
 }
 
-/** Find the check-in and check-out column keys from the first row. */
 function findDateCols(data) {
   if (!data?.length) return { checkIn: null, checkOut: null };
   const keys = Object.keys(data[0]);
@@ -56,7 +55,27 @@ function findStatusCol(data) {
   return Object.keys(data[0]).find(k => normalise(k).includes('status')) ?? null;
 }
 
-/** Parse an ISO or DD/MM/YYYY date string to midnight local Date. */
+function findPhoneCol(data) {
+  if (!data?.length) return null;
+  return Object.keys(data[0]).find(k =>
+    ['phone','mobile','contact','phoneno','mobileno'].includes(normalise(k))
+  ) ?? null;
+}
+
+function findRoomCol(data) {
+  if (!data?.length) return null;
+  return Object.keys(data[0]).find(k =>
+    ['roomno','roomnumber','room'].includes(normalise(k))
+  ) ?? null;
+}
+
+function findBalanceCol(data) {
+  if (!data?.length) return null;
+  return Object.keys(data[0]).find(k =>
+    ['balance','balanceamount','due','balancedue'].includes(normalise(k))
+  ) ?? null;
+}
+
 function parseDate(s) {
   if (!s) return null;
   const d = new Date(s);
@@ -79,19 +98,42 @@ export default function OccupancyCalendar() {
   const [viewYear,  setViewYear]  = useState(today.getFullYear());
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selected,  setSelected]  = useState(null);
+  const [dayDetail, setDayDetail] = useState(null); // { dateKey, bookings[] }
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneInput,   setPhoneInput]   = useState('');
 
   const { bookingsTab } = useTabNames();
   const { data, loading, error, refetch } = useSheetData(bookingsTab);
+
+  // localStorage phone overrides
+  const STORE_KEY = `chakrio_phones_${bookingsTab ?? 'default'}`;
+  function loadPhoneOverrides() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; }
+  }
+  function savePhoneOverride(idx, phone) {
+    const store = loadPhoneOverrides();
+    store[idx] = phone;
+    localStorage.setItem(STORE_KEY, JSON.stringify(store));
+  }
+  const phoneOverrides = useMemo(() => loadPhoneOverrides(), [data]); // eslint-disable-line react-hooks/exhaustive-deps
+  function getPhone(bk) {
+    const stored = phoneOverrides[bk._idx];
+    if (stored) return stored;
+    return cols.phoneCol ? bk[cols.phoneCol] : '';
+  }
 
   // Build a map: 'YYYY-MM-DD' → [booking rows]
   const { byDay, cols } = useMemo(() => {
     if (!data?.length) return { byDay: {}, cols: {} };
 
     const { checkIn, checkOut } = findDateCols(data);
-    const guestCol  = findGuestCol(data);
-    const statusCol = findStatusCol(data);
+    const guestCol   = findGuestCol(data);
+    const statusCol  = findStatusCol(data);
+    const phoneCol   = findPhoneCol(data);
+    const roomCol    = findRoomCol(data);
+    const balanceCol = findBalanceCol(data);
 
-    if (!checkIn || !checkOut) return { byDay: {}, cols: { guestCol, statusCol } };
+    if (!checkIn || !checkOut) return { byDay: {}, cols: { guestCol, statusCol, phoneCol, roomCol, balanceCol } };
 
     const map = {};
     data.forEach((row, idx) => {
@@ -99,7 +141,6 @@ export default function OccupancyCalendar() {
       const co = parseDate(row[checkOut]);
       if (!ci || !co || co <= ci) return;
 
-      // Iterate each night (check-in day up to but not including check-out day)
       const cur = new Date(ci);
       while (cur < co) {
         const key = toKey(cur);
@@ -108,7 +149,7 @@ export default function OccupancyCalendar() {
       }
     });
 
-    return { byDay: map, cols: { checkIn, checkOut, guestCol, statusCol } };
+    return { byDay: map, cols: { checkIn, checkOut, guestCol, statusCol, phoneCol, roomCol, balanceCol } };
   }, [data]);
 
   // Month-level stats
@@ -136,6 +177,19 @@ export default function OccupancyCalendar() {
 
   const firstDayOfWeek = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth    = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  function openSelected(bk) {
+    setDayDetail(null);
+    setSelected(bk);
+    setEditingPhone(false);
+    setPhoneInput('');
+  }
+
+  function closeSelected() {
+    setSelected(null);
+    setEditingPhone(false);
+    setPhoneInput('');
+  }
 
   // ---------------------------------------------------------------------------
   // Render states
@@ -175,7 +229,7 @@ export default function OccupancyCalendar() {
               Occupancy Calendar
             </h2>
             <p style={{ fontSize: '13px', color: '#56546a', marginTop: '4px' }}>
-              Click a booking chip to see details
+              Click a booking chip or date to see all bookings for that day
             </p>
           </div>
 
@@ -220,8 +274,8 @@ export default function OccupancyCalendar() {
 
             {/* Actual days */}
             {Array.from({ length: daysInMonth }).map((_, i) => {
-              const day     = i + 1;
-              const dateKey = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+              const day      = i + 1;
+              const dateKey  = `${viewYear}-${String(viewMonth + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
               const bookings = byDay[dateKey] || [];
               const isToday  = toKey(today) === dateKey;
 
@@ -236,14 +290,18 @@ export default function OccupancyCalendar() {
                     verticalAlign: 'top',
                   }}
                 >
-                  {/* Day number */}
-                  <span style={{
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    width: '24px', height: '24px', borderRadius: '50%', fontSize: '13px',
-                    fontWeight: isToday ? 700 : 400,
-                    color: isToday ? '#fff' : (bookings.length ? '#c4c2d4' : '#56546a'),
-                    background: isToday ? '#6C63FF' : 'transparent',
-                  }}>
+                  {/* Day number — clickable when bookings exist */}
+                  <span
+                    onClick={() => bookings.length && setDayDetail({ dateKey, bookings })}
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      width: '24px', height: '24px', borderRadius: '50%', fontSize: '13px',
+                      fontWeight: isToday ? 700 : 400,
+                      color: isToday ? '#fff' : (bookings.length ? '#c4c2d4' : '#56546a'),
+                      background: isToday ? '#6C63FF' : 'transparent',
+                      cursor: bookings.length ? 'pointer' : 'default',
+                    }}
+                  >
                     {day}
                   </span>
 
@@ -251,31 +309,41 @@ export default function OccupancyCalendar() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
                     {bookings.slice(0, 3).map((bk, bi) => {
                       const status = cols.statusCol ? bk[cols.statusCol] : '';
-                      const guest  = cols.guestCol ? bk[cols.guestCol] : 'Guest';
+                      const guest  = cols.guestCol  ? bk[cols.guestCol]  : 'Guest';
+                      const room   = cols.roomCol   ? bk[cols.roomCol]   : '';
+                      const phone  = getPhone(bk);
                       const { bg, text } = statusColor(status);
+                      const label  = room ? `Rm ${room} · ${guest}` : guest;
                       return (
                         <div
                           key={bi}
-                          onClick={() => setSelected(bk)}
-                          title={guest}
+                          onClick={() => openSelected(bk)}
+                          title={phone ? `${label} · ${phone}` : label}
                           style={{
                             background: bg, color: text,
                             fontSize: '11px', fontWeight: 500,
                             padding: '2px 6px', borderRadius: '3px',
                             cursor: 'pointer',
                             whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                            lineHeight: '1.5',
-                            transition: 'opacity 0.15s',
+                            lineHeight: '1.4', transition: 'opacity 0.15s',
                           }}
                           onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
                           onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                         >
-                          {guest}
+                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
+                          {phone && (
+                            <div style={{ fontSize: '10px', opacity: 0.8, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {phone}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
                     {bookings.length > 3 && (
-                      <span style={{ fontSize: '10px', color: '#56546a', paddingLeft: '4px' }}>
+                      <span
+                        onClick={() => setDayDetail({ dateKey, bookings })}
+                        style={{ fontSize: '10px', color: '#7c6af5', paddingLeft: '4px', cursor: 'pointer', textDecoration: 'underline' }}
+                      >
                         +{bookings.length - 3} more
                       </span>
                     )}
@@ -303,18 +371,107 @@ export default function OccupancyCalendar() {
 
       </div>
 
-      {/* Booking detail modal */}
+      {/* ------------------------------------------------------------------- */}
+      {/* Day Detail Modal — all bookings for a clicked day                   */}
+      {/* ------------------------------------------------------------------- */}
+      {dayDetail && (
+        <div
+          onClick={() => setDayDetail(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#16151f', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', maxWidth: '720px', padding: '24px', position: 'relative', maxHeight: '82vh', display: 'flex', flexDirection: 'column' }}
+          >
+            <button
+              onClick={() => setDayDetail(null)}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#8c8a9e', display: 'flex', alignItems: 'center' }}
+            >
+              <X size={16} />
+            </button>
+
+            <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#f0eee8', marginBottom: '2px' }}>
+              {dayDetail.dateKey}
+            </h3>
+            <p style={{ fontSize: '12px', color: '#56546a', marginBottom: '16px' }}>
+              {dayDetail.bookings.length} booking{dayDetail.bookings.length !== 1 ? 's' : ''} · click a row to see full details
+            </p>
+
+            <div style={{ overflowY: 'auto', flex: 1 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <thead style={{ position: 'sticky', top: 0, background: '#16151f', zIndex: 1 }}>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                    {cols.roomCol    && <th style={thStyle}>Room</th>}
+                    <th style={thStyle}>Guest</th>
+                    {cols.phoneCol   && <th style={thStyle}>Phone</th>}
+                    <th style={thStyle}>Check-in</th>
+                    <th style={thStyle}>Check-out</th>
+                    <th style={thStyle}>Status</th>
+                    {cols.balanceCol && <th style={thStyle}>Balance</th>}
+                  </tr>
+                </thead>
+                <tbody>
+                  {dayDetail.bookings.map((bk, i) => {
+                    const status = cols.statusCol ? bk[cols.statusCol] : '';
+                    const phone  = getPhone(bk);
+                    const { bg, text } = statusColor(status);
+                    return (
+                      <tr
+                        key={i}
+                        onClick={() => openSelected(bk)}
+                        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', cursor: 'pointer', transition: 'background 0.1s' }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {cols.roomCol && (
+                          <td style={{ ...tdStyle, fontWeight: 600, color: '#c4c2d4' }}>
+                            {bk[cols.roomCol] || '—'}
+                          </td>
+                        )}
+                        <td style={{ ...tdStyle, color: '#f0eee8', fontWeight: 500 }}>
+                          {cols.guestCol ? bk[cols.guestCol] : '—'}
+                        </td>
+                        {cols.phoneCol && (
+                          <td style={tdStyle}>
+                            {phone || <span style={{ color: '#56546a' }}>—</span>}
+                          </td>
+                        )}
+                        <td style={tdStyle}>{cols.checkIn  ? formatDate(bk[cols.checkIn])  : '—'}</td>
+                        <td style={tdStyle}>{cols.checkOut ? formatDate(bk[cols.checkOut]) : '—'}</td>
+                        <td style={tdStyle}>
+                          <span style={{ background: bg, color: text, fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '4px', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>
+                            {status || '—'}
+                          </span>
+                        </td>
+                        {cols.balanceCol && (
+                          <td style={{ ...tdStyle, color: '#f0eee8' }}>
+                            ₹{bk[cols.balanceCol] || 0}
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------------- */}
+      {/* Booking detail modal                                                 */}
+      {/* ------------------------------------------------------------------- */}
       {selected && (
         <div
-          onClick={() => setSelected(null)}
-          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={closeSelected}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{ background: '#16151f', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', width: '100%', maxWidth: '440px', padding: '24px', position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}
           >
             <button
-              onClick={() => setSelected(null)}
+              onClick={closeSelected}
               style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer', color: '#8c8a9e', display: 'flex', alignItems: 'center' }}
             >
               <X size={16} />
@@ -330,7 +487,54 @@ export default function OccupancyCalendar() {
                 .map(([k, v]) => {
                   const isStatus = k.toLowerCase().includes('status');
                   const isDate   = isDateCol(k);
+                  const isPhone  = cols.phoneCol && k === cols.phoneCol;
                   const { bg, text } = isStatus ? statusColor(v) : {};
+                  const displayPhone = getPhone(selected);
+
+                  if (isPhone) {
+                    return (
+                      <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <span style={{ fontSize: '12px', color: '#56546a', flexShrink: 0 }}>{k}</span>
+                        {editingPhone ? (
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <input
+                              autoFocus
+                              value={phoneInput}
+                              onChange={e => setPhoneInput(e.target.value)}
+                              placeholder="Enter phone number"
+                              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(108,99,255,0.5)', borderRadius: '6px', padding: '4px 8px', color: '#f0eee8', fontSize: '13px', width: '160px', outline: 'none' }}
+                            />
+                            <button
+                              onClick={() => {
+                                if (phoneInput.trim()) {
+                                  savePhoneOverride(selected._idx, phoneInput.trim());
+                                  setSelected(prev => ({ ...prev, [k]: phoneInput.trim() }));
+                                }
+                                setEditingPhone(false);
+                              }}
+                              style={{ background: '#6C63FF', border: 'none', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center' }}
+                            >
+                              <Check size={13} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                            <span style={{ fontSize: '13px', color: displayPhone ? '#f0eee8' : '#56546a', fontWeight: 500 }}>
+                              {displayPhone || 'Not added'}
+                            </span>
+                            <button
+                              onClick={() => { setEditingPhone(true); setPhoneInput(displayPhone || ''); }}
+                              style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', padding: '4px', cursor: 'pointer', color: '#8c8a9e', display: 'flex', alignItems: 'center' }}
+                              title="Edit phone number"
+                            >
+                              <Pencil size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
                   return (
                     <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                       <span style={{ fontSize: '12px', color: '#56546a', flexShrink: 0, paddingTop: '2px' }}>{k}</span>
@@ -344,6 +548,48 @@ export default function OccupancyCalendar() {
                     </div>
                   );
                 })}
+
+              {/* Add phone row if no phone column exists in data at all */}
+              {!cols.phoneCol && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span style={{ fontSize: '12px', color: '#56546a', flexShrink: 0 }}>Phone</span>
+                  {editingPhone ? (
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                      <input
+                        autoFocus
+                        value={phoneInput}
+                        onChange={e => setPhoneInput(e.target.value)}
+                        placeholder="Enter phone number"
+                        style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(108,99,255,0.5)', borderRadius: '6px', padding: '4px 8px', color: '#f0eee8', fontSize: '13px', width: '160px', outline: 'none' }}
+                      />
+                      <button
+                        onClick={() => {
+                          if (phoneInput.trim()) {
+                            savePhoneOverride(selected._idx, phoneInput.trim());
+                          }
+                          setEditingPhone(false);
+                        }}
+                        style={{ background: '#6C63FF', border: 'none', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center' }}
+                      >
+                        <Check size={13} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '13px', color: phoneOverrides[selected._idx] ? '#f0eee8' : '#56546a', fontWeight: 500 }}>
+                        {phoneOverrides[selected._idx] || 'Not added'}
+                      </span>
+                      <button
+                        onClick={() => { setEditingPhone(true); setPhoneInput(phoneOverrides[selected._idx] || ''); }}
+                        style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', padding: '4px', cursor: 'pointer', color: '#8c8a9e', display: 'flex', alignItems: 'center' }}
+                        title="Add phone number"
+                      >
+                        <Pencil size={12} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -371,4 +617,20 @@ const navBtn = {
 const emptyCell = {
   minHeight: '88px',
   borderTop: '1px solid rgba(255,255,255,0.05)',
+};
+
+const thStyle = {
+  textAlign: 'left',
+  padding: '8px 12px',
+  fontSize: '11px',
+  color: '#56546a',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+};
+
+const tdStyle = {
+  padding: '10px 12px',
+  color: '#8c8a9e',
+  verticalAlign: 'middle',
 };
