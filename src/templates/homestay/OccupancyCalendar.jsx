@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, X, Pencil, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useSheetData } from '../../hooks/useSheetData';
 import { useTabNames } from '../../hooks/useTabNames';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -99,26 +99,11 @@ export default function OccupancyCalendar() {
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [selected,  setSelected]  = useState(null);
   const [dayDetail, setDayDetail] = useState(null); // { dateKey, bookings[] }
-  const [editingPhone, setEditingPhone] = useState(false);
-  const [phoneInput,   setPhoneInput]   = useState('');
 
   const { bookingsTab } = useTabNames();
   const { data, loading, error, refetch } = useSheetData(bookingsTab);
 
-  // localStorage phone overrides
-  const STORE_KEY = `chakrio_phones_${bookingsTab ?? 'default'}`;
-  function loadPhoneOverrides() {
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { return {}; }
-  }
-  function savePhoneOverride(idx, phone) {
-    const store = loadPhoneOverrides();
-    store[idx] = phone;
-    localStorage.setItem(STORE_KEY, JSON.stringify(store));
-  }
-  const phoneOverrides = useMemo(() => loadPhoneOverrides(), [data]); // eslint-disable-line react-hooks/exhaustive-deps
   function getPhone(bk) {
-    const stored = phoneOverrides[bk._idx];
-    if (stored) return stored;
     return cols.phoneCol ? bk[cols.phoneCol] : '';
   }
 
@@ -181,14 +166,10 @@ export default function OccupancyCalendar() {
   function openSelected(bk) {
     setDayDetail(null);
     setSelected(bk);
-    setEditingPhone(false);
-    setPhoneInput('');
   }
 
   function closeSelected() {
     setSelected(null);
-    setEditingPhone(false);
-    setPhoneInput('');
   }
 
   // ---------------------------------------------------------------------------
@@ -487,53 +468,7 @@ export default function OccupancyCalendar() {
                 .map(([k, v]) => {
                   const isStatus = k.toLowerCase().includes('status');
                   const isDate   = isDateCol(k);
-                  const isPhone  = cols.phoneCol && k === cols.phoneCol;
                   const { bg, text } = isStatus ? statusColor(v) : {};
-                  const displayPhone = getPhone(selected);
-
-                  if (isPhone) {
-                    return (
-                      <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                        <span style={{ fontSize: '12px', color: '#56546a', flexShrink: 0 }}>{k}</span>
-                        {editingPhone ? (
-                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                            <input
-                              autoFocus
-                              value={phoneInput}
-                              onChange={e => setPhoneInput(e.target.value)}
-                              placeholder="Enter phone number"
-                              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(108,99,255,0.5)', borderRadius: '6px', padding: '4px 8px', color: '#f0eee8', fontSize: '13px', width: '160px', outline: 'none' }}
-                            />
-                            <button
-                              onClick={() => {
-                                if (phoneInput.trim()) {
-                                  savePhoneOverride(selected._idx, phoneInput.trim());
-                                  setSelected(prev => ({ ...prev, [k]: phoneInput.trim() }));
-                                }
-                                setEditingPhone(false);
-                              }}
-                              style={{ background: '#6C63FF', border: 'none', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center' }}
-                            >
-                              <Check size={13} />
-                            </button>
-                          </div>
-                        ) : (
-                          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            <span style={{ fontSize: '13px', color: displayPhone ? '#f0eee8' : '#56546a', fontWeight: 500 }}>
-                              {displayPhone || 'Not added'}
-                            </span>
-                            <button
-                              onClick={() => { setEditingPhone(true); setPhoneInput(displayPhone || ''); }}
-                              style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', padding: '4px', cursor: 'pointer', color: '#8c8a9e', display: 'flex', alignItems: 'center' }}
-                              title="Edit phone number"
-                            >
-                              <Pencil size={12} />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
 
                   return (
                     <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -549,47 +484,6 @@ export default function OccupancyCalendar() {
                   );
                 })}
 
-              {/* Add phone row if no phone column exists in data at all */}
-              {!cols.phoneCol && (
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span style={{ fontSize: '12px', color: '#56546a', flexShrink: 0 }}>Phone</span>
-                  {editingPhone ? (
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                      <input
-                        autoFocus
-                        value={phoneInput}
-                        onChange={e => setPhoneInput(e.target.value)}
-                        placeholder="Enter phone number"
-                        style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(108,99,255,0.5)', borderRadius: '6px', padding: '4px 8px', color: '#f0eee8', fontSize: '13px', width: '160px', outline: 'none' }}
-                      />
-                      <button
-                        onClick={() => {
-                          if (phoneInput.trim()) {
-                            savePhoneOverride(selected._idx, phoneInput.trim());
-                          }
-                          setEditingPhone(false);
-                        }}
-                        style={{ background: '#6C63FF', border: 'none', borderRadius: '6px', padding: '4px 8px', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center' }}
-                      >
-                        <Check size={13} />
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                      <span style={{ fontSize: '13px', color: phoneOverrides[selected._idx] ? '#f0eee8' : '#56546a', fontWeight: 500 }}>
-                        {phoneOverrides[selected._idx] || 'Not added'}
-                      </span>
-                      <button
-                        onClick={() => { setEditingPhone(true); setPhoneInput(phoneOverrides[selected._idx] || ''); }}
-                        style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: '6px', padding: '4px', cursor: 'pointer', color: '#8c8a9e', display: 'flex', alignItems: 'center' }}
-                        title="Add phone number"
-                      >
-                        <Pencil size={12} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>
