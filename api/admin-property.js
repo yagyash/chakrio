@@ -83,11 +83,37 @@ export default async function handler(req, res) {
   };
 
   if (req.method === 'DELETE') {
+    // Fetch client_id before deleting so we can cascade-delete orphaned client
+    const fetchHeaders = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Accept: 'application/json' };
+    const propRes = await fetch(
+      `${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}&select=client_id`,
+      { headers: fetchHeaders }
+    ).catch(() => null);
+    const propData = propRes?.ok ? await propRes.json().catch(() => []) : [];
+    const clientId = propData[0]?.client_id ?? null;
+
+    // Delete property (cascades to rooms via FK)
     const r = await fetch(
       `${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}`,
       { method: 'DELETE', headers }
     );
     if (!r.ok) return res.status(502).json({ error: 'Delete failed' });
+
+    // Delete client if they have no remaining properties
+    if (clientId) {
+      const remRes = await fetch(
+        `${supabaseUrl}/rest/v1/properties?client_id=eq.${clientId}&select=id`,
+        { headers: fetchHeaders }
+      ).catch(() => null);
+      const remaining = remRes?.ok ? await remRes.json().catch(() => [null]) : [null];
+      if (remaining.length === 0) {
+        await fetch(
+          `${supabaseUrl}/rest/v1/clients?id=eq.${clientId}`,
+          { method: 'DELETE', headers }
+        ).catch(() => null);
+      }
+    }
+
     return res.status(200).json({ ok: true });
   }
 
