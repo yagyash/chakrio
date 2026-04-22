@@ -124,14 +124,25 @@ export default function Sidebar() {
         {hasMultipleProperties && (
           <button
             onClick={() => { selectProperty(null); setMobileOpen(false); }}
-            className="mt-2 flex items-center gap-1.5 text-xs transition-colors duration-100 focus-visible:outline-none focus-visible:underline"
-            style={{ color: '#c8a96e' }}
+            className="mt-2 w-full flex items-center justify-center gap-2 transition-all duration-100 focus-visible:outline-none"
+            style={{
+              background: 'rgba(200,169,110,0.08)',
+              border: '1px solid rgba(200,169,110,0.2)',
+              borderRadius: '8px',
+              padding: '7px 10px',
+              color: '#c8a96e',
+              fontSize: '12px',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(200,169,110,0.15)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(200,169,110,0.08)'}
           >
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
-            Switch property
+            Switch Property
           </button>
         )}
       </div>
