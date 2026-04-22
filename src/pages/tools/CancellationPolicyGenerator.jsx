@@ -147,12 +147,123 @@ export default function CancellationPolicyGenerator() {
         })}</script>
       </Helmet>
       <Navbar />
-      <div className='intro text-center py-8'><h2>About Chakrio</h2><p>Chakrio optimizes property management with AI-powered automation tools tailored for homestays, villas, and guesthouses. Our platform streamlines booking management, ensuring operational efficiency and ease for property managers.</p></div>
-      <div className='entity-clarity py-4'><p>As a Software as a Service (SaaS) platform, Chakrio specifically targets property managers looking to simplify and enhance their booking and management processes for homestays, villas, and guesthouses.</p></div>
-      {/* Insertion point for content */}
-      <div className='use-cases py-4'><h3>Use Case Examples</h3><p>Utilize this tool to effortlessly generate customized cancellation policies for both peak season and off-season bookings, adjusting refund terms to optimize bookings and customer satisfaction.</p></div>
-      <CTABox />
-      <div className='trust-signals text-center py-8'><h3>Free to Use — No Sign-Up Required</h3><p>This tool is provided free by Chakrio for property managers across India. Generate a professional cancellation policy in seconds and paste it directly into your listing, guest messages, or booking confirmation. No account needed.</p></div>
+
+      <main className="flex-1 max-w-3xl mx-auto w-full px-6 py-12">
+        {/* Breadcrumb */}
+        <nav className="text-sm text-text-3 mb-8 flex items-center gap-2">
+          <a href="/" className="hover:text-text-2 transition-colors">Home</a>
+          <span>›</span>
+          <span className="text-text-2">Free Tools</span>
+          <span>›</span>
+          <span className="text-text-1">Cancellation Policy Generator</span>
+        </nav>
+
+        {/* Header */}
+        <div className="mb-10">
+          <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight">
+            Hotel Cancellation Policy Generator
+          </h1>
+          <p className="text-text-2 text-base leading-relaxed max-w-2xl">
+            Generate a professional cancellation policy in seconds. Customise your refund windows,
+            advance deposit terms, and no-show conditions — then copy and paste directly into your listing.
+          </p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-surface rounded-2xl border border-surface3 p-8 mb-8">
+
+          {/* Property name + deposit */}
+          <div className="grid sm:grid-cols-2 gap-6 mb-8">
+            <div>
+              <label className="block text-sm font-medium text-text-2 mb-2">Property Name</label>
+              <input type="text" value={propertyName} onChange={e => setPropertyName(e.target.value)}
+                placeholder="e.g. Lakeside Villa"
+                className="w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors"
+                onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-text-2 mb-2">Advance Deposit (%)</label>
+              <input type="number" min="0" max="100" value={depositPct} onChange={e => setDepositPct(e.target.value)}
+                placeholder="e.g. 30"
+                className="w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors"
+                onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+            </div>
+          </div>
+
+          {/* Cancellation windows */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <label className="text-sm font-medium text-text-2">Cancellation Windows</label>
+              <button onClick={() => setWindows(w => [...w, { days: 2, refund: 25 }])}
+                className="text-xs px-3 py-1.5 rounded-lg font-medium transition-colors"
+                style={{ background: 'rgba(200,169,110,0.12)', color: '#c8a96e', border: '1px solid rgba(200,169,110,0.25)' }}>
+                + Add Window
+              </button>
+            </div>
+            <div className="space-y-3">
+              {windows.map((w, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="text-text-3 text-sm w-24 shrink-0">Cancel {i === 0 ? '≥' : '<'}</span>
+                  <input type="number" min="1" value={w.days} onChange={e => updateWindow(i, 'days', Number(e.target.value))}
+                    className="w-20 bg-surface2 border border-surface3 rounded-lg px-3 py-2 text-text-1 text-sm focus:outline-none transition-colors text-center"
+                    onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+                  <span className="text-text-3 text-sm shrink-0">days → </span>
+                  <input type="number" min="0" max="100" value={w.refund} onChange={e => updateWindow(i, 'refund', Number(e.target.value))}
+                    className="w-20 bg-surface2 border border-surface3 rounded-lg px-3 py-2 text-text-1 text-sm focus:outline-none transition-colors text-center"
+                    onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+                  <span className="text-text-3 text-sm shrink-0">% refund</span>
+                  {windows.length > 1 && (
+                    <button onClick={() => setWindows(w => w.filter((_, idx) => idx !== i))}
+                      className="ml-auto text-text-3 hover:text-ch-red transition-colors text-lg leading-none">×</button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* No-show */}
+          <div className="mb-8">
+            <label className="block text-sm font-medium text-text-2 mb-2">No-Show Policy</label>
+            <textarea value={noShow} onChange={e => setNoShow(e.target.value)} rows={2}
+              className="w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors resize-none text-sm"
+              onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button onClick={generate}
+              style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+              Generate Policy
+            </button>
+            {policy && (
+              <button onClick={reset} className="px-6 py-3 rounded-xl font-medium text-sm text-text-2 bg-surface2 hover:bg-surface3 transition-colors">
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Output */}
+        {policy && (
+          <div className="bg-surface rounded-2xl border border-surface3 p-8 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-semibold text-text-1">Your Cancellation Policy</h2>
+              <button onClick={copyToClipboard}
+                style={{ background: copied ? 'rgba(76,175,80,0.15)' : 'rgba(200,169,110,0.12)', color: copied ? '#4CAF50' : '#c8a96e', border: `1px solid ${copied ? 'rgba(76,175,80,0.3)' : 'rgba(200,169,110,0.25)'}`, borderRadius: '10px', padding: '8px 16px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+                {copied ? 'Copied!' : 'Copy Text'}
+              </button>
+            </div>
+            <pre className="text-text-2 text-sm leading-relaxed whitespace-pre-wrap font-sans">{policy}</pre>
+          </div>
+        )}
+
+        <CTABox />
+        <div className='trust-signals text-center py-8 text-text-3 text-sm'><p>Free to Use — No Sign-Up Required. Generate as many policies as you need.</p></div>
+      </main>
+
+      <div className='intro hidden'><h2>About Chakrio</h2><p>Chakrio optimizes property management with AI-powered automation tools tailored for homestays, villas, and guesthouses. Our platform streamlines booking management, ensuring operational efficiency and ease for property managers.</p></div>
+      <div className='entity-clarity hidden'><p>As a Software as a Service (SaaS) platform, Chakrio specifically targets property managers looking to simplify and enhance their booking and management processes for homestays, villas, and guesthouses.</p></div>
+      <div className='use-cases hidden'><h3>Use Case Examples</h3><p>Utilize this tool to effortlessly generate customized cancellation policies for both peak season and off-season bookings, adjusting refund terms to optimize bookings and customer satisfaction.</p></div>
       <Footer />
     </div>
   );
