@@ -53,7 +53,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
         <title>Chakrio — Property Bookings, Auto-Recorded</title>
-        <meta name="description" content="Send a message, your booking is logged. Chakrio's AI records bookings, cancellations, and expenses automatically. No spreadsheets, no manual entry. Free tools for property managers." />
+        <meta name="description" content="Record property bookings, expenses & cancellations by message. Chakrio's AI logs everything instantly. Free dashboard for homestay and villa managers." />
         <link rel="canonical" href="https://chakrio.com/" />
         <meta property="og:title" content="Chakrio — Property Bookings, Auto-Recorded" />
         <meta property="og:description" content="Send a message, your booking is logged. Chakrio's AI records everything automatically — no spreadsheets, no manual entry." />
