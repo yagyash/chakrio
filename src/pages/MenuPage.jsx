@@ -10,6 +10,7 @@
  */
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
@@ -60,6 +61,12 @@ export default function MenuPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0f0e17', color: '#f0eee8', fontFamily: "'DM Sans', sans-serif" }}>
+      <Helmet>
+        <title>Digital Menu | Chakrio</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href={`https://chakrio.com/menu/${propertyId}`} />
+        <meta property="og:url" content={`https://chakrio.com/menu/${propertyId}`} />
+      </Helmet>
 
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #1a1830 0%, #16151f 100%)', borderBottom: '1px solid rgba(255,255,255,0.07)', padding: '24px 20px 20px' }}>

@@ -264,6 +264,38 @@ export default function CancellationPolicyGenerator() {
       <div className='intro hidden'><h2>About Chakrio</h2><p>Chakrio optimizes property management with AI-powered automation tools tailored for homestays, villas, and guesthouses. Our platform streamlines booking management, ensuring operational efficiency and ease for property managers.</p></div>
       <div className='entity-clarity hidden'><p>As a Software as a Service (SaaS) platform, Chakrio specifically targets property managers looking to simplify and enhance their booking and management processes for homestays, villas, and guesthouses.</p></div>
       <div className='use-cases hidden'><h3>Use Case Examples</h3><p>Utilize this tool to effortlessly generate customized cancellation policies for both peak season and off-season bookings, adjusting refund terms to optimize bookings and customer satisfaction.</p></div>
+
+      {/* Related tools */}
+      <div className="max-w-3xl mx-auto px-4 pb-10">
+        <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
+        <div className="grid sm:grid-cols-3 gap-4">
+          <Link to="/tools/occupancy-calculator"
+            className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+            style={{ textDecoration: 'none' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+            <p className="font-medium text-text-1 mb-1">Occupancy Rate Calculator</p>
+            <p className="text-text-2 text-sm">Calculate your property's occupancy rate and compare to industry benchmarks.</p>
+          </Link>
+          <Link to="/tools/rental-income-calculator"
+            className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+            style={{ textDecoration: 'none' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+            <p className="font-medium text-text-1 mb-1">Rental Income Calculator</p>
+            <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
+          </Link>
+          <Link to="/tools/invoice-generator"
+            className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+            style={{ textDecoration: 'none' }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+            <p className="font-medium text-text-1 mb-1">Villa & Homestay Invoice Generator</p>
+            <p className="text-text-2 text-sm">Generate a professional PDF invoice for your guests. No sign-up required.</p>
+          </Link>
+        </div>
+      </div>
+
       <Footer />
     </div>
   );

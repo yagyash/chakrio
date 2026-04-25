@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ChevronRight, ChevronLeft, Upload, X, Download } from 'lucide-react';
 
@@ -392,6 +392,14 @@ function Success({ email, channel }) {
 export default function OnboardPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const meta = document.createElement('meta');
+    meta.name = 'robots';
+    meta.content = 'noindex, nofollow';
+    document.head.appendChild(meta);
+    return () => document.head.removeChild(meta);
+  }, []);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [done, setDone] = useState(false);
@@ -480,7 +488,7 @@ export default function OnboardPage() {
     <div style={S.page}>
       {/* Logo / branding */}
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
-        <span style={{ fontSize: 22, fontWeight: 800, color: '#6C63FF', letterSpacing: '-0.03em' }}>chakrio</span>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#6C63FF', letterSpacing: '-0.03em', margin: 0 }}>chakrio</h1>
         <div style={{ fontSize: 13, color: '#56546a', marginTop: 4 }}>Property Management Dashboard</div>
       </div>
 
