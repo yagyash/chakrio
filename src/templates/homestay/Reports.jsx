@@ -432,12 +432,17 @@ export default function Reports() {
           <ChartCard title="Room Revenue vs Food & Extras" className="animate-fade-in-up stagger-7">
             <ResponsiveContainer width="100%" height={220}>
               <BarChart
-                data={sortedMonths.map((ym) => ({
-                  label: ym,
-                  Room:  monthlyData[ym]?.revenue ?? 0,
-                  Food:  (extrasMonthly[ym] ?? {}).food ?? 0,
-                  Other: (extrasMonthly[ym] ?? {}).other ?? 0,
-                }))}
+                data={sortedMonths.map((ym) => {
+                  const totalRev = monthlyData[ym]?.revenue ?? 0;
+                  const food  = (extrasMonthly[ym] ?? {}).food  ?? 0;
+                  const other = (extrasMonthly[ym] ?? {}).other ?? 0;
+                  return {
+                    label: ym,
+                    Room:  Math.max(0, totalRev - food - other),
+                    Food:  food,
+                    Other: other,
+                  };
+                })}
                 barGap={2}
                 margin={{ top: 18, right: 8, left: 0, bottom: 0 }}
               >
