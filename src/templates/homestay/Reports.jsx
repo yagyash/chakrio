@@ -135,6 +135,7 @@ export default function Reports() {
   const { bookingsTab, expensesTab } = useTabNames();
   const { data: bookings, loading: bLoading, error: bError, refetch: bRefetch } = useSheetData(bookingsTab);
   const { data: expenses, loading: eLoading, error: eError, refetch: eRefetch } = useSheetData(expensesTab);
+  const { data: extras } = useSheetData('extras');
 
   const [selectedMonth, setSelectedMonth] = useState('');
 
@@ -179,6 +180,19 @@ export default function Reports() {
 
     return map;
   }, [bookings, expenses]);
+
+  // ── extras aggregated by month + category ────────────────────────────────
+  const extrasMonthly = useMemo(() => {
+    const map = {};
+    (extras || []).forEach((r) => {
+      const ym = toYearMonth(String(r.created_at ?? ''));
+      if (!ym) return;
+      if (!map[ym]) map[ym] = { food: 0, other: 0 };
+      if (r.category === 'food') map[ym].food += Number(r.amount || 0);
+      else map[ym].other += Number(r.amount || 0);
+    });
+    return map;
+  }, [extras]);
 
   // ── sorted month list for picker ──────────────────────────────────────────
   const monthOptions = useMemo(
@@ -323,11 +337,12 @@ export default function Reports() {
         </div>
 
         {/* ── P&L summary strip for selected month ────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in-up stagger-2">
-          <PLCard label="Revenue"    value={`₹${fmt(plData.revenue)}`} color="emerald" />
-          <PLCard label="Expenses"   value={`₹${fmt(plData.expense)}`} color="rose" />
-          <PLCard label="Net Profit" value={`₹${fmt(plData.profit)}`}  color={plData.profit >= 0 ? 'emerald' : 'rose'} />
-          <PLCard label="Bookings"   value={plData.bookingCount}        color="blue" />
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 animate-fade-in-up stagger-2">
+          <PLCard label="Revenue"      value={`₹${fmt(plData.revenue)}`} color="emerald" />
+          <PLCard label="Expenses"     value={`₹${fmt(plData.expense)}`} color="rose" />
+          <PLCard label="Net Profit"   value={`₹${fmt(plData.profit)}`}  color={plData.profit >= 0 ? 'emerald' : 'rose'} />
+          <PLCard label="Food Revenue" value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`} color="amber" />
+          <PLCard label="Bookings"     value={plData.bookingCount}        color="blue" />
         </div>
 
         {/* ── 4 chart panels ──────────────────────────────────────────────── */}
@@ -412,6 +427,32 @@ export default function Reports() {
 
         </div>
 
+        {/* ── Room vs Food extras breakdown ────────────────────────────────── */}
+        {Object.keys(extrasMonthly).length > 0 && (
+          <ChartCard title="Room Revenue vs Food & Extras" className="animate-fade-in-up stagger-7">
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart
+                data={sortedMonths.map((ym) => ({
+                  label: ym,
+                  Room:  monthlyData[ym]?.revenue ?? 0,
+                  Food:  (extrasMonthly[ym] ?? {}).food ?? 0,
+                  Other: (extrasMonthly[ym] ?? {}).other ?? 0,
+                }))}
+                barGap={2}
+                margin={{ top: 18, right: 8, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Bar dataKey="Room"  name="Room Revenue" fill="#7c6af5" stackId="a" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="Food"  name="Food Revenue" fill="#c8a96e" stackId="a" radius={[0, 0, 0, 0]} />
+                <Bar dataKey="Other" name="Other Extras" fill="#4ecdc4" stackId="a" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        )}
+
         {/* ── full monthly summary table ───────────────────────────────────── */}
         <div className="animate-fade-in-up stagger-7">
           <p style={{ fontSize: '11px', fontWeight: 600, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.7px', marginBottom: '12px' }}>
@@ -483,6 +524,11 @@ function PLCard({ label, value, color }) {
       text: '#c8a96e',
       bg: 'linear-gradient(135deg, rgba(200,169,110,0.12), rgba(200,169,110,0.04))',
       border: 'rgba(200,169,110,0.3)',
+    },
+    amber: {
+      text: '#e8a86a',
+      bg: 'linear-gradient(135deg, rgba(232,168,106,0.12), rgba(232,168,106,0.04))',
+      border: 'rgba(232,168,106,0.3)',
     },
   };
   const { text, bg, border } = colorMap[color] ?? colorMap.emerald;

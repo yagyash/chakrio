@@ -24,7 +24,7 @@ const FIREBASE_JWKS = createRemoteJWKSet(
   new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com')
 );
 
-const VALID_TABS = new Set(['bookings', 'expenses', 'summary']);
+const VALID_TABS = new Set(['bookings', 'expenses', 'summary', 'extras']);
 
 // Supabase REST query per tab
 function supabaseQuery(tab, propertyId) {
@@ -32,6 +32,7 @@ function supabaseQuery(tab, propertyId) {
     case 'bookings': return `/bookings?property_id=eq.${propertyId}&select=*&order=check_in.desc&limit=2000`;
     case 'expenses': return `/expenses?property_id=eq.${propertyId}&select=*&order=date.desc&limit=2000`;
     case 'summary':  return `/monthly_summary?property_id=eq.${propertyId}&select=*&order=year.desc,month.desc&limit=2000`;
+    case 'extras':   return `/booking_extras?property_id=eq.${propertyId}&select=*&order=created_at.desc&limit=2000`;
   }
 }
 

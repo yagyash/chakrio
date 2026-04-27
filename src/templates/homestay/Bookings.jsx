@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useSheetData } from '../../hooks/useSheetData';
 import { useTabNames } from '../../hooks/useTabNames';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
@@ -26,6 +27,11 @@ function formatCell(col, val) {
   if (c.includes('status')) return <StatusBadge value={val} />;
   if (isDateCol(col)) return formatDate(val);
 
+  // Extras column — gold amount or dash
+  if (c === 'extras') {
+    if (!val || val === '—') return <span style={{ color: '#56546a' }}>—</span>;
+    return <span style={{ color: '#c8a96e', fontWeight: 600 }}>₹{Number(val).toLocaleString('en-IN')}</span>;
+  }
   // ID columns — monospace muted
   if (c.includes('id') || c.includes('bookingid') || c.includes('booking_id')) {
     return <span style={{ fontFamily: "'Courier New', monospace", fontSize: '12px', color: '#56546a', letterSpacing: '0.3px' }}>{val}</span>;
@@ -58,6 +64,27 @@ function formatCell(col, val) {
 export default function Bookings() {
   const { bookingsTab } = useTabNames();
   const { data, loading, error, refetch } = useSheetData(bookingsTab);
+  const { data: extrasRaw } = useSheetData('extras');
+
+  // Build booking_ref → total extras amount map
+  const extrasMap = useMemo(() => {
+    const map = {};
+    (extrasRaw || []).forEach((row) => {
+      const ref = row.booking_ref;
+      if (ref) map[ref] = (map[ref] || 0) + Number(row.amount || 0);
+    });
+    return map;
+  }, [extrasRaw]);
+
+  // Inject Extras column into each booking row
+  const dataWithExtras = useMemo(() =>
+    data.map((row) => {
+      const ref = row['Booking ID'] || row['booking_ref'] || row['booking_id'];
+      const total = ref ? (extrasMap[ref] || 0) : 0;
+      return { ...row, Extras: total > 0 ? total : '—' };
+    }),
+    [data, extrasMap],
+  );
 
   if (loading) {
     return (
@@ -87,7 +114,7 @@ export default function Bookings() {
       <DemoBanner />
       <div className="flex-1 overflow-auto p-6">
         <GenericTable
-          data={data}
+          data={dataWithExtras}
           title={`${bookingsTab} — ${data.length} rows`}
           downloadFileName={bookingsTab}
           showMonthFilter
