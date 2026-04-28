@@ -121,6 +121,11 @@ export async function fetchSupabaseTab(propertyUuid, tabName) {
     return rows.map(toSheetSummary);
   }
 
+  if (tab.includes('extra')) {
+    const rows = await apiFetch(propertyUuid, 'extras');
+    return rows;
+  }
+
   // Financials tab — not yet in Supabase; return empty (shows empty table, no error)
   return [];
 }

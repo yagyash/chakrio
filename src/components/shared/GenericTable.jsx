@@ -96,6 +96,7 @@ export default function GenericTable({ data, title, maxRows, downloadFileName, s
       background: '#16151f',
       borderRadius: '12px',
       border: '1px solid rgba(255,255,255,0.07)',
+      overflow: 'hidden',
     }} className="animate-fade-in-up card-hover">
       {/* Header */}
       <div style={{
