@@ -352,7 +352,7 @@ export default function Reports() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <PLCard label="Construction"   value={`₹${fmt(plData.construction ?? 0)}`}                       color="amber" />
             <PLCard label="Owner Drawings" value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                       color="violet" />
-            <PLCard label="Food Revenue"   value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`}   color="amber" />
+            <PLCard label="Food Revenue"   value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`}   color="teal" />
             <PLCard label="Bookings"       value={plData.bookingCount}                                        color="blue" />
           </div>
         </div>
@@ -538,9 +538,14 @@ function PLCard({ label, value, color }) {
       border: 'rgba(224,112,112,0.25)',
     },
     blue: {
-      text: '#c8a96e',
-      bg: 'linear-gradient(135deg, rgba(200,169,110,0.12), rgba(200,169,110,0.04))',
-      border: 'rgba(200,169,110,0.3)',
+      text: '#60a5fa',
+      bg: 'linear-gradient(135deg, rgba(96,165,250,0.12), rgba(96,165,250,0.04))',
+      border: 'rgba(96,165,250,0.3)',
+    },
+    teal: {
+      text: '#00D4FF',
+      bg: 'linear-gradient(135deg, rgba(0,212,255,0.10), rgba(0,212,255,0.03))',
+      border: 'rgba(0,212,255,0.25)',
     },
     amber: {
       text: '#e8a86a',
