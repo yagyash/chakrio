@@ -341,14 +341,20 @@ export default function Reports() {
         </div>
 
         {/* ── P&L summary strip for selected month ────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 animate-fade-in-up stagger-2">
-          <PLCard label="Revenue"        value={`₹${fmt(plData.revenue)}`}                                      color="emerald" />
-          <PLCard label="Op. Expenses"   value={`₹${fmt(plData.expense)}`}                                      color="rose" />
-          <PLCard label="Op. Profit"     value={`₹${fmt(plData.profit)}`}   color={plData.profit >= 0 ? 'emerald' : 'rose'} />
-          <PLCard label="Construction"   value={`₹${fmt(plData.construction ?? 0)}`}                            color="amber" />
-          <PLCard label="Owner Drawings" value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                            color="violet" />
-          <PLCard label="Food Revenue"   value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`}        color="amber" />
-          <PLCard label="Bookings"       value={plData.bookingCount}                                             color="blue" />
+        <div className="flex flex-col gap-3 animate-fade-in-up stagger-2">
+          {/* Row 1: core P&L — 3 equal cards */}
+          <div className="grid grid-cols-3 gap-3">
+            <PLCard label="Revenue"      value={`₹${fmt(plData.revenue)}`}                                    color="emerald" />
+            <PLCard label="Op. Expenses" value={`₹${fmt(plData.expense)}`}                                    color="rose" />
+            <PLCard label="Op. Profit"   value={`₹${fmt(plData.profit)}`} color={plData.profit >= 0 ? 'emerald' : 'rose'} />
+          </div>
+          {/* Row 2: informational — 4 cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <PLCard label="Construction"   value={`₹${fmt(plData.construction ?? 0)}`}                       color="amber" />
+            <PLCard label="Owner Drawings" value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                       color="violet" />
+            <PLCard label="Food Revenue"   value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`}   color="amber" />
+            <PLCard label="Bookings"       value={plData.bookingCount}                                        color="blue" />
+          </div>
         </div>
 
         {/* ── 4 chart panels ──────────────────────────────────────────────── */}
