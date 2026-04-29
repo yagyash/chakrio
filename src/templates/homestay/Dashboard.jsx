@@ -215,7 +215,7 @@ export default function HomestayDashboard() {
     }));
   }, [activeExpenses]);
 
-  // ── net profit = primary booking revenue col − primary expense amount col ──
+  // ── op. profit = revenue − operational expenses (excludes Construction & Owner Drawing) ──
   const netProfit = useMemo(() => {
     const pickCol = (data, keywords) => {
       const cols = numericCols(data);
@@ -225,10 +225,13 @@ export default function HomestayDashboard() {
       }
       return cols[0] ?? null;
     };
-    const revCol  = pickCol(activeBookings, ['total_amount', 'booking_amount', 'total', 'revenue', 'amount']);
-    const expCol  = pickCol(activeExpenses,  ['amount', 'total', 'expense']);
+    const revCol = pickCol(activeBookings, ['total_amount', 'booking_amount', 'total', 'revenue', 'amount']);
+    const expCol = pickCol(activeExpenses,  ['amount', 'total', 'expense']);
     const revenue = revCol ? activeBookings.reduce((s, r) => s + Number(r[revCol] || 0), 0) : 0;
-    const expense = expCol ? activeExpenses.reduce((s,  r) => s + Number(r[expCol]  || 0), 0) : 0;
+    const _NON_OP = new Set(['construction', 'owner drawing']);
+    const catCol = Object.keys(activeExpenses[0] || {}).find(k => k.toLowerCase() === 'category') ?? 'Category';
+    const opExpenses = activeExpenses.filter(r => !_NON_OP.has(String(r[catCol] || '').toLowerCase().trim()));
+    const expense = expCol ? opExpenses.reduce((s, r) => s + Number(r[expCol] || 0), 0) : 0;
     return revenue - expense;
   }, [activeBookings, activeExpenses]);
 
@@ -634,7 +637,7 @@ function NetProfitCard({ value }) {
             {positive ? '↑ this period' : '↓ this period'}
           </span>
         </div>
-        <p style={{ fontSize: '11px', color: '#56546a', margin: '6px 0 0' }}>Net Profit (current &amp; upcoming)</p>
+        <p style={{ fontSize: '11px', color: '#56546a', margin: '6px 0 0' }}>Op. Profit (current &amp; upcoming)</p>
       </div>
     </div>
   );
