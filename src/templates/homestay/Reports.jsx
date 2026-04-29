@@ -156,13 +156,13 @@ export default function Reports() {
       d.setDate(1);
       d.setMonth(d.getMonth() + offset);
       const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      map[ym] = { revenue: 0, expense: 0, bookingCount: 0 };
+      map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, bookingCount: 0 };
     }
 
     bookings.forEach((r) => {
       const ym = toYearMonth(String(r['Check-in'] ?? r['check_in'] ?? ''));
       if (!ym) return;
-      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, bookingCount: 0 };
+      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, bookingCount: 0 };
       map[ym].revenue += Number(r['Total_Amount'] ?? 0);
       map[ym].bookingCount += 1;
     });
@@ -170,8 +170,12 @@ export default function Reports() {
     expenses.forEach((r) => {
       const ym = toYearMonth(String(r['Date'] ?? r['date'] ?? ''));
       if (!ym) return;
-      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, bookingCount: 0 };
-      map[ym].expense += Number(r['Amount'] ?? 0);
+      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, bookingCount: 0 };
+      const cat = String(r['Category'] ?? r['category'] ?? '').toLowerCase().trim();
+      const amt = Number(r['Amount'] ?? 0);
+      if (cat === 'construction')        map[ym].construction  += amt;
+      else if (cat === 'owner drawing')  map[ym].ownerDrawing  += amt;
+      else                               map[ym].expense       += amt;
     });
 
     Object.keys(map).forEach((ym) => {
@@ -206,7 +210,7 @@ export default function Reports() {
   }, [selectedMonth, monthlyData, currentYM]);
 
   // ── selected month P&L ────────────────────────────────────────────────────
-  const plData = useMemo(() => monthlyData[activeMonth] ?? { revenue: 0, expense: 0, profit: 0, bookingCount: 0 }, [monthlyData, activeMonth]);
+  const plData = useMemo(() => monthlyData[activeMonth] ?? { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, profit: 0, bookingCount: 0 }, [monthlyData, activeMonth]);
 
   // ── chart series (all months sorted) ─────────────────────────────────────
   const sortedMonths = useMemo(() => monthOptions, [monthOptions]);
@@ -337,12 +341,14 @@ export default function Reports() {
         </div>
 
         {/* ── P&L summary strip for selected month ────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 animate-fade-in-up stagger-2">
-          <PLCard label="Revenue"      value={`₹${fmt(plData.revenue)}`} color="emerald" />
-          <PLCard label="Expenses"     value={`₹${fmt(plData.expense)}`} color="rose" />
-          <PLCard label="Net Profit"   value={`₹${fmt(plData.profit)}`}  color={plData.profit >= 0 ? 'emerald' : 'rose'} />
-          <PLCard label="Food Revenue" value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`} color="amber" />
-          <PLCard label="Bookings"     value={plData.bookingCount}        color="blue" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 animate-fade-in-up stagger-2">
+          <PLCard label="Revenue"        value={`₹${fmt(plData.revenue)}`}                                      color="emerald" />
+          <PLCard label="Op. Expenses"   value={`₹${fmt(plData.expense)}`}                                      color="rose" />
+          <PLCard label="Op. Profit"     value={`₹${fmt(plData.profit)}`}   color={plData.profit >= 0 ? 'emerald' : 'rose'} />
+          <PLCard label="Construction"   value={`₹${fmt(plData.construction ?? 0)}`}                            color="amber" />
+          <PLCard label="Owner Drawings" value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                            color="violet" />
+          <PLCard label="Food Revenue"   value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`}        color="amber" />
+          <PLCard label="Bookings"       value={plData.bookingCount}                                             color="blue" />
         </div>
 
         {/* ── 4 chart panels ──────────────────────────────────────────────── */}
@@ -534,6 +540,11 @@ function PLCard({ label, value, color }) {
       text: '#e8a86a',
       bg: 'linear-gradient(135deg, rgba(232,168,106,0.12), rgba(232,168,106,0.04))',
       border: 'rgba(232,168,106,0.3)',
+    },
+    violet: {
+      text: '#b085f5',
+      bg: 'linear-gradient(135deg, rgba(176,133,245,0.12), rgba(176,133,245,0.04))',
+      border: 'rgba(176,133,245,0.3)',
     },
   };
   const { text, bg, border } = colorMap[color] ?? colorMap.emerald;
