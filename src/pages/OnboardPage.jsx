@@ -125,6 +125,8 @@ function Step1({ data, onChange, errors }) {
 // ── Step 2 — Property ─────────────────────────────────────────────
 
 function Step2({ data, onChange, errors }) {
+  const [showOwner, setShowOwner] = useState(false);
+
   function handleNameChange(val) {
     onChange('property_name', val);
     if (!data._slugEdited) onChange('property_id', slugify(val));
@@ -191,6 +193,64 @@ function Step2({ data, onChange, errors }) {
           {errors.manager_whatsapp && <div style={S.err}>{errors.manager_whatsapp}</div>}
         </div>
       )}
+
+      <div style={{ marginTop: 4, marginBottom: 18 }}>
+        <button
+          type="button"
+          onClick={() => setShowOwner(v => !v)}
+          style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#8c8a9e', fontSize: 13, cursor: 'pointer', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}
+        >
+          <span style={{ fontSize: 11 }}>{showOwner ? '▲' : '▼'}</span>
+          Owner &amp; Notifications
+          <span style={{ fontSize: 11, color: '#56546a' }}>(optional)</span>
+        </button>
+
+        {showOwner && (
+          <div style={{ marginTop: 12, padding: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10 }}>
+            <div style={S.row}>
+              <label style={S.label}>Owner Name(s)</label>
+              <input style={S.input} value={data.owner_names_raw} onChange={e => onChange('owner_names_raw', e.target.value)} placeholder="Acharya Ji, Koustubh" />
+              <div style={S.hint}>Comma-separated if multiple owners</div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={S.row}>
+                <label style={S.label}>Owner WhatsApp</label>
+                <input style={S.input} value={data.owner_phone} onChange={e => onChange('owner_phone', e.target.value)} placeholder="9660013325" />
+              </div>
+              <div style={S.row}>
+                <label style={S.label}>Owner Telegram Chat ID</label>
+                <input style={S.input} value={data.owner_telegram_chat_id} onChange={e => onChange('owner_telegram_chat_id', e.target.value)} placeholder="5953587554" />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div style={S.row}>
+                <label style={S.label}>Subscription reminders</label>
+                <select style={S.select} value={data.subscription_notify} onChange={e => onChange('subscription_notify', e.target.value)}>
+                  <option value="manager">Manager only</option>
+                  <option value="owner">Owner only</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+              <div style={S.row}>
+                <label style={S.label}>Monthly P&amp;L reports</label>
+                <select style={S.select} value={data.monthly_report_notify} onChange={e => onChange('monthly_report_notify', e.target.value)}>
+                  <option value="manager">Manager only</option>
+                  <option value="owner">Owner only</option>
+                  <option value="both">Both</option>
+                </select>
+              </div>
+            </div>
+
+            {(data.subscription_notify !== 'manager' || data.monthly_report_notify !== 'manager') && !data.owner_phone && !data.owner_telegram_chat_id && (
+              <div style={{ fontSize: 12, color: '#c8a96e', marginTop: 4 }}>
+                Fill in owner contact above to send notifications to the owner.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <div style={S.row}>
         <label style={S.label}>Address (optional)</label>
@@ -342,6 +402,11 @@ function Step4({ client, property, rooms }) {
     property.address ? ['Address', property.address] : null,
     property.manager_phone ? ['Manager Phone', property.manager_phone] : null,
     property.google_review_link ? ['Google Review', property.google_review_link] : null,
+    property.owner_names_raw ? ['Owner Name(s)', property.owner_names_raw] : null,
+    property.owner_phone ? ['Owner WhatsApp', property.owner_phone] : null,
+    property.owner_telegram_chat_id ? ['Owner Telegram ID', property.owner_telegram_chat_id] : null,
+    property.subscription_notify !== 'manager' ? ['Subscription alerts', property.subscription_notify] : null,
+    property.monthly_report_notify !== 'manager' ? ['Monthly reports', property.monthly_report_notify] : null,
     ['Rooms', rooms.length > 0 ? `${rooms.length} rooms` : 'None'],
   ].filter(Boolean);
 
@@ -409,6 +474,8 @@ export default function OnboardPage() {
     property_name: '', property_id: '', short_name: '', property_type: 'homestay',
     notification_channel: 'telegram', telegram_chat_id: '', manager_whatsapp: '',
     address: '', manager_phone: '', google_review_link: '',
+    owner_names_raw: '', owner_phone: '', owner_telegram_chat_id: '',
+    subscription_notify: 'manager', monthly_report_notify: 'manager',
     _slugEdited: false, _shortEdited: false,
   });
   const [rooms, setRooms]           = useState([]);
@@ -454,18 +521,25 @@ export default function OnboardPage() {
       const payload = {
         client: { name: client.name, plan: client.plan, email: client.email, phone: client.phone },
         property: {
-          property_id:          property.property_id,
-          property_name:        property.property_name,
-          property_type:        property.property_type,
-          short_name:           property.short_name,
-          notification_channel: property.notification_channel,
-          telegram_chat_id:     property.telegram_chat_id,
-          manager_whatsapp:     property.manager_whatsapp,
-          address:              property.address,
-          manager_phone:        property.manager_phone,
-          google_review_link:   property.google_review_link,
-          has_rooms:            HOTEL_TYPES.has(property.property_type) || hasRoomsOverride,
-          is_hotel_type:        HOTEL_TYPES.has(property.property_type) || hasRoomsOverride,
+          property_id:            property.property_id,
+          property_name:          property.property_name,
+          property_type:          property.property_type,
+          short_name:             property.short_name,
+          notification_channel:   property.notification_channel,
+          telegram_chat_id:       property.telegram_chat_id,
+          manager_whatsapp:       property.manager_whatsapp,
+          address:                property.address,
+          manager_phone:          property.manager_phone,
+          google_review_link:     property.google_review_link,
+          has_rooms:              HOTEL_TYPES.has(property.property_type) || hasRoomsOverride,
+          is_hotel_type:          HOTEL_TYPES.has(property.property_type) || hasRoomsOverride,
+          owner_names:            property.owner_names_raw
+                                    ? property.owner_names_raw.split(',').map(n => n.trim()).filter(Boolean)
+                                    : [],
+          owner_phone:            property.owner_phone,
+          owner_telegram_chat_id: property.owner_telegram_chat_id,
+          subscription_notify:    property.subscription_notify,
+          monthly_report_notify:  property.monthly_report_notify,
         },
         rooms,
       };
