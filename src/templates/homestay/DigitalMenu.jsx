@@ -533,7 +533,7 @@ export default function DigitalMenu() {
                     onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                     style={inputStyle}
                   >
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    {CATEGORIES.map(c => <option key={c} value={c} style={{ background: '#1e1c2a', color: '#f0eee8' }}>{c}</option>)}
                   </select>
                 </label>
 
@@ -736,7 +736,7 @@ export default function DigitalMenu() {
                             onChange={e => updateExtractedItem(item._key, 'category', e.target.value)}
                             style={{ ...inputStyle, width: '120px' }}
                           >
-                            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                            {CATEGORIES.map(c => <option key={c} value={c} style={{ background: '#1e1c2a', color: '#f0eee8' }}>{c}</option>)}
                           </select>
                         </td>
                         <td style={{ padding: '6px 10px' }}>
