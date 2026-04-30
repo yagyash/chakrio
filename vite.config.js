@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
 
   server: {
+    allowedHosts: ['.ngrok-free.dev', '.ngrok.io', '.loca.lt'],
     headers: {
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
@@ -18,7 +19,7 @@ export default defineConfig({
         "font-src 'self' https://fonts.gstatic.com",
         "img-src 'self' data: https://placehold.co",
         "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com",
-        "frame-src 'none'",
+        "frame-src https://www.youtube.com",
       ].join('; '),
     },
   },

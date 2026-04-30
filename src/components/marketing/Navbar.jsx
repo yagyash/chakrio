@@ -1,8 +1,17 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
+
   return (
-    <nav className="sticky top-0 z-50 bg-sidebar border-b border-surface3">
+    <nav className="sticky top-0 z-50 bg-sidebar transition-colors duration-300"
+      style={{ borderBottom: `1px solid ${scrolled ? 'rgba(200,169,110,0.2)' : 'rgba(255,255,255,0.04)'}` }}>
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo — matches login page */}
         <Link to="/" className="flex items-center gap-2.5">
@@ -41,12 +50,13 @@ export default function Navbar() {
 
         {/* Nav links */}
         <div className="flex items-center gap-6">
-          <Link
-            to="/#tools"
+          <a
+            href="#tools"
             className="text-sm text-text-2 hover:text-text-1 transition-colors"
+            style={{ textDecoration: 'none' }}
           >
             Free Tools
-          </Link>
+          </a>
           <Link
             to="/login"
             style={{
