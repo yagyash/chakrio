@@ -52,7 +52,7 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
           <a
             href="#tools"
-            className="text-sm text-text-2 hover:text-text-1 transition-colors"
+            className="hidden sm:inline text-sm text-text-2 hover:text-text-1 transition-colors"
             style={{ textDecoration: 'none' }}
           >
             Free Tools

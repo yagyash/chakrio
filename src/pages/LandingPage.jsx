@@ -135,7 +135,7 @@ function TestimonialCarousel() {
 
         <div className="overflow-hidden">
           <div style={slideStyle} className="text-center">
-            <blockquote className="font-display font-extrabold text-2xl sm:text-3xl text-text-1 leading-snug mb-8">
+            <blockquote className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-text-1 leading-snug mb-8">
               "{t.quote}"
             </blockquote>
             <div className="flex items-center justify-center gap-4">
@@ -393,7 +393,7 @@ export default function LandingPage() {
             </div>
             <p className="text-text-3 text-sm">No sign-up required.</p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {TOOLS.map(t => (
               <Link
                 key={t.href}
@@ -514,7 +514,7 @@ export default function LandingPage() {
           </div>
 
           {/* Plus divider */}
-          <div className="flex items-center justify-center px-4 py-6 sm:py-0 text-2xl font-display font-extrabold flex-shrink-0" style={{ color: 'rgba(200,169,110,0.5)' }}>
+          <div className="hidden sm:flex items-center justify-center px-4 py-0 text-2xl font-display font-extrabold flex-shrink-0" style={{ color: 'rgba(200,169,110,0.5)' }}>
             +
           </div>
 
@@ -612,7 +612,7 @@ export default function LandingPage() {
 
       {/* CTA Strip */}
       <section className="max-w-4xl mx-auto px-6 pb-20 w-full">
-        <div className="reveal rounded-2xl p-12 text-center border" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(37,211,102,0.07) 0%, rgba(200,169,110,0.05) 50%, transparent 70%), #16151f', borderColor: 'rgba(37,211,102,0.25)' }}>
+        <div className="reveal rounded-2xl p-8 sm:p-12 text-center border" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(37,211,102,0.07) 0%, rgba(200,169,110,0.05) 50%, transparent 70%), #16151f', borderColor: 'rgba(37,211,102,0.25)' }}>
           <div className="w-16 h-px mx-auto mb-6" style={{ background: 'linear-gradient(90deg, transparent, #c8a96e, transparent)' }} />
           <h2 className="font-display font-extrabold text-3xl text-text-1 mb-4">
             We onboard every property personally.
