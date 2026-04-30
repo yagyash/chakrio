@@ -7,15 +7,21 @@ import { formatDate, isDateCol } from '../../utils/formatDate';
 
 const HIDDEN_COLS = ['created_at', 'Created_At', 'createdat'];
 
-// FIX 5 — Category pill styles
+const CATEGORY_STYLES = {
+  supplies:      { bg: 'rgba(148,163,184,0.1)', color: '#94a3b8', border: 'rgba(148,163,184,0.25)' },
+  maintenance:   { bg: 'rgba(232,168,106,0.1)', color: '#e8a86a', border: 'rgba(232,168,106,0.25)' },
+  utilities:     { bg: 'rgba(96,165,250,0.1)',  color: '#60a5fa', border: 'rgba(96,165,250,0.25)'  },
+  staff:         { bg: 'rgba(168,150,248,0.1)', color: '#a896f8', border: 'rgba(168,150,248,0.25)' },
+  food:          { bg: 'rgba(78,205,196,0.1)',  color: '#4ecdc4', border: 'rgba(78,205,196,0.25)'  },
+  transport:     { bg: 'rgba(56,189,248,0.1)',  color: '#38bdf8', border: 'rgba(56,189,248,0.25)'  },
+  construction:  { bg: 'rgba(251,146,60,0.1)',  color: '#fb923c', border: 'rgba(251,146,60,0.25)'  },
+  'owner drawing': { bg: 'rgba(248,113,113,0.1)', color: '#f87171', border: 'rgba(248,113,113,0.25)' },
+  rent:          { bg: 'rgba(92,184,138,0.1)',  color: '#5cb88a', border: 'rgba(92,184,138,0.25)'  },
+};
+
 function CategoryPill({ value }) {
-  const v = String(value).toLowerCase();
-  let style = { bg: 'rgba(255,255,255,0.05)', color: '#8c8a9e', border: 'rgba(255,255,255,0.1)' };
-  if (v.includes('chlorine'))                         style = { bg: 'rgba(78,205,196,0.1)',   color: '#4ecdc4', border: 'rgba(78,205,196,0.2)' };
-  else if (v.includes('caretaker'))                   style = { bg: 'rgba(124,106,245,0.1)',  color: '#a896f8', border: 'rgba(124,106,245,0.2)' };
-  else if (v.includes('plant') || v.includes('garden')) style = { bg: 'rgba(92,184,138,0.1)', color: '#5cb88a', border: 'rgba(92,184,138,0.2)' };
-  else if (v.includes('pipeline') || v.includes('maintenance') || v.includes('repair'))
-                                                       style = { bg: 'rgba(232,168,106,0.1)', color: '#e8a86a', border: 'rgba(232,168,106,0.2)' };
+  const key = String(value).toLowerCase().trim();
+  const style = CATEGORY_STYLES[key] ?? { bg: 'rgba(255,255,255,0.05)', color: '#8c8a9e', border: 'rgba(255,255,255,0.1)' };
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center',
