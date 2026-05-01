@@ -47,7 +47,10 @@ function detectDateCol(data) {
  */
 export default function GenericTable({ data, title, maxRows, downloadFileName, showMonthFilter, getRowClassName, formatCell, hideCols, formatHeader }) {
   const [search, setSearch] = useState('');
-  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  });
 
   const columns = useMemo(() => {
     const all = data.length > 0 ? Object.keys(data[0]) : [];
