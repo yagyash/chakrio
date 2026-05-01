@@ -469,7 +469,7 @@ export default function HomestayDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
                     <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} axisLine={false} tickLine={false} />
-                    <Tooltip content={<ChartTooltip />} />
+                    <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(255,255,255,0.06)' }} />
                     <Legend wrapperStyle={{ fontSize: 11, color: '#8c8a9e' }} formatter={(value) => formatColumnLabel(value)} />
                     {displayCols.map((col, i) => (
                       <Bar key={col} dataKey={col} fill={BAR_COLORS[i % BAR_COLORS.length]} radius={[4, 4, 0, 0]}>

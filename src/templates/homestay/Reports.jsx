@@ -367,7 +367,7 @@ export default function Reports() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} cursor={{ fill: 'rgba(255,255,255,0.06)' }} />
                 <Bar dataKey="value" name="Revenue" fill="#7c6af5" radius={[4, 4, 0, 0]}>
                   <LabelList dataKey="value" position="top"
                     formatter={(v) => v > 0 ? `₹${(v/1000).toFixed(1)}k` : ''}
@@ -384,7 +384,7 @@ export default function Reports() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} cursor={{ fill: 'rgba(255,255,255,0.06)' }} />
                 <Bar dataKey="value" name="Expenses" fill="#e07070" radius={[4, 4, 0, 0]}>
                   <LabelList dataKey="value" position="top"
                     formatter={(v) => v > 0 ? `₹${(v/1000).toFixed(1)}k` : ''}
@@ -430,7 +430,7 @@ export default function Reports() {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                   <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} axisLine={false} tickLine={false} />
-                  <Tooltip content={<ChartTooltip prefix="" suffix="%" />} />
+                  <Tooltip content={<ChartTooltip prefix="" suffix="%" />} cursor={{ fill: 'rgba(255,255,255,0.06)' }} />
                   <Bar dataKey="Occupancy" name="Occupancy" fill="#4ecdc4" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -461,7 +461,7 @@ export default function Reports() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={formatMonthLabel} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#56546a' }} tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} axisLine={false} tickLine={false} />
-                <Tooltip content={<ChartTooltip prefix="₹" />} />
+                <Tooltip content={<ChartTooltip prefix="₹" />} cursor={{ fill: 'rgba(255,255,255,0.06)' }} />
                 <Bar dataKey="Room"  name="Room Revenue" fill="#7c6af5" stackId="a" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="Food"  name="Food Revenue" fill="#c8a96e" stackId="a" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="Other" name="Other Extras" fill="#4ecdc4" stackId="a" radius={[4, 4, 0, 0]} />
