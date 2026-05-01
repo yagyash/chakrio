@@ -322,7 +322,7 @@ export default function LandingPage() {
               to="/login"
               style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', fontWeight: 600, padding: '14px 32px', borderRadius: '12px', fontSize: '14px', textDecoration: 'none' }}
             >
-              Get Started Free →
+              Start Free Trial →
             </Link>
             <a
               href="#how-it-works"
@@ -331,6 +331,9 @@ export default function LandingPage() {
               See how it works
             </a>
           </div>
+          <p style={{ color: '#a0aec0', fontSize: '0.8rem', marginTop: '10px' }}>
+            14-day free trial · No credit card required
+          </p>
         </div>
       </section>
 
@@ -524,6 +527,9 @@ export default function LandingPage() {
               style={{ background: 'rgba(200,169,110,0.15)', color: '#c8a96e', border: '1px solid rgba(200,169,110,0.35)' }}>
               ★ Most Popular
             </div>
+            <span style={{ background: 'rgba(72,199,142,0.15)', color: '#48c78e', border: '1px solid rgba(72,199,142,0.3)', borderRadius: '20px', padding: '3px 12px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-block', marginBottom: '10px' }}>
+              14-day free trial included
+            </span>
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#c8a96e' }}>Monthly subscription</p>
             <div className="mb-1">
               <span className="font-display font-extrabold text-5xl text-text-1">₹2,000</span>
@@ -617,8 +623,11 @@ export default function LandingPage() {
           <h2 className="font-display font-extrabold text-3xl text-text-1 mb-4">
             We onboard every property personally.
           </h2>
-          <p className="text-text-2 mb-8 max-w-lg mx-auto">
+          <p className="text-text-2 mb-2 max-w-lg mx-auto">
             WhatsApp us and we'll have your booking bot live within 24 hours — no setup on your end.
+          </p>
+          <p style={{ color: '#a0aec0', fontSize: '0.85rem', marginBottom: '24px' }}>
+            Start with a 14-day free trial. No credit card needed.
           </p>
           <a
             href="https://wa.me/919461888529"
