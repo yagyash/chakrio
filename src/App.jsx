@@ -12,6 +12,7 @@ import RentalIncomeCalculator from './pages/tools/RentalIncomeCalculator';
 import CancellationPolicyGenerator from './pages/tools/CancellationPolicyGenerator';
 import InvoiceGenerator from './pages/tools/InvoiceGenerator';
 import MenuPage from './pages/MenuPage';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/tools/rental-income-calculator" element={<RentalIncomeCalculator />} />
           <Route path="/tools/cancellation-policy" element={<CancellationPolicyGenerator />} />
           <Route path="/tools/invoice-generator" element={<InvoiceGenerator />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/menu/:propertyId" element={<MenuPage />} />
 
           {/* Admin — protected, full-page (outside AppShell) */}

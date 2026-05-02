@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 
 const inputCls = 'w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors';
 
@@ -286,6 +287,8 @@ export default function OccupancyCalculator() {
           body="Chakrio's AI chatbot auto-records every booking, cancellation, and expense straight to your dashboard — so your occupancy data is always up to date."
           buttonText="Track Bookings Automatically →"
         />
+
+        <LeadCaptureBox sourcePage="occupancy-calculator" />
 
         {/* Related tools */}
         <div className="mt-10">

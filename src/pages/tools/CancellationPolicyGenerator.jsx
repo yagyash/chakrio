@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 
 const DEFAULT_WINDOWS = [
   { days: 7, refund: 100 },
@@ -258,6 +259,7 @@ export default function CancellationPolicyGenerator() {
         )}
 
         <CTABox />
+        <LeadCaptureBox sourcePage="cancellation-policy" />
         <div className='trust-signals text-center py-8 text-text-3 text-sm'><p>Free to Use — No Sign-Up Required. Generate as many policies as you need.</p></div>
       </main>
 

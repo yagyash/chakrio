@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 
 function fmt(n) {
   return '₹' + Math.round(n).toLocaleString('en-IN');
@@ -320,6 +321,8 @@ export default function RentalIncomeCalculator() {
           body="Chakrio auto-records every booking your property receives via chatbot — so you can track real revenue, not estimates."
           buttonText="Automate Your Booking Records →"
         />
+
+        <LeadCaptureBox sourcePage="rental-income-calculator" />
 
         {/* Related tools */}
         <div className="mt-10">
