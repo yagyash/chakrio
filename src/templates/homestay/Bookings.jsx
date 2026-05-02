@@ -115,7 +115,7 @@ export default function Bookings() {
       <div className="flex-1 overflow-auto p-6">
         <GenericTable
           data={dataWithExtras}
-          title={`${bookingsTab} — ${data.length} rows`}
+          title={bookingsTab}
           downloadFileName={bookingsTab}
           showMonthFilter
           hideCols={HIDDEN_COLS}

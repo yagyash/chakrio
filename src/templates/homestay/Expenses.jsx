@@ -102,7 +102,7 @@ export default function Expenses() {
       <div className="flex-1 overflow-auto p-6">
         <GenericTable
           data={data}
-          title={`${expensesTab} — ${data.length} rows`}
+          title={expensesTab}
           downloadFileName={expensesTab}
           showMonthFilter
           hideCols={HIDDEN_COLS}

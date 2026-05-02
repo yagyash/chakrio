@@ -37,7 +37,7 @@ export default function Financials() {
       <div className="flex-1 overflow-auto p-6">
         <GenericTable
           data={data}
-          title={`${financialsTab} — ${data.length} rows`}
+          title={financialsTab}
         />
       </div>
     </div>
