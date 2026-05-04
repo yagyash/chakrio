@@ -597,10 +597,6 @@ export default function LandingPage() {
               a: 'Most properties are live within 24 hours of contacting us. We handle the entire setup — bot configuration, dashboard access, and a walkthrough with your team. You don\'t need to do anything technical.',
             },
             {
-              q: 'Which OTAs does Chakrio work with?',
-              a: 'Chakrio works alongside any OTA — MakeMyTrip, Booking.com, Airbnb, or direct bookings. You simply forward or retype the booking into the chat and Chakrio logs it. It doesn\'t require API access to any OTA.',
-            },
-            {
               q: 'What if I send a wrong message or make a mistake?',
               a: 'Just send a correction. For example: "Update Rajan check-out to 8th April." Chakrio will find the booking and update it. If you need to cancel, just say so — the bot handles updates, cancellations, and corrections the same way it handles new bookings.',
             },
