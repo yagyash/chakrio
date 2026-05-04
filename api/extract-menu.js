@@ -280,7 +280,7 @@ export default async function handler(req, res) {
 
   if (!openAIRes.ok) {
     const errText = await openAIRes.text().catch(() => '');
-    console.error('OpenAI API error', openAIRes.status, errText);
+    console.error('OpenAI API error', openAIRes.status);
     return res.status(502).json({ error: 'AI extraction failed. Please try again.' });
   }
 
@@ -291,7 +291,7 @@ export default async function handler(req, res) {
     const rawText = data.choices?.[0]?.message?.content ?? '';
     items = parseItems(rawText);
   } catch (e) {
-    console.error('Menu parse error:', e.message);
+    console.error('Menu parse error');
     return res.status(422).json({ error: 'Could not parse menu items from the image. Try a clearer photo.' });
   }
 
