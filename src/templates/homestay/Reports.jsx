@@ -156,13 +156,13 @@ export default function Reports() {
       d.setDate(1);
       d.setMonth(d.getMonth() + offset);
       const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, bookingCount: 0 };
+      map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
     }
 
     bookings.forEach((r) => {
       const ym = toYearMonth(String(r['Check-in'] ?? r['check_in'] ?? ''));
       if (!ym) return;
-      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, bookingCount: 0 };
+      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
       map[ym].revenue += Number(r['Total_Amount'] ?? 0);
       map[ym].bookingCount += 1;
     });
@@ -170,12 +170,15 @@ export default function Reports() {
     expenses.forEach((r) => {
       const ym = toYearMonth(String(r['Date'] ?? r['date'] ?? ''));
       if (!ym) return;
-      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, bookingCount: 0 };
+      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
       const cat = String(r['Category'] ?? r['category'] ?? '').toLowerCase().trim();
       const amt = Number(r['Amount'] ?? 0);
-      if (cat === 'construction')        map[ym].construction  += amt;
-      else if (cat === 'owner drawing')  map[ym].ownerDrawing  += amt;
-      else                               map[ym].expense       += amt;
+      if (cat === 'construction' || cat === 'maintenance') map[ym].construction += amt;
+      else if (cat === 'owner drawing')                   map[ym].ownerDrawing  += amt;
+      else {
+        map[ym].expense += amt;
+        if (cat === 'staff') map[ym].staff += amt;
+      }
     });
 
     Object.keys(map).forEach((ym) => {
@@ -210,7 +213,7 @@ export default function Reports() {
   }, [selectedMonth, monthlyData, currentYM]);
 
   // ── selected month P&L ────────────────────────────────────────────────────
-  const plData = useMemo(() => monthlyData[activeMonth] ?? { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, profit: 0, bookingCount: 0 }, [monthlyData, activeMonth]);
+  const plData = useMemo(() => monthlyData[activeMonth] ?? { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, staff: 0, profit: 0, bookingCount: 0 }, [monthlyData, activeMonth]);
 
   // ── chart series (all months sorted) ─────────────────────────────────────
   const sortedMonths = useMemo(() => monthOptions, [monthOptions]);
@@ -348,12 +351,13 @@ export default function Reports() {
             <PLCard label="Op. Expenses" value={`₹${fmt(plData.expense)}`}                                    color="rose" />
             <PLCard label="Op. Profit"   value={`₹${fmt(plData.profit)}`} color={plData.profit >= 0 ? 'emerald' : 'rose'} />
           </div>
-          {/* Row 2: informational — 4 cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <PLCard label="Construction"   value={`₹${fmt(plData.construction ?? 0)}`}                       color="amber" />
-            <PLCard label="Owner Drawings" value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                       color="violet" />
-            <PLCard label="Food Revenue"   value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`}   color="teal" />
-            <PLCard label="Bookings"       value={plData.bookingCount}                                        color="blue" />
+          {/* Row 2: informational — 5 cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <PLCard label="Constr. + Maint." value={`₹${fmt(plData.construction ?? 0)}`}                     color="amber" />
+            <PLCard label="Owner Drawings"   value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                     color="violet" />
+            <PLCard label="Staff"            value={`₹${fmt(plData.staff ?? 0)}`}                            color="rose" />
+            <PLCard label="Food Revenue"     value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`} color="teal" />
+            <PLCard label="Bookings"         value={plData.bookingCount}                                      color="blue" />
           </div>
         </div>
 
