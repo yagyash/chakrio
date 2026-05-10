@@ -8,6 +8,7 @@ const PROPERTY_TYPES = ['homestay', 'villa', 'hotel', 'resort', 'dharamshala'];
 const PLANS          = ['free', 'starter', 'pro'];
 const ROOM_TYPES     = ['standard', 'vip', 'family', 'group', 'dorm'];
 const HOTEL_TYPES    = new Set(['hotel', 'resort', 'dharamshala']);
+const OTA_NAMES      = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 'other'];
 
 const CSV_TEMPLATE = 'room_no,room_type,beds\n101,standard,2\n102,vip,1\n103,family,3\n';
 
@@ -273,9 +274,10 @@ function Step2({ data, onChange, errors }) {
 
 // ── Step 3 — Rooms ────────────────────────────────────────────────
 
-function Step3({ propData, rooms, setRooms, hasRoomsOverride, setHasRoomsOverride }) {
+function Step3({ propData, rooms, setRooms, hasRoomsOverride, setHasRoomsOverride, otaFeeds, setOtaFeeds }) {
   const fileRef = useRef();
-  const [csvError, setCsvError] = useState('');
+  const [csvError, setCsvError]   = useState('');
+  const [showOTA, setShowOTA]     = useState(false);
   const isHotelType = HOTEL_TYPES.has(propData.property_type);
   const showRooms   = isHotelType || hasRoomsOverride;
 
@@ -381,13 +383,71 @@ function Step3({ propData, rooms, setRooms, hasRoomsOverride, setHasRoomsOverrid
           No rooms — click Next to continue
         </div>
       )}
+
+      {/* OTA iCal feeds */}
+      <div style={{ marginTop: 24 }}>
+        <button
+          type="button"
+          onClick={() => setShowOTA(v => !v)}
+          style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#8c8a9e', fontSize: 13, cursor: 'pointer', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}
+        >
+          <span style={{ fontSize: 11 }}>{showOTA ? '▲' : '▼'}</span>
+          OTA Calendar Links
+          <span style={{ fontSize: 11, color: '#56546a' }}>(optional — Airbnb, Booking.com, etc.)</span>
+          {otaFeeds.length > 0 && (
+            <span style={{ background: '#6C63FF', color: '#fff', borderRadius: 10, fontSize: 10, padding: '1px 7px', marginLeft: 4 }}>{otaFeeds.length}</span>
+          )}
+        </button>
+
+        {showOTA && (
+          <div style={{ marginTop: 12, padding: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10 }}>
+            <p style={{ fontSize: 12, color: '#56546a', margin: '0 0 14px' }}>
+              Paste iCal export URLs from your OTAs. Chakrio will sync these calendars every 6 hours so OTA bookings block out dates automatically.
+            </p>
+
+            {otaFeeds.map((feed, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 10, alignItems: 'flex-start' }}>
+                <select
+                  value={feed.ota_name}
+                  onChange={e => setOtaFeeds(prev => prev.map((f, idx) => idx === i ? { ...f, ota_name: e.target.value } : f))}
+                  style={{ ...S.select, width: 150, flexShrink: 0 }}
+                >
+                  {OTA_NAMES.map(n => <option key={n} value={n}>{n.charAt(0).toUpperCase() + n.slice(1)}</option>)}
+                </select>
+                <input
+                  value={feed.ical_url}
+                  onChange={e => setOtaFeeds(prev => prev.map((f, idx) => idx === i ? { ...f, ical_url: e.target.value } : f))}
+                  placeholder="https://www.airbnb.com/calendar/ical/..."
+                  style={{ ...S.input, flex: 1 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setOtaFeeds(prev => prev.filter((_, idx) => idx !== i))}
+                  style={{ background: 'none', border: 'none', color: '#56546a', cursor: 'pointer', padding: '10px 4px', flexShrink: 0 }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+
+            <button
+              type="button"
+              onClick={() => setOtaFeeds(prev => [...prev, { ota_name: 'airbnb', ical_url: '' }])}
+              style={{ ...S.btnOut, fontSize: 12, padding: '7px 14px', marginTop: 4 }}
+            >
+              + Add OTA
+            </button>
+          </div>
+        )}
+      </div>
     </>
   );
 }
 
 // ── Step 4 — Review ───────────────────────────────────────────────
 
-function Step4({ client, property, rooms }) {
+function Step4({ client, property, rooms, otaFeeds }) {
+  const validOta = (otaFeeds || []).filter(f => f.ical_url.trim());
   const rows = [
     ['Owner Name',    client.name],
     ['Email',         client.email],
@@ -408,6 +468,7 @@ function Step4({ client, property, rooms }) {
     property.subscription_notify !== 'manager' ? ['Subscription alerts', property.subscription_notify] : null,
     property.monthly_report_notify !== 'manager' ? ['Monthly reports', property.monthly_report_notify] : null,
     ['Rooms', rooms.length > 0 ? `${rooms.length} rooms` : 'None'],
+    validOta.length > 0 ? ['OTA feeds', validOta.map(f => f.ota_name).join(', ')] : null,
   ].filter(Boolean);
 
   return (
@@ -480,6 +541,7 @@ export default function OnboardPage() {
   });
   const [rooms, setRooms]           = useState([]);
   const [hasRoomsOverride, setHasRoomsOverride] = useState(false);
+  const [otaFeeds, setOtaFeeds]     = useState([]);
   const [errors, setErrors]         = useState({});
 
   function updateClient(k, v)   { setClient(p => ({ ...p, [k]: v })); setErrors(e => ({ ...e, [k]: '' })); }
@@ -542,6 +604,7 @@ export default function OnboardPage() {
           monthly_report_notify:  property.monthly_report_notify,
         },
         rooms,
+        ota_feeds: otaFeeds.filter(f => f.ical_url.trim()),
       };
       const res = await fetch('/api/onboard', {
         method:  'POST',
@@ -580,9 +643,10 @@ export default function OnboardPage() {
                 propData={property}
                 rooms={rooms} setRooms={setRooms}
                 hasRoomsOverride={hasRoomsOverride} setHasRoomsOverride={setHasRoomsOverride}
+                otaFeeds={otaFeeds} setOtaFeeds={setOtaFeeds}
               />
             )}
-            {step === 3 && <Step4 client={client} property={property} rooms={rooms} />}
+            {step === 3 && <Step4 client={client} property={property} rooms={rooms} otaFeeds={otaFeeds} />}
 
             {submitError && (
               <div style={{ marginTop: 16, padding: '12px 16px', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: 8, fontSize: 13, color: '#ff6b6b' }}>
