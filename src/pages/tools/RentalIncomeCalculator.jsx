@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 
 function fmt(n) {
@@ -355,6 +356,13 @@ export default function RentalIncomeCalculator() {
           </div>
         </div>
       </main>
+
+      <div className="max-w-2xl mx-auto px-6 pb-8">
+        <ToolConversionHook
+          heading="Want to actually hit this number?"
+          body="Chakrio helps you capture every booking without missing one — your income only grows if every inquiry is recorded."
+        />
+      </div>
 
       <Footer />
     </div>

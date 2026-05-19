@@ -6,6 +6,7 @@ import { jsPDF } from 'jspdf';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import { db } from '../../services/firebase';
 
 // ---------------------------------------------------------------------------
@@ -590,6 +591,13 @@ export default function InvoiceGenerator() {
           </div>
         </div>
       </main>
+
+      <div className="max-w-2xl mx-auto px-6 pb-8">
+        <ToolConversionHook
+          heading="Generating invoices one by one?"
+          body="Chakrio logs every booking and expense automatically. Your monthly report is always ready — no manual invoice writing."
+        />
+      </div>
 
       <Footer />
 

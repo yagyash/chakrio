@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 
 const DEFAULT_WINDOWS = [
@@ -296,6 +297,13 @@ export default function CancellationPolicyGenerator() {
             <p className="text-text-2 text-sm">Generate a professional PDF invoice for your guests. No sign-up required.</p>
           </Link>
         </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-6 pb-8">
+        <ToolConversionHook
+          heading="Managing cancellations on WhatsApp?"
+          body="Chakrio tracks cancellations and adjusts your availability automatically. No manual updates, no confusion."
+        />
       </div>
 
       <Footer />

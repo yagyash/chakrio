@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
+import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 
 const inputCls = 'w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors';
@@ -321,6 +322,13 @@ export default function OccupancyCalculator() {
           </div>
         </div>
       </main>
+
+      <div className="max-w-2xl mx-auto px-6 pb-8">
+        <ToolConversionHook
+          heading="Tired of calculating this manually?"
+          body="Chakrio tracks your occupancy automatically — every booking recorded by WhatsApp message, dashboard updates in real time."
+        />
+      </div>
 
       <Footer />
     </div>

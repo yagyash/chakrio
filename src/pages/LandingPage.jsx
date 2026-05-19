@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 
 function useScrollReveal() {
   useEffect(() => {
@@ -71,17 +71,23 @@ const STEPS = [
 const TESTIMONIALS = [
   {
     initials: 'KS',
-    quote: 'Chakrio completely changed how we manage our bookings. What used to take an hour of writing in our register now happens automatically the moment we send a message.',
+    quote: 'Chakrio completely changed how we manage our bookings. What used to take an hour of writing in our register now happens automatically the moment we send a message. We can track expenses through the reports and check room availability quite easily.',
     name: 'Koustubh Sharma',
-    property: 'Raghuleela Dham',
+    title: 'Owner, Raghuleela Dham',
     location: 'Goverdhan, Uttar Pradesh',
+    stats: [
+      { value: '60 rooms', label: 'Property size' },
+      { value: 'Physical register', label: 'Was using before' },
+      { value: '1 hr/day', label: 'Saved on record-keeping' },
+    ],
+    note: 'Manager-level daily usage — bookings, expenses, and availability tracking',
   },
   {
     initials: 'NC',
     quote: 'Managing a villa used to mean constant back-and-forth just to keep records straight. With Chakrio, everything is logged the moment I send a message — no effort, no errors.',
     name: 'Nupur Choubisa',
-    property: 'Niva The Rooted Heaven',
-    location: 'Morwaniya, Udaipur',
+    title: 'Owner, Niva — The Rooted Heaven',
+    location: 'Udaipur, Rajasthan',
   },
 ];
 
@@ -92,83 +98,58 @@ const TOOLS = [
   { title: 'Villa & Homestay Invoice Generator', desc: 'Generate a clean PDF invoice for your guests in seconds. No sign-up required.', href: '/tools/invoice-generator' },
 ];
 
-function TestimonialCarousel() {
-  const [current, setCurrent] = useState(0);
-  const [dir, setDir] = useState(null); // 'forward' | 'backward'
-  const [animating, setAnimating] = useState(false);
-  const timerRef = useRef(null);
-
-  const goTo = (next, direction) => {
-    if (animating || next === current) return;
-    setDir(direction);
-    setAnimating(true);
-    setTimeout(() => {
-      setCurrent(next);
-      setAnimating(false);
-    }, 420);
-  };
-
-  const next = () => goTo((current + 1) % TESTIMONIALS.length, 'forward');
-  const prev = () => goTo((current - 1 + TESTIMONIALS.length) % TESTIMONIALS.length, 'backward');
-
-  useEffect(() => {
-    timerRef.current = setInterval(next, 5000);
-    return () => clearInterval(timerRef.current);
-  }, [current, animating]);
-
-  const t = TESTIMONIALS[current];
-
-  const slideStyle = animating ? {
-    opacity: 0,
-    transform: `translateX(${dir === 'forward' ? '-48px' : '48px'})`,
-    transition: 'opacity 0.38s ease, transform 0.38s cubic-bezier(0.22,1,0.36,1)',
-  } : {
-    opacity: 1,
-    transform: 'translateX(0)',
-    transition: 'opacity 0.38s ease, transform 0.38s cubic-bezier(0.22,1,0.36,1)',
-  };
-
+function TestimonialsSection() {
+  const [ks, nc] = TESTIMONIALS;
   return (
     <section className="bg-surface border-y border-surface3">
-      <div className="max-w-3xl mx-auto px-6 py-20">
+      <div className="max-w-5xl mx-auto px-6 py-20">
         <p className="reveal text-xs font-medium uppercase tracking-widest mb-10 text-center" style={{ color: '#c8a96e' }}>From our clients</p>
+        <div className="grid md:grid-cols-2 gap-6 items-start">
 
-        <div className="overflow-hidden">
-          <div style={slideStyle} className="text-center">
-            <blockquote className="font-display font-extrabold text-xl sm:text-2xl md:text-3xl text-text-1 leading-snug mb-8">
-              "{t.quote}"
+          {/* Primary card — Koustubh Sharma */}
+          <div className="reveal reveal-delay-1 rounded-2xl border p-8 flex flex-col" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.1) 0%, #16151f 70%)', borderColor: 'rgba(200,169,110,0.35)' }}>
+            <blockquote className="text-sm font-normal text-text-2 leading-relaxed mb-6">
+              "{ks.quote}"
             </blockquote>
-            <div className="flex items-center justify-center gap-4">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center font-display font-extrabold text-base flex-shrink-0"
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {ks.stats.map(s => (
+                <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(200,169,110,0.07)', border: '1px solid rgba(200,169,110,0.15)' }}>
+                  <p className="font-display font-extrabold text-sm text-text-1 mb-0.5">{s.value}</p>
+                  <p className="text-text-3 text-xs leading-tight">{s.label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-4 mt-auto">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0"
                 style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17' }}>
-                {t.initials}
+                {ks.initials}
               </div>
-              <div className="text-left">
-                <p className="font-display font-extrabold text-lg text-text-1">{t.name}</p>
-                <p className="text-base font-medium" style={{ color: '#c8a96e' }}>Owner, {t.property}</p>
-                <p className="text-text-3 text-xs mt-0.5">{t.location}</p>
+              <div>
+                <p className="font-display font-extrabold text-base text-text-1">{ks.name}</p>
+                <p className="text-sm font-medium" style={{ color: '#c8a96e' }}>{ks.title}</p>
+                <p className="text-text-3 text-xs mt-0.5">{ks.location}</p>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-center gap-4 mt-10">
-          <button onClick={prev} className="w-9 h-9 rounded-full border border-surface3 flex items-center justify-center text-text-3 transition-colors hover:border-[rgba(200,169,110,0.4)] hover:text-text-1"
-            style={{ background: 'transparent', cursor: 'pointer' }}>
-            ←
-          </button>
-          <div className="flex gap-2">
-            {TESTIMONIALS.map((_, i) => (
-              <button key={i} onClick={() => goTo(i, i > current ? 'forward' : 'backward')}
-                className="rounded-full transition-all"
-                style={{ width: i === current ? '20px' : '6px', height: '6px', background: i === current ? '#c8a96e' : 'rgba(200,169,110,0.25)', border: 'none', cursor: 'pointer', padding: 0 }} />
-            ))}
+          {/* Secondary card — Nupur Choubisa */}
+          <div className="reveal reveal-delay-2 bg-bg-app rounded-2xl border border-surface3 p-8 flex flex-col">
+            <blockquote className="text-sm font-normal text-text-2 leading-relaxed mb-6">
+              "{nc.quote}"
+            </blockquote>
+            <div className="flex items-center gap-4 mt-auto">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17' }}>
+                {nc.initials}
+              </div>
+              <div>
+                <p className="font-display font-extrabold text-base text-text-1">{nc.name}</p>
+                <p className="text-sm font-medium" style={{ color: '#c8a96e' }}>{nc.title}</p>
+                <p className="text-text-3 text-xs mt-0.5">{nc.location}</p>
+              </div>
+            </div>
           </div>
-          <button onClick={next} className="w-9 h-9 rounded-full border border-surface3 flex items-center justify-center text-text-3 transition-colors hover:border-[rgba(200,169,110,0.4)] hover:text-text-1"
-            style={{ background: 'transparent', cursor: 'pointer' }}>
-            →
-          </button>
+
         </div>
       </div>
     </section>
@@ -188,17 +169,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
-        <title>Chakrio — Property Bookings, Auto-Recorded</title>
-        <meta name="description" content="Record property bookings, expenses & cancellations by message. Chakrio's AI logs everything instantly. Free dashboard for homestay and villa managers." />
+        <title>Chakrio — WhatsApp Booking Automation for Dharmshalas and Villas in India</title>
+        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp. Used by dharmshalas in Goverdhan UP and villas in Udaipur Rajasthan. Setup in 24 hours." />
         <link rel="canonical" href="https://chakrio.com/" />
-        <meta property="og:title" content="Chakrio — Property Bookings, Auto-Recorded" />
-        <meta property="og:description" content="Send a message, your booking is logged. Chakrio's AI records everything automatically — no spreadsheets, no manual entry." />
+        <meta property="og:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas and Villas in India" />
+        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp. Used by dharmshalas in Goverdhan UP and villas in Udaipur Rajasthan. Setup in 24 hours." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://chakrio.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Chakrio — Property Bookings, Auto-Recorded" />
-        <meta name="twitter:description" content="Send a message, your booking is logged. Chakrio's AI records everything automatically." />
+        <meta name="twitter:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas and Villas in India" />
+        <meta name="twitter:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp. Used by dharmshalas in Goverdhan UP and villas in Udaipur Rajasthan." />
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -306,10 +287,9 @@ export default function LandingPage() {
           </div>
 
           <h1 className="animate-fade-in-up stagger-2 font-display font-extrabold text-4xl sm:text-6xl text-text-1 mb-6 tracking-tight leading-tight">
-            Your bookings.
-            <br />
+            WhatsApp booking automation for{' '}
             <span style={{ background: 'linear-gradient(135deg, #c8a96e, #e8c98a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Auto-recorded.
+              dharmshalas, villas, and homestays in India
             </span>
           </h1>
 
@@ -333,6 +313,9 @@ export default function LandingPage() {
           </div>
           <p style={{ color: '#a0aec0', fontSize: '0.8rem', marginTop: '10px' }}>
             14-day free trial · No credit card required
+          </p>
+          <p className="text-text-3 text-xs mt-5 max-w-lg mx-auto leading-relaxed">
+            Chakrio is used by property managers in Goverdhan, Udaipur, and across India to record bookings, track expenses, and manage availability — all by sending a WhatsApp message.
           </p>
         </div>
       </section>
@@ -444,7 +427,10 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 py-20">
           <div className="reveal text-center mb-12">
             <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Everything you need</h2>
-            <p className="text-text-2 max-w-xl mx-auto">Built for small property managers who handle everything on their phone.</p>
+            <p className="text-text-2 max-w-xl mx-auto mb-3">Built for small property managers who handle everything on their phone.</p>
+            <h2 className="text-xs font-semibold uppercase tracking-widest max-w-2xl mx-auto" style={{ color: 'rgba(200,169,110,0.6)' }}>
+              Used by pilgrimage town dharmshalas and boutique villas across India
+            </h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-6">
             {FEATURES.map((f, i) => (
@@ -561,8 +547,8 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* Testimonials — carousel */}
-      <TestimonialCarousel />
+      {/* Testimonials */}
+      <TestimonialsSection />
 
       {/* FAQ */}
       <section id="faq" className="max-w-3xl mx-auto px-6 py-20 w-full">
