@@ -12,6 +12,7 @@ const businessTemplates = {
       { label: 'Expenses',   path: '/expenses'   },
       { label: 'Reports',    path: '/reports'    },
       { label: 'Menu',       path: '/menu'       },
+      { label: 'Settings',   path: '/settings'   },
     ],
   },
   hotel: {
@@ -23,6 +24,7 @@ const businessTemplates = {
       { label: 'Expenses',   path: '/expenses'   },
       { label: 'Reports',    path: '/reports'    },
       { label: 'Menu',       path: '/menu'       },
+      { label: 'Settings',   path: '/settings'   },
     ],
   },
   villa: {
@@ -34,6 +36,7 @@ const businessTemplates = {
       { label: 'Expenses',   path: '/expenses'   },
       { label: 'Reports',    path: '/reports'    },
       { label: 'Menu',       path: '/menu'       },
+      { label: 'Settings',   path: '/settings'   },
     ],
   },
   dharmshala: {
@@ -45,6 +48,7 @@ const businessTemplates = {
       { label: 'Expenses',   path: '/expenses'   },
       { label: 'Reports',    path: '/reports'    },
       { label: 'Menu',       path: '/menu'       },
+      { label: 'Settings',   path: '/settings'   },
     ],
   },
   bakery: {
