@@ -128,10 +128,21 @@ function Step1({ data, onChange, errors }) {
 function Step2({ data, onChange, errors }) {
   const [showOwner, setShowOwner] = useState(false);
 
+  // True when either routing is set to reach the owner
+  const needsOwner = data.subscription_notify !== 'manager' || data.monthly_report_notify !== 'manager';
+  // Owner section stays open when routing requires it, or user manually opened it
+  const isOwnerOpen = showOwner || needsOwner;
+
   function handleNameChange(val) {
     onChange('property_name', val);
     if (!data._slugEdited) onChange('property_id', slugify(val));
     if (!data._shortEdited) onChange('short_name', val.split(' ')[0]);
+  }
+
+  // Auto-open owner section when routing is changed to include owner
+  function handleNotifyChange(key, val) {
+    onChange(key, val);
+    if (val !== 'manager') setShowOwner(true);
   }
 
   return (
@@ -195,18 +206,49 @@ function Step2({ data, onChange, errors }) {
         </div>
       )}
 
+      {/* ── Notification routing — always visible, decided during onboarding ── */}
+      <div style={{ marginBottom: 18, padding: '14px 16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 12 }}>Notification Routing</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+          <div style={S.row}>
+            <label style={S.label}>Subscription payment links</label>
+            <select style={S.select} value={data.subscription_notify} onChange={e => handleNotifyChange('subscription_notify', e.target.value)}>
+              <option value="manager">→ Manager only</option>
+              <option value="owner">→ Owner only</option>
+              <option value="both">→ Both</option>
+            </select>
+          </div>
+          <div style={S.row}>
+            <label style={S.label}>Monthly P&amp;L reports</label>
+            <select style={S.select} value={data.monthly_report_notify} onChange={e => handleNotifyChange('monthly_report_notify', e.target.value)}>
+              <option value="manager">→ Manager only</option>
+              <option value="owner">→ Owner only</option>
+              <option value="both">→ Both</option>
+            </select>
+          </div>
+        </div>
+        {needsOwner && !data.owner_phone && !data.owner_telegram_chat_id && (
+          <div style={{ fontSize: 12, color: '#c8a96e', marginTop: 4 }}>
+            ↓ Add owner contact below so we know where to send these.
+          </div>
+        )}
+      </div>
+
+      {/* ── Owner contact — collapsible; auto-opens when owner routing is selected ── */}
       <div style={{ marginTop: 4, marginBottom: 18 }}>
         <button
           type="button"
           onClick={() => setShowOwner(v => !v)}
-          style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#8c8a9e', fontSize: 13, cursor: 'pointer', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}
+          style={{ background: 'none', border: `1px solid ${needsOwner ? 'rgba(200,169,110,0.35)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 8, color: '#8c8a9e', fontSize: 13, cursor: 'pointer', padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}
         >
-          <span style={{ fontSize: 11 }}>{showOwner ? '▲' : '▼'}</span>
-          Owner &amp; Notifications
-          <span style={{ fontSize: 11, color: '#56546a' }}>(optional)</span>
+          <span style={{ fontSize: 11 }}>{isOwnerOpen ? '▲' : '▼'}</span>
+          Owner Contact
+          {needsOwner
+            ? <span style={{ fontSize: 11, color: '#c8a96e' }}>(required for owner routing)</span>
+            : <span style={{ fontSize: 11, color: '#56546a' }}>(optional)</span>}
         </button>
 
-        {showOwner && (
+        {isOwnerOpen && (
           <div style={{ marginTop: 12, padding: '16px', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10 }}>
             <div style={S.row}>
               <label style={S.label}>Owner Name(s)</label>
@@ -224,32 +266,11 @@ function Step2({ data, onChange, errors }) {
                 <input style={S.input} value={data.owner_telegram_chat_id} onChange={e => onChange('owner_telegram_chat_id', e.target.value)} placeholder="5953587554" />
               </div>
             </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={S.row}>
-                <label style={S.label}>Subscription reminders</label>
-                <select style={S.select} value={data.subscription_notify} onChange={e => onChange('subscription_notify', e.target.value)}>
-                  <option value="manager">Manager only</option>
-                  <option value="owner">Owner only</option>
-                  <option value="both">Both</option>
-                </select>
-              </div>
-              <div style={S.row}>
-                <label style={S.label}>Monthly P&amp;L reports</label>
-                <select style={S.select} value={data.monthly_report_notify} onChange={e => onChange('monthly_report_notify', e.target.value)}>
-                  <option value="manager">Manager only</option>
-                  <option value="owner">Owner only</option>
-                  <option value="both">Both</option>
-                </select>
-              </div>
-            </div>
-
-            {(data.subscription_notify !== 'manager' || data.monthly_report_notify !== 'manager') && !data.owner_phone && !data.owner_telegram_chat_id && (
-              <div style={{ fontSize: 12, color: '#c8a96e', marginTop: 4 }}>
-                Fill in owner contact above to send notifications to the owner.
-              </div>
-            )}
+            {errors.owner_contact && <div style={{ ...S.err, marginTop: 4 }}>{errors.owner_contact}</div>}
           </div>
+        )}
+        {errors.owner_contact && !isOwnerOpen && (
+          <div style={{ ...S.err, marginTop: 8 }}>{errors.owner_contact}</div>
         )}
       </div>
 
@@ -465,8 +486,8 @@ function Step4({ client, property, rooms, otaFeeds }) {
     property.owner_names_raw ? ['Owner Name(s)', property.owner_names_raw] : null,
     property.owner_phone ? ['Owner WhatsApp', property.owner_phone] : null,
     property.owner_telegram_chat_id ? ['Owner Telegram ID', property.owner_telegram_chat_id] : null,
-    property.subscription_notify !== 'manager' ? ['Subscription alerts', property.subscription_notify] : null,
-    property.monthly_report_notify !== 'manager' ? ['Monthly reports', property.monthly_report_notify] : null,
+    ['Subscription links →', property.subscription_notify],
+    ['Monthly reports →', property.monthly_report_notify],
     ['Rooms', rooms.length > 0 ? `${rooms.length} rooms` : 'None'],
     validOta.length > 0 ? ['OTA feeds', validOta.map(f => f.ota_name).join(', ')] : null,
   ].filter(Boolean);
@@ -545,7 +566,12 @@ export default function OnboardPage() {
   const [errors, setErrors]         = useState({});
 
   function updateClient(k, v)   { setClient(p => ({ ...p, [k]: v })); setErrors(e => ({ ...e, [k]: '' })); }
-  function updateProperty(k, v) { setProperty(p => ({ ...p, [k]: v })); setErrors(e => ({ ...e, [k]: '' })); }
+  function updateProperty(k, v) {
+    setProperty(p => ({ ...p, [k]: v }));
+    // Also clear owner_contact error when any related field is updated
+    const clearExtra = (k === 'owner_phone' || k === 'owner_telegram_chat_id') ? { owner_contact: '' } : {};
+    setErrors(e => ({ ...e, [k]: '', ...clearExtra }));
+  }
 
   function validateStep(s) {
     const errs = {};
@@ -563,6 +589,9 @@ export default function OnboardPage() {
         errs.telegram_chat_id = 'Required for Telegram';
       if (property.notification_channel === 'whatsapp' && !property.manager_whatsapp.trim())
         errs.manager_whatsapp = 'Required for WhatsApp';
+      if ((property.subscription_notify !== 'manager' || property.monthly_report_notify !== 'manager')
+          && !property.owner_phone.trim() && !property.owner_telegram_chat_id.trim())
+        errs.owner_contact = 'Owner phone or Telegram ID required when routing to owner';
     }
     return errs;
   }
