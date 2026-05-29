@@ -642,6 +642,7 @@ export default function OnboardPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Onboarding failed.');
+      if (window.fbq) window.fbq('track', 'Lead');
       setDone(true);
     } catch (err) {
       setSubmitError(err.message || 'Something went wrong. Please try again.');

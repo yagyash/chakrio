@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -14,11 +15,20 @@ import InvoiceGenerator from './pages/tools/InvoiceGenerator';
 import MenuPage from './pages/MenuPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 
+function MetaPageView() {
+  const location = useLocation();
+  useEffect(() => {
+    if (window.fbq) window.fbq('track', 'PageView');
+  }, [location.pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <HelmetProvider>
     <AuthProvider>
       <BrowserRouter>
+        <MetaPageView />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
