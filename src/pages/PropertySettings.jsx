@@ -22,13 +22,16 @@ export default function PropertySettings() {
   const { selectedProperty } = useAuthContext();
   const propertyId = selectedProperty?.id || 'default';
 
-  const [text, setText]             = useState('');
-  const [reviewUrl, setReviewUrl]   = useState('');
-  const [loading, setLoading]       = useState(true);
-  const [saving, setSaving]         = useState(false);
+  const [text, setText]                 = useState('');
+  const [reviewUrl, setReviewUrl]       = useState('');
+  const [placeId, setPlaceId]           = useState('');
+  const [loading, setLoading]           = useState(true);
+  const [saving, setSaving]             = useState(false);
   const [savingReview, setSavingReview] = useState(false);
-  const [status, setStatus]         = useState(null); // 'saved' | 'error' | null
+  const [savingPlace, setSavingPlace]   = useState(false);
+  const [status, setStatus]             = useState(null);
   const [reviewStatus, setReviewStatus] = useState(null);
+  const [placeStatus, setPlaceStatus]   = useState(null);
 
   useEffect(() => {
     if (!propertyId) return;
@@ -39,6 +42,7 @@ export default function PropertySettings() {
           const data = snap.data() || {};
           setText(data.local_recommendations || '');
           setReviewUrl(data.google_review_link || '');
+          setPlaceId(data.google_place_id || '');
         }
       })
       .catch(err => console.error('PropertySettings load error:', err))
@@ -80,6 +84,25 @@ export default function PropertySettings() {
       setReviewStatus('error');
     } finally {
       setSavingReview(false);
+    }
+  };
+
+  const handleSavePlaceId = async () => {
+    setSavingPlace(true);
+    setPlaceStatus(null);
+    try {
+      await setDoc(
+        doc(db, 'property_settings', propertyId),
+        { google_place_id: placeId.trim() },
+        { merge: true }
+      );
+      setPlaceStatus('saved');
+      setTimeout(() => setPlaceStatus(null), 3000);
+    } catch (err) {
+      console.error('PropertySettings place ID save error:', err);
+      setPlaceStatus('error');
+    } finally {
+      setSavingPlace(false);
     }
   };
 
@@ -181,7 +204,7 @@ export default function PropertySettings() {
           </>
         )}
       </div>
-      {/* Google Review URL Card */}
+      {/* Google Review Link Card */}
       <div style={{
         background: '#16151f',
         border: '1px solid rgba(255,255,255,0.07)',
@@ -251,6 +274,89 @@ export default function PropertySettings() {
                 onMouseLeave={e => { if (!savingReview) e.currentTarget.style.background = '#c8a96e'; }}
               >
                 {savingReview ? 'Saving…' : 'Save'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+      {/* Google Place ID Card */}
+      <div style={{
+        background: '#16151f',
+        border: '1px solid rgba(255,255,255,0.07)',
+        borderRadius: '16px',
+        padding: '24px',
+        maxWidth: '680px',
+        marginTop: '20px',
+      }}>
+        <h2 style={{
+          fontFamily: 'Syne, sans-serif',
+          fontWeight: 600,
+          fontSize: '15px',
+          color: '#f0eee8',
+          marginBottom: '6px',
+        }}>
+          Google Place ID
+        </h2>
+        <p style={{ fontSize: '12px', color: '#8c8a9e', marginBottom: '16px' }}>
+          Used for the post-checkout review button (Template C). Find it at{' '}
+          <a
+            href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#c8a96e' }}
+          >
+            Place ID Finder
+          </a>. Looks like: <span style={{ color: '#6c6a80', fontFamily: 'monospace' }}>ChIJx0RVVd...</span>
+        </p>
+
+        {loading ? (
+          <div style={{ color: '#56546a', fontSize: '13px', padding: '12px 0' }}>Loading…</div>
+        ) : (
+          <>
+            <input
+              type="text"
+              value={placeId}
+              onChange={e => setPlaceId(e.target.value)}
+              placeholder="ChIJx0RVVdYNczkRP9oTugegcc4"
+              style={{ ...inputStyle, resize: 'none', fontFamily: 'monospace' }}
+            />
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              marginTop: '10px',
+            }}>
+              {placeStatus === 'saved' && (
+                <span style={{ fontSize: '12px', color: '#5cb88a', fontWeight: 500 }}>
+                  Place ID saved ✓
+                </span>
+              )}
+              {placeStatus === 'error' && (
+                <span style={{ fontSize: '12px', color: '#e07070', fontWeight: 500 }}>
+                  Failed to save. Try again.
+                </span>
+              )}
+              <button
+                onClick={handleSavePlaceId}
+                disabled={savingPlace}
+                style={{
+                  background: savingPlace ? 'rgba(200,169,110,0.4)' : '#c8a96e',
+                  color: '#0f0e17',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '9px 20px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: savingPlace ? 'not-allowed' : 'pointer',
+                  fontFamily: 'DM Sans, sans-serif',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => { if (!savingPlace) e.currentTarget.style.background = '#d4b87a'; }}
+                onMouseLeave={e => { if (!savingPlace) e.currentTarget.style.background = '#c8a96e'; }}
+              >
+                {savingPlace ? 'Saving…' : 'Save'}
               </button>
             </div>
           </>
