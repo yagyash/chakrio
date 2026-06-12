@@ -81,6 +81,31 @@ const ROUTES = [
       JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://chakrio.com/' }, { '@type': 'ListItem', position: 2, name: 'Free Tools', item: 'https://chakrio.com/#tools' }, { '@type': 'ListItem', position: 3, name: 'Hotel Cancellation Policy Generator', item: 'https://chakrio.com/tools/cancellation-policy' }] }),
     ],
   },
+  {
+    outPath: 'tools/invoice-generator/index.html',
+    title: 'Hotel Invoice Generator — Free Billing Template | Chakrio',
+    description:
+      'Create professional hotel and homestay invoices instantly. Add guest details, room charges, taxes, and download as PDF. Free invoice template for property managers.',
+    canonical: 'https://chakrio.com/tools/invoice-generator',
+    ogUrl: 'https://chakrio.com/tools/invoice-generator',
+    schemas: [
+      ORG_SCHEMA,
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Hotel Invoice Generator — Free Billing Template | Chakrio', url: 'https://chakrio.com/tools/invoice-generator', description: 'Create professional hotel and homestay invoices in seconds. Fill in guest name, dates, room charges and extras — download as PDF instantly. Free, no sign-up required.', datePublished: '2025-01-01', dateModified: '2026-06-12', author: { '@type': 'Organization', name: 'Chakrio', url: 'https://chakrio.com' }, publisher: { '@type': 'Organization', name: 'Chakrio', logo: { '@type': 'ImageObject', url: 'https://chakrio.com/og-image.png' } } }),
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://chakrio.com/' }, { '@type': 'ListItem', position: 2, name: 'Free Tools', item: 'https://chakrio.com/#tools' }, { '@type': 'ListItem', position: 3, name: 'Hotel Invoice Generator', item: 'https://chakrio.com/tools/invoice-generator' }] }),
+    ],
+  },
+  {
+    outPath: 'privacy/index.html',
+    title: 'Privacy Policy — Chakrio',
+    description:
+      'Chakrio privacy policy. Learn how we collect, use, and protect your personal data when you use our property management tools.',
+    canonical: 'https://chakrio.com/privacy',
+    ogUrl: 'https://chakrio.com/privacy',
+    schemas: [
+      ORG_SCHEMA,
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Privacy Policy — Chakrio', url: 'https://chakrio.com/privacy', description: 'Chakrio privacy policy — how we collect, use, and protect your data.', author: { '@type': 'Organization', name: 'Chakrio', url: 'https://chakrio.com' } }),
+    ],
+  },
 ];
 
 const baseHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
@@ -115,4 +140,4 @@ for (const route of ROUTES) {
   console.log(`✓ Prerendered: /${route.outPath}`);
 }
 
-console.log('\nPrerender complete — 4 routes with unique meta tags + JSON-LD.');
+console.log('\nPrerender complete — 6 routes with unique meta tags + JSON-LD.');
