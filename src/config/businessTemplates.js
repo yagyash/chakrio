@@ -12,6 +12,7 @@ const businessTemplates = {
       { label: 'Expenses',   path: '/expenses'   },
       { label: 'Reports',    path: '/reports'    },
       { label: 'Menu',       path: '/menu'       },
+      { label: 'Campaigns',  path: '/campaigns'  },
       { label: 'Settings',   path: '/settings'   },
     ],
   },
