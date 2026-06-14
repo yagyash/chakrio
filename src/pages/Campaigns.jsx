@@ -284,7 +284,7 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
   useEffect(() => {
     if (!selected) return;
     setRecipientCount(null);
-    apiFetch(`/api/campaigns/count?propertyId=${propertyId}`)
+    apiFetch(`/api/campaigns?action=count&propertyId=${propertyId}`)
       .then(d => setRecipientCount(d.count ?? 0))
       .catch(() => setRecipientCount('—'));
   }, [selected, propertyId]);
@@ -292,6 +292,7 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
   const tpl = TEMPLATES[selected];
 
   const allFilled = tpl?.fields.every(f => (vars[f.key] ?? '').trim());
+  const hasRecipients = typeof recipientCount === 'number' && recipientCount > 0;
 
   const launch = async () => {
     setLaunching(true);
@@ -383,8 +384,8 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
             <div style={{ display: 'flex', gap: '10px' }}>
               <button style={btnGhost} onClick={() => setStep('pick')}>← Back</button>
               <button
-                style={{ ...btnPrimary, flex: 1, opacity: (!allFilled || launching) ? 0.5 : 1 }}
-                disabled={!allFilled || launching}
+                style={{ ...btnPrimary, flex: 1, opacity: (!allFilled || !hasRecipients || launching) ? 0.5 : 1 }}
+                disabled={!allFilled || !hasRecipients || launching}
                 onClick={launch}
               >
                 {launching ? 'Launching…' : `Send to ${recipientCount ?? '…'} guests`}

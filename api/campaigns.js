@@ -116,7 +116,39 @@ export default async function handler(req, res) {
 
   // ── GET ───────────────────────────────────────────────────────────
   if (req.method === 'GET') {
-    const { propertyId, campaignId } = req.query;
+    const { propertyId, campaignId, action } = req.query;
+
+    // Recipient count — how many eligible past guests with phone numbers
+    if (action === 'count' && propertyId) {
+      if (!UUID_RE.test(propertyId)) return res.status(400).json({ error: 'Bad request' });
+
+      const ownedIds = await getOwnerPropertyIds(uid, token, projectId);
+      if (!ownedIds.includes(propertyId)) return res.status(403).json({ error: 'Forbidden' });
+
+      try {
+        // Get all completed bookings with a guest phone for this property
+        const rows = await supabaseFetch(
+          `/bookings?property_id=eq.${propertyId}&status=eq.completed&guest_phone=not.is.null&select=guest_phone`,
+          supabaseUrl, serviceKey,
+        );
+        // Deduplicate by phone
+        const uniquePhones = [...new Set(rows.map(r => r.guest_phone).filter(Boolean))];
+
+        // Subtract opted-out phones
+        let optedOut = 0;
+        if (uniquePhones.length > 0) {
+          const optOutRows = await supabaseFetch(
+            `/marketing_opt_outs?phone=in.(${uniquePhones.join(',')})&select=phone`,
+            supabaseUrl, serviceKey,
+          ).catch(() => []);
+          optedOut = optOutRows.length;
+        }
+
+        return res.status(200).json({ count: Math.max(0, uniquePhones.length - optedOut) });
+      } catch {
+        return res.status(502).json({ error: 'Failed to get recipient count' });
+      }
+    }
 
     // Single campaign status
     if (campaignId) {
