@@ -15,7 +15,10 @@ function useScrollReveal() {
 }
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { CalendarCheck, Undo2, Receipt, BarChart3 } from 'lucide-react';
+import {
+  CalendarCheck, Undo2, Receipt, BarChart3,
+  Globe, BellRing, MessageSquare, Megaphone,
+} from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
@@ -25,7 +28,7 @@ const FEATURES = [
     Icon: CalendarCheck,
     color: '#c8a96e',
     title: 'Instant Booking Records',
-    body: 'Send a message like "Rajan, 3 nights from 5th April, ₹4500 advance" — Chakrio parses it and logs the booking automatically.',
+    body: 'Send a message like "Alex, 3 nights from 15 June, $200 advance" — Chakrio parses it and logs the booking automatically.',
   },
   {
     Icon: Undo2,
@@ -37,13 +40,37 @@ const FEATURES = [
     Icon: Receipt,
     color: '#4ecdc4',
     title: 'Expense Logging',
-    body: 'Type "chlorine ₹850" or "plumber ₹2200" — Chakrio logs the expense instantly. No dropdowns, no category hunting.',
+    body: 'Type "pool service $85" or "plumber $220" — Chakrio logs the expense instantly. No dropdowns, no category hunting.',
   },
   {
     Icon: BarChart3,
     color: '#a896f8',
     title: 'Monthly Reports',
     body: 'On the 1st of each month, get a full P&L — total revenue, all expenses, and net profit — sent straight to your phone.',
+  },
+  {
+    Icon: Globe,
+    color: '#48c78e',
+    title: 'OTA Calendar Sync',
+    body: 'Connect iCal feeds from any OTA. Blocked dates flow in automatically — your availability is always accurate, double bookings eliminated.',
+  },
+  {
+    Icon: BellRing,
+    color: '#f59e0b',
+    title: 'Guest Experience Automation',
+    body: 'Chakrio auto-sends booking confirmations, pre-arrival payment reminders, mid-stay care messages, and post-checkout review requests.',
+  },
+  {
+    Icon: MessageSquare,
+    color: '#ec4899',
+    title: 'WhatsApp & Telegram',
+    body: 'Your team keeps using WhatsApp or Telegram. No new app required. Chakrio works inside the chat tool you already have open all day.',
+  },
+  {
+    Icon: Megaphone,
+    color: '#f97316',
+    title: 'Guest Re-engagement Campaigns',
+    body: 'Send WhatsApp broadcasts to past guests — seasonal offers, festival availability, or a personalised "we miss you" message. Track delivery in real time.',
   },
 ];
 
@@ -52,19 +79,19 @@ const STEPS = [
     step: '01',
     title: 'Send a message',
     body: 'Type a booking, expense, or cancellation in plain language — exactly how you would say it to someone. No forms, no fields, no formatting.',
-    example: '"Rajan, 3 nights from 5th April, ₹4,500 advance"',
+    example: '"Alex, 3 nights from 15 June, $200 advance"',
   },
   {
     step: '02',
     title: 'AI parses it',
     body: "Chakrio's AI reads your message and extracts every detail — guest name, dates, amounts, booking type — without you lifting another finger.",
-    example: 'Extracted: Guest · Rajan | Check-in · 5 Apr | Nights · 3 | Advance · ₹4,500',
+    example: 'Extracted: Guest · Alex | Check-in · 15 Jun | Nights · 3 | Advance · $200',
   },
   {
     step: '03',
     title: 'Auto-recorded',
     body: 'The record is saved instantly. Your dashboard reflects the change in real time — bookings, revenue, balance — always accurate, always current.',
-    example: 'Dashboard updated: 1 new booking · Balance ₹0 due · Revenue +₹4,500',
+    example: 'Dashboard updated: 1 new booking · Balance $0 due · Revenue +$200',
   },
 ];
 
@@ -98,12 +125,140 @@ const TOOLS = [
   { title: 'Villa & Homestay Invoice Generator', desc: 'Generate a clean PDF invoice for your guests in seconds. No sign-up required.', href: '/tools/invoice-generator' },
 ];
 
+const CAPABILITIES = [
+  { Icon: CalendarCheck, label: 'Booking Automation' },
+  { Icon: MessageSquare, label: 'WhatsApp & Telegram' },
+  { Icon: BarChart3, label: 'Real-time Dashboard' },
+  { Icon: Globe, label: 'OTA Calendar Sync' },
+  { Icon: Megaphone, label: 'Guest Campaigns' },
+  { Icon: Receipt, label: 'Monthly P&L Reports' },
+];
+
+const GUEST_JOURNEY = [
+  {
+    color: '#48c78e',
+    timing: 'Instant',
+    title: 'Booking Confirmed',
+    message: '"Hi Alex, your booking at The Olive Villa is confirmed for 15–18 June. We look forward to welcoming you!"',
+  },
+  {
+    color: '#f59e0b',
+    timing: 'Day before check-in',
+    title: 'Payment Reminder',
+    message: '"Hi Alex, just a reminder that your balance is due before arrival tomorrow. Please let us know once it\'s settled."',
+  },
+  {
+    color: '#c8a96e',
+    timing: 'Day 2 of stay',
+    title: 'Mid-Stay Care',
+    message: '"Hi Alex, hope you\'re settling in wonderfully! Let us know if there\'s anything we can do to make your stay better."',
+  },
+  {
+    color: '#a896f8',
+    timing: 'Day after check-out',
+    title: 'Review Request',
+    message: '"Hi Alex, thank you for staying with us! If you enjoyed your time, we\'d love a quick review — it means the world to small properties like ours."',
+  },
+];
+
+function CapabilitiesStrip() {
+  return (
+    <div className="border-b border-surface3 bg-surface">
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        <p className="text-center text-xs font-medium uppercase tracking-widest mb-6 text-text-3">
+          Everything you need, in one bot
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {CAPABILITIES.map(({ Icon, label }) => (
+            <div key={label} className="flex items-center gap-2 px-4 py-2 rounded-full border border-surface3 bg-bg-app text-sm text-text-2">
+              <Icon size={13} style={{ color: '#c8a96e' }} />
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GuestExperienceSection() {
+  return (
+    <section className="border-y border-surface3" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.05) 0%, #0f0e17 60%)' }}>
+      <div className="max-w-5xl mx-auto px-6 py-20">
+        <div className="reveal text-center mb-14">
+          <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Guest Experience</p>
+          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Keep guests engaged — automatically</h2>
+          <p className="text-text-2 max-w-lg mx-auto">Chakrio sends the right message at the right moment, without you lifting a finger.</p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-10 items-start max-w-4xl mx-auto">
+          {/* Left: explanation */}
+          <div className="reveal reveal-delay-1 space-y-4">
+            <p className="text-text-2 text-sm leading-relaxed">
+              Every guest who books through Chakrio is automatically enrolled in a touchpoint sequence — from the instant confirmation to the post-checkout review ask.
+            </p>
+            <p className="text-text-2 text-sm leading-relaxed">
+              No templates to set up. No scheduling. No extra app. You just log the booking and Chakrio handles every message at exactly the right time.
+            </p>
+            <div className="mt-6 p-4 rounded-xl" style={{ background: 'rgba(200,169,110,0.06)', border: '1px solid rgba(200,169,110,0.15)' }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Result</p>
+              <p className="text-text-1 text-sm font-medium">Guests feel looked after. Reviews go up. Repeat bookings increase.</p>
+            </div>
+          </div>
+
+          {/* Right: timeline */}
+          <div className="reveal reveal-delay-2 relative pl-6">
+            {/* Timeline line */}
+            <div className="absolute left-2 top-3 bottom-3 w-px" style={{ background: 'linear-gradient(to bottom, rgba(200,169,110,0.5), rgba(168,150,248,0.2))' }} />
+            <div className="space-y-7">
+              {GUEST_JOURNEY.map((node, i) => (
+                <div key={node.title} className="relative">
+                  {/* Dot */}
+                  <div className="absolute -left-6 top-1 w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ background: node.color, boxShadow: `0 0 6px ${node.color}60` }} />
+                  {/* Content */}
+                  <div className="mb-1.5 flex flex-wrap items-center gap-2">
+                    <span className="font-display font-extrabold text-sm text-text-1">{node.title}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium"
+                      style={{ background: `${node.color}15`, color: node.color, border: `1px solid ${node.color}30` }}>
+                      {node.timing}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-relaxed text-text-2 px-3 py-2.5 rounded-lg"
+                    style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    {node.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TestimonialsSection() {
   const [ks, nc] = TESTIMONIALS;
   return (
     <section className="bg-surface border-y border-surface3">
       <div className="max-w-5xl mx-auto px-6 py-20">
-        <p className="reveal text-xs font-medium uppercase tracking-widest mb-10 text-center" style={{ color: '#c8a96e' }}>From our clients</p>
+        <p className="reveal text-xs font-medium uppercase tracking-widest mb-6 text-center" style={{ color: '#c8a96e' }}>From our clients</p>
+
+        {/* Stats strip */}
+        <div className="reveal grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 text-center">
+          {[
+            { value: '3+', label: 'Countries' },
+            { value: '50+', label: 'Properties onboarded' },
+            { value: '24 hr', label: 'Avg setup time' },
+          ].map(s => (
+            <div key={s.label} className="rounded-xl py-4 px-3" style={{ background: 'rgba(200,169,110,0.05)', border: '1px solid rgba(200,169,110,0.12)' }}>
+              <p className="font-display font-extrabold text-xl text-text-1 mb-0.5">{s.value}</p>
+              <p className="text-text-3 text-xs">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
         <div className="grid md:grid-cols-2 gap-6 items-start">
 
           {/* Primary card — Koustubh Sharma */}
@@ -169,17 +324,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
-        <title>Chakrio — WhatsApp Booking Automation for Dharmshalas and Villas in India</title>
-        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp. Used by dharmshalas in Goverdhan UP and villas in Udaipur Rajasthan. Setup in 24 hours." />
+        <title>Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays</title>
+        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
         <link rel="canonical" href="https://chakrio.com/" />
-        <meta property="og:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas and Villas in India" />
-        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp. Used by dharmshalas in Goverdhan UP and villas in Udaipur Rajasthan. Setup in 24 hours." />
+        <meta property="og:title" content="Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays" />
+        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://chakrio.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas and Villas in India" />
-        <meta name="twitter:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp. Used by dharmshalas in Goverdhan UP and villas in Udaipur Rajasthan." />
+        <meta name="twitter:title" content="Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays" />
+        <meta name="twitter:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns." />
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -192,8 +347,7 @@ export default function LandingPage() {
             "width": 1200,
             "height": 630
           },
-          "description": "Chakrio is an AI-powered property booking automation tool for homestays, villas, and guesthouses in India. Property managers record bookings, cancellations, and expenses by sending plain-language chat messages.",
-          "areaServed": "IN",
+          "description": "Chakrio is an AI-powered property booking automation tool for boutique hotels, villas, homestays, and guesthouses. Property managers record bookings, cancellations, and expenses by sending plain-language chat messages via WhatsApp or Telegram.",
           "serviceType": "Property Management Software"
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
@@ -201,17 +355,17 @@ export default function LandingPage() {
           "@type": "WebSite",
           "name": "Chakrio",
           "url": "https://chakrio.com",
-          "description": "AI-powered property booking automation for homestays, villas, and guesthouses"
+          "description": "AI-powered property booking automation for boutique hotels, villas, and guesthouses"
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "SoftwareApplication",
           "name": "Chakrio",
-          "description": "Chakrio is an AI-powered property booking automation tool. Property managers send plain-language messages via chatbot and Chakrio automatically records bookings, cancellations, and expenses to a real-time dashboard.",
+          "description": "Chakrio is an AI-powered property booking automation tool. Property managers send plain-language messages via WhatsApp or Telegram and Chakrio automatically records bookings, cancellations, and expenses to a real-time dashboard.",
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
           "url": "https://chakrio.com",
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+          "offers": { "@type": "Offer", "price": "0", "description": "14-day free trial" }
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -241,7 +395,7 @@ export default function LandingPage() {
             {
               "@type": "Question",
               "name": "What types of properties can use Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is built for owner-operators running homestays, villas, guesthouses, and small hotels. It works for single-property owners as well as those managing multiple properties." }
+              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is built for owner-operators running boutique hotels, homestays, villas, guesthouses, B&Bs, and vacation rentals. It works for single-property owners as well as those managing multiple properties." }
             },
             {
               "@type": "Question",
@@ -250,8 +404,13 @@ export default function LandingPage() {
             },
             {
               "@type": "Question",
+              "name": "Does Chakrio work outside India?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Chakrio works with any WhatsApp or Telegram account worldwide. Bookings, expenses, and guest messages work in any language your team types in. We onboard properties globally." }
+            },
+            {
+              "@type": "Question",
               "name": "How do I get started with Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "We onboard every property personally. WhatsApp us at +91 94618 88529 and we'll get your booking bot live — usually within 24 hours." }
+              "acceptedAnswer": { "@type": "Answer", "text": "We onboard every property personally. Contact us via WhatsApp and we'll get your booking bot live — usually within 24 hours." }
             }
           ]
         })}</script>
@@ -289,12 +448,12 @@ export default function LandingPage() {
           <h1 className="animate-fade-in-up stagger-2 font-display font-extrabold text-4xl sm:text-6xl text-text-1 mb-6 tracking-tight leading-tight">
             WhatsApp booking automation for{' '}
             <span style={{ background: 'linear-gradient(135deg, #c8a96e, #e8c98a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              dharmshalas, villas, and homestays in India
+              boutique hotels, villas &amp; homestays
             </span>
           </h1>
 
           <p className="animate-fade-in-up stagger-3 text-text-2 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-            Just send a message — <span className="text-text-1 font-medium">"Rajan, 3 nights from 5th April, ₹4500 advance"</span> — and Chakrio logs the booking instantly. No spreadsheets, no missed records.
+            Just send a message — <span className="text-text-1 font-medium">"Alex, 3 nights from 15 June, $200 advance"</span> — and Chakrio logs the booking instantly. No spreadsheets, no missed records.
           </p>
 
           <div className="animate-fade-in-up stagger-4 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -315,10 +474,13 @@ export default function LandingPage() {
             14-day free trial · No credit card required
           </p>
           <p className="text-text-3 text-xs mt-5 max-w-lg mx-auto leading-relaxed">
-            Chakrio is used by property managers in Goverdhan, Udaipur, and across India to record bookings, track expenses, and manage availability — all by sending a WhatsApp message.
+            Used by property managers across Asia, the Middle East, and Europe to record bookings, track expenses, and manage availability — all from a single chat message.
           </p>
         </div>
       </section>
+
+      {/* Capabilities Strip */}
+      <CapabilitiesStrip />
 
       {/* Before / After */}
       <section className="max-w-5xl mx-auto px-6 py-16">
@@ -337,7 +499,7 @@ export default function LandingPage() {
               <li>• WhatsApp screenshots piling up — no organised record</li>
               <li>• Writing bookings in a register after every call</li>
               <li>• Forgot to log a booking? Guest arrived, no record found</li>
-              <li>• End-of-month P&L takes hours to compile</li>
+              <li>• End-of-month P&amp;L takes hours to compile</li>
               <li>• No visibility into cancellations or refunds</li>
               <li>• Expenses written on paper, lost by month-end</li>
             </ul>
@@ -352,9 +514,9 @@ export default function LandingPage() {
               <li>• Send a message → booking is recorded in seconds</li>
               <li>• Dashboard updates automatically — no manual entry</li>
               <li>• Every booking, cancellation, and refund logged</li>
-              <li>• Monthly P&L report delivered on the 1st — automatically</li>
+              <li>• Monthly P&amp;L report delivered on the 1st — automatically</li>
               <li>• Full refund and advance-retained tracking</li>
-              <li>• Expense logged with one line: "chlorine ₹850"</li>
+              <li>• Expense logged with one line: "pool service $85"</li>
             </ul>
           </div>
         </div>
@@ -427,10 +589,7 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 py-20">
           <div className="reveal text-center mb-12">
             <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Everything you need</h2>
-            <p className="text-text-2 max-w-xl mx-auto mb-3">Built for small property managers who handle everything on their phone.</p>
-            <h2 className="text-xs font-semibold uppercase tracking-widest max-w-2xl mx-auto" style={{ color: 'rgba(200,169,110,0.6)' }}>
-              Used by pilgrimage town dharmshalas and boutique villas across India
-            </h2>
+            <p className="text-text-2 max-w-xl mx-auto">Built for independent property managers who handle everything on their phone.</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-6">
             {FEATURES.map((f, i) => (
@@ -449,6 +608,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Guest Experience Timeline */}
+      <GuestExperienceSection />
+
       {/* Dashboard Screenshot */}
       <section className="bg-surface border-y border-surface3">
         <div className="max-w-6xl mx-auto px-6 py-20">
@@ -460,7 +622,7 @@ export default function LandingPage() {
           <div className="reveal reveal-delay-1 rounded-2xl overflow-hidden border" style={{ borderColor: 'rgba(200,169,110,0.2)' }}>
             <img
               src="/screenshot.png"
-              alt="Chakrio property dashboard showing bookings, revenue, and expenses"
+              alt="Chakrio property dashboard showing bookings, revenue, and occupancy"
               className="w-full"
             />
           </div>
@@ -475,13 +637,13 @@ export default function LandingPage() {
           <p className="text-text-2 mt-3 max-w-xl mx-auto text-sm">No hidden fees. Pay for the rooms you operate.</p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch gap-0 max-w-3xl mx-auto">
-          {/* Setup card — first */}
+          {/* Setup card */}
           <div className="flex-1 bg-surface rounded-2xl sm:rounded-r-none border border-surface3 p-8 flex flex-col">
             <p className="text-xs font-semibold uppercase tracking-widest text-text-3 mb-3">One-time setup</p>
             <div className="mb-1">
               <span className="font-display font-extrabold text-4xl text-text-1">Custom</span>
             </div>
-            <p className="text-text-3 text-sm mb-6">Depends on property type &amp; room count</p>
+            <p className="text-text-3 text-sm mb-6">Scoped to your property type &amp; room count</p>
             <ul className="space-y-2 text-text-2 text-sm mb-8 flex-1">
               <li>✓ Bot configuration &amp; testing</li>
               <li>✓ Dashboard onboarding</li>
@@ -507,7 +669,7 @@ export default function LandingPage() {
             +
           </div>
 
-          {/* Subscription card — second */}
+          {/* Subscription card */}
           <div className="flex-1 rounded-2xl sm:rounded-l-none border p-8 flex flex-col" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.08) 0%, #16151f 70%)', borderColor: 'rgba(200,169,110,0.3)' }}>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-3 self-start"
               style={{ background: 'rgba(200,169,110,0.15)', color: '#c8a96e', border: '1px solid rgba(200,169,110,0.35)' }}>
@@ -518,10 +680,9 @@ export default function LandingPage() {
             </span>
             <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#c8a96e' }}>Monthly subscription</p>
             <div className="mb-1">
-              <span className="font-display font-extrabold text-5xl text-text-1">₹2,000</span>
-              <span className="text-text-2 text-sm ml-1">/month</span>
+              <span className="font-display font-extrabold text-5xl text-text-1">Custom</span>
             </div>
-            <p className="text-sm font-semibold mb-6" style={{ color: '#c8a96e' }}>+ ₹100 per room / month</p>
+            <p className="text-sm font-medium mb-6 text-text-3">Priced per property + room — contact us for a quote</p>
             <ul className="space-y-2 text-text-2 text-sm mb-8 flex-1">
               <li>✓ AI booking &amp; expense logging</li>
               <li>✓ Real-time dashboard</li>
@@ -542,9 +703,6 @@ export default function LandingPage() {
             </a>
           </div>
         </div>
-        <p className="text-center text-text-3 text-sm mt-8 max-w-lg mx-auto">
-          Month 1: one-time setup cost + ₹2,000 + ₹100/room. &nbsp;Month 2 onwards: ₹2,000 + ₹100/room only.
-        </p>
       </section>
 
       {/* Testimonials */}
@@ -568,7 +726,11 @@ export default function LandingPage() {
             },
             {
               q: 'What types of properties can use Chakrio?',
-              a: 'Chakrio is built for owner-operators running homestays, villas, guesthouses, and small hotels. It works for single-property owners as well as those managing two or more properties.',
+              a: 'Chakrio is built for owner-operators running boutique hotels, villas, homestays, guesthouses, B&Bs, and vacation rentals. It works for single-property owners as well as those managing multiple properties.',
+            },
+            {
+              q: 'Does Chakrio work outside India?',
+              a: 'Yes. Chakrio works with any WhatsApp or Telegram account worldwide. Bookings, expenses, and guest messages work in any language your team types in. We onboard properties globally.',
             },
             {
               q: 'Do I need technical knowledge to use Chakrio?',
@@ -576,7 +738,7 @@ export default function LandingPage() {
             },
             {
               q: 'How do I get started?',
-              a: 'We onboard every property personally. WhatsApp us at +91 94618 88529 and we\'ll get your booking bot live — usually within 24 hours.',
+              a: 'We onboard every property personally. Contact us via WhatsApp and we\'ll get your booking bot live — usually within 24 hours.',
             },
             {
               q: 'How long does setup take?',
@@ -584,7 +746,7 @@ export default function LandingPage() {
             },
             {
               q: 'What if I send a wrong message or make a mistake?',
-              a: 'Just send a correction. For example: "Update Rajan check-out to 8th April." Chakrio will find the booking and update it. If you need to cancel, just say so — the bot handles updates, cancellations, and corrections the same way it handles new bookings.',
+              a: 'Just send a correction. For example: "Update Alex check-out to 18th June." Chakrio will find the booking and update it. If you need to cancel, just say so — the bot handles updates, cancellations, and corrections the same way it handles new bookings.',
             },
           ].map(({ q, a }) => (
             <details key={q} className="bg-surface border border-surface3 rounded-2xl group">
@@ -606,7 +768,7 @@ export default function LandingPage() {
             We onboard every property personally.
           </h2>
           <p className="text-text-2 mb-2 max-w-lg mx-auto">
-            WhatsApp us and we'll have your booking bot live within 24 hours — no setup on your end.
+            We onboard every property personally — wherever you are. Get your booking bot live within 24 hours, no technical setup on your end.
           </p>
           <p style={{ color: '#a0aec0', fontSize: '0.85rem', marginBottom: '24px' }}>
             Start with a 14-day free trial. No credit card needed.

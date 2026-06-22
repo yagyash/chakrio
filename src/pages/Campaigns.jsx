@@ -9,22 +9,22 @@ const TEMPLATES = {
     label: 'Festival Availability',
     description: 'Invite past guests to stay during an upcoming festival',
     fields: [
-      { key: 'festival_name', label: 'Festival Name',  placeholder: 'e.g. Diwali, Holi, Navratri' },
-      { key: 'festival_date', label: 'Festival Dates', placeholder: 'e.g. Oct 20–25' },
+      { key: 'festival_name', label: 'Festival Name',  placeholder: 'e.g. Christmas, New Year, Eid' },
+      { key: 'festival_date', label: 'Festival Dates', placeholder: 'e.g. Dec 24–27' },
     ],
   },
   welcome_back_guest: {
     label: 'Welcome Back',
     description: 'Re-engage past guests with a warm personal invite',
     fields: [
-      { key: 'location', label: 'Location', placeholder: 'e.g. Udaipur, Pushkar' },
+      { key: 'location', label: 'Location', placeholder: 'e.g. Bali, Santorini, Tuscany' },
     ],
   },
   seasonal_offer: {
     label: 'Seasonal Offer',
     description: 'Share a seasonal discount or special package',
     fields: [
-      { key: 'season_label',  label: 'Season Name',    placeholder: 'e.g. Monsoon Special' },
+      { key: 'season_label',  label: 'Season Name',    placeholder: 'e.g. Summer Special' },
       { key: 'offer_details', label: 'Offer Details',  placeholder: 'e.g. 20% off on weekdays' },
       { key: 'expiry_date',   label: 'Valid Until',    placeholder: 'e.g. July 31' },
     ],
@@ -33,7 +33,7 @@ const TEMPLATES = {
     label: 'We Miss You',
     description: 'Reach out to guests who haven\'t visited in a while',
     fields: [
-      { key: 'location', label: 'Location', placeholder: 'e.g. Udaipur' },
+      { key: 'location', label: 'Location', placeholder: 'e.g. Bali, the Maldives, Tuscany' },
     ],
   },
 };

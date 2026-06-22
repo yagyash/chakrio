@@ -90,23 +90,23 @@ export default function OccupancyCalculator() {
             },
             {
               "@type": "Question",
-              "name": "What is the average hotel occupancy rate in India?",
-              "acceptedAnswer": { "@type": "Answer", "text": "The average hotel occupancy rate in India ranges from 55–70% annually for budget and mid-scale properties. Premium hill stations and coastal destinations (Manali, Goa, Coorg, Munnar) see peak-season occupancy above 90%, while off-season rates can fall to 25–35%. Indian homestays and villas typically target 60–75% annually as a healthy benchmark." }
+              "name": "What is the average hotel occupancy rate globally?",
+              "acceptedAnswer": { "@type": "Answer", "text": "The average hotel occupancy rate globally ranges from 55–70% annually for budget and mid-scale properties. Premium leisure destinations (ski resorts, beach towns, heritage cities) see peak-season occupancy above 90%, while off-season rates can fall to 25–35%. Boutique homestays and villas typically target 60–75% annually as a healthy benchmark." }
             },
             {
               "@type": "Question",
               "name": "What is RevPAR and how is it different from occupancy rate?",
-              "acceptedAnswer": { "@type": "Answer", "text": "RevPAR (Revenue Per Available Room) = Occupancy Rate × Average Daily Rate. While occupancy rate tells you how full your property is, RevPAR tells you how much revenue each available room is generating. For example, a hotel with 80% occupancy at ₹2,000/night has a RevPAR of ₹1,600. RevPAR is a more complete measure of performance than occupancy alone." }
+              "acceptedAnswer": { "@type": "Answer", "text": "RevPAR (Revenue Per Available Room) = Occupancy Rate × Average Daily Rate. While occupancy rate tells you how full your property is, RevPAR tells you how much revenue each available room is generating. For example, a hotel with 80% occupancy at $150/night has a RevPAR of $120. RevPAR is a more complete measure of performance than occupancy alone." }
             },
             {
               "@type": "Question",
               "name": "How can I improve my hotel occupancy rate?",
-              "acceptedAnswer": { "@type": "Answer", "text": "To improve hotel occupancy rate: (1) List on multiple OTAs (Booking.com, MakeMyTrip, Airbnb) to increase visibility. (2) Use dynamic pricing — lower rates on weekdays and off-season, raise them for weekends and holidays. (3) Offer early-bird discounts for bookings made 30+ days in advance. (4) Respond to reviews promptly — properties with 4.5+ ratings consistently outperform on occupancy. (5) Add value packages (breakfast included, airport transfer) to justify your rate." }
+              "acceptedAnswer": { "@type": "Answer", "text": "To improve hotel occupancy rate: (1) List on multiple OTAs (Booking.com, Airbnb, Vrbo, Expedia) to increase visibility. (2) Use dynamic pricing — lower rates on weekdays and off-season, raise them for weekends and holidays. (3) Offer early-bird discounts for bookings made 30+ days in advance. (4) Respond to reviews promptly — properties with 4.5+ ratings consistently outperform on occupancy. (5) Add value packages (breakfast included, airport transfer) to justify your rate." }
             },
             {
               "@type": "Question",
               "name": "How does occupancy rate affect hotel revenue?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Occupancy rate directly multiplies your revenue. A 10-point increase in occupancy on a 10-room property at ₹3,000/night generates ₹9,000 in extra revenue per day — ₹2,70,000 per month. However, a high occupancy at a low rate can generate less revenue than a moderate occupancy at a premium rate. Use RevPAR (Occupancy × ADR) to measure overall revenue health." }
+              "acceptedAnswer": { "@type": "Answer", "text": "Occupancy rate directly multiplies your revenue. A 10-point increase in occupancy on a 10-room property at $150/night generates $1,500 in extra revenue per day — $45,000 per month. However, a high occupancy at a low rate can generate less revenue than a moderate occupancy at a premium rate. Use RevPAR (Occupancy × ADR) to measure overall revenue health." }
             },
             {
               "@type": "Question",
@@ -214,21 +214,21 @@ export default function OccupancyCalculator() {
             A good occupancy rate for a hotel, homestay, or villa is generally <strong className="text-text-1">65–80%</strong>. Rates above 80% are considered excellent and indicate strong, consistent demand. Rates below 50% may suggest pricing, marketing, or availability issues.
           </p>
           <p className="text-text-2 text-sm leading-relaxed">
-            Seasonal properties (hill stations, beach resorts, pilgrim-route homestays) naturally see low off-season occupancy — compare your rate against the same period last year rather than an annual average for a more accurate picture.
+            Seasonal properties (mountain retreats, beach resorts, rural homestays) naturally see low off-season occupancy — compare your rate against the same period last year rather than an annual average for a more accurate picture.
           </p>
         </div>
 
-        {/* India occupancy benchmarks */}
+        {/* Global occupancy benchmarks */}
         <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
-          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Hotel occupancy benchmarks in India</h2>
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Hotel occupancy benchmarks by property type</h2>
           <p className="text-text-2 text-sm leading-relaxed mb-4">
-            Occupancy benchmarks vary significantly by property type and location across India:
+            Occupancy benchmarks vary significantly by property type and seasonality:
           </p>
           <div className="space-y-3">
             {[
-              { label: 'Hill station homestay (peak season: Oct–Mar)', range: '80–95%' },
-              { label: 'Coastal villa/resort (peak season: Nov–Feb)', range: '75–90%' },
-              { label: 'City guesthouse (year-round)', range: '55–70%' },
+              { label: 'Mountain / ski retreat (peak season)', range: '80–95%' },
+              { label: 'Coastal villa / beach resort (peak season)', range: '75–90%' },
+              { label: 'City guesthouse / B&B (year-round)', range: '55–70%' },
               { label: 'Heritage / boutique property', range: '60–80%' },
               { label: 'Off-season (any leisure destination)', range: '20–40%' },
             ].map(({ label, range }) => (

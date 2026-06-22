@@ -95,27 +95,27 @@ export default function RentalIncomeCalculator() {
             {
               "@type": "Question",
               "name": "What expenses should I deduct from rental income?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Common rental property expenses include: staff wages, electricity and water, maintenance and repairs, cleaning supplies, property tax, insurance, platform/OTA fees (if listed on Booking.com or Airbnb), and internet. For a typical Indian homestay or villa, operating expenses run 25–35% of gross revenue." }
+              "acceptedAnswer": { "@type": "Answer", "text": "Common rental property expenses include: staff wages, electricity and water, maintenance and repairs, cleaning supplies, property tax, insurance, platform/OTA fees (if listed on Booking.com or Airbnb), and internet. For a typical boutique homestay or villa, operating expenses run 25–35% of gross revenue." }
             },
             {
               "@type": "Question",
-              "name": "What is a good net rental yield for a property?",
-              "acceptedAnswer": { "@type": "Answer", "text": "A good net rental yield for a holiday homestay or villa in India is typically 6–12% annually on the property value. Short-term rental properties (holiday lets) generally yield more than long-term rentals. Properties in high-tourism areas — hill stations, coastal destinations, heritage towns — often achieve yields at the higher end of this range." }
+              "name": "What is a good net rental yield for a short-term property?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A good net rental yield for a holiday homestay or villa is typically 6–12% annually on the property value. Short-term rental properties (holiday lets) generally yield more than long-term rentals. Properties in high-tourism areas — coastal destinations, mountain resorts, heritage towns — often achieve yields at the higher end of this range." }
             },
             {
               "@type": "Question",
-              "name": "Is rental income from a homestay taxable in India?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Yes, rental income from a homestay or short-term rental property in India is taxable under 'Income from House Property' or 'Income from Business' depending on the level of services provided. If the property provides hotel-like services (meals, housekeeping), it is typically taxed as business income. You can deduct 30% of net annual value as a standard deduction, plus actual interest on home loans. Consult a CA for your specific situation." }
+              "name": "Is rental income from a homestay taxable?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes, rental income from a homestay or short-term rental property is taxable in most jurisdictions. If the property provides hotel-like services (meals, housekeeping), it is typically taxed as business income. Tax treatment varies by country — consult a local accountant or tax advisor for your specific situation." }
             },
             {
               "@type": "Question",
               "name": "How do OTA platform fees affect rental income?",
-              "acceptedAnswer": { "@type": "Answer", "text": "OTA platform fees typically reduce your gross rental income by 15–25%. Booking.com charges 15–18% commission, Airbnb charges hosts 3% plus guests 12–15%, and MakeMyTrip charges 15–20%. To calculate net income after OTA fees, reduce your gross income by the commission percentage before deducting operating expenses. Properties with high direct booking rates (repeat guests, own website) retain significantly more net income." }
+              "acceptedAnswer": { "@type": "Answer", "text": "OTA platform fees typically reduce your gross rental income by 8–25%. Booking.com charges 15–18% commission, Airbnb charges hosts 3% plus guests 12–15%, and Vrbo/Expedia charges 8–12%. To calculate net income after OTA fees, reduce your gross income by the commission percentage before deducting operating expenses. Properties with high direct booking rates (repeat guests, own website) retain significantly more net income." }
             },
             {
               "@type": "Question",
               "name": "What is the difference between gross rental yield and net rental yield?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Gross rental yield = (Annual Gross Rental Income ÷ Property Value) × 100. Net rental yield = (Annual Net Rental Income after expenses ÷ Property Value) × 100. For example, a property worth ₹1 crore generating ₹10 lakh gross annual revenue has a gross yield of 10%. After 30% operating expenses (₹3 lakh), net income is ₹7 lakh — a net yield of 7%. Net yield is the more meaningful measure of actual investment return." }
+              "acceptedAnswer": { "@type": "Answer", "text": "Gross rental yield = (Annual Gross Rental Income ÷ Property Value) × 100. Net rental yield = (Annual Net Rental Income after expenses ÷ Property Value) × 100. For example, a property worth $500,000 generating $50,000 gross annual revenue has a gross yield of 10%. After 30% operating expenses ($15,000), net income is $35,000 — a net yield of 7%. Net yield is the more meaningful measure of actual investment return." }
             },
             {
               "@type": "Question",
@@ -124,8 +124,8 @@ export default function RentalIncomeCalculator() {
             },
             {
               "@type": "Question",
-              "name": "What operating expenses should I budget for a homestay in India?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Typical operating expense breakdown for an Indian homestay (as % of gross revenue): Staff wages 10–15%, Electricity and water 5–8%, Cleaning and laundry 4–6%, Maintenance and repairs 3–5%, Platform/OTA commissions 15–20% (if OTA-heavy), Property tax and insurance 2–3%, Internet and cable 1–2%, Consumables (toiletries, cleaning supplies) 2–3%. Total operating expenses typically range 25–40% of gross revenue depending on staffing and OTA mix." }
+              "name": "What operating expenses should I budget for a boutique property?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Typical operating expense breakdown for a boutique property (as % of gross revenue): Staff wages 10–15%, Electricity and water 5–8%, Cleaning and laundry 4–6%, Maintenance and repairs 3–5%, Platform/OTA commissions 15–20% (if OTA-heavy), Property tax and insurance 2–3%, Internet and cable 1–2%, Consumables (toiletries, cleaning supplies) 2–3%. Total operating expenses typically range 25–40% of gross revenue depending on staffing and OTA mix." }
             }
           ]
         })}</script>
@@ -233,16 +233,16 @@ export default function RentalIncomeCalculator() {
             <strong className="text-text-1">Gross income</strong> = Rooms × Nightly Rate × Occupancy % × Days. This is your revenue before any expenses.
           </p>
           <p className="text-text-2 text-sm leading-relaxed mb-3">
-            <strong className="text-text-1">Net income</strong> = Gross − Operating Expenses. Typical operating expenses for an Indian homestay or villa run <strong className="text-text-1">25–35% of gross revenue</strong>, covering staff, utilities, maintenance, and cleaning.
+            <strong className="text-text-1">Net income</strong> = Gross − Operating Expenses. Typical operating expenses for a boutique property or villa run <strong className="text-text-1">25–35% of gross revenue</strong>, covering staff, utilities, maintenance, and cleaning.
           </p>
           <p className="text-text-2 text-sm leading-relaxed">
-            A healthy net rental yield for a short-term holiday property in India is <strong className="text-text-1">6–12% annually</strong> on the property value. Properties in high-demand locations (hill stations, coastal areas, heritage towns) tend to sit at the higher end.
+            A healthy net rental yield for a short-term holiday property is <strong className="text-text-1">6–12% annually</strong> on the property value. Properties in high-demand leisure locations (coastal areas, mountain resorts, heritage towns) tend to sit at the higher end.
           </p>
         </div>
 
         {/* Expense breakdown */}
         <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
-          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Typical operating expense breakdown for Indian homestays</h2>
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">Typical operating expense breakdown for boutique properties</h2>
           <p className="text-text-2 text-sm leading-relaxed mb-4">
             Use these benchmarks to set your expense % slider above:
           </p>
@@ -277,8 +277,8 @@ export default function RentalIncomeCalculator() {
             {[
               { ota: 'Booking.com', fee: '15–18% of booking value' },
               { ota: 'Airbnb (host fee)', fee: '3% of booking subtotal' },
-              { ota: 'MakeMyTrip', fee: '15–20% of booking value' },
-              { ota: 'Goibibo', fee: '15–18% of booking value' },
+              { ota: 'Vrbo / Expedia', fee: '8–12% of booking value' },
+              { ota: 'Direct booking (WhatsApp / website)', fee: '0% commission' },
             ].map(({ ota, fee }) => (
               <div key={ota} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
                 <span className="text-text-2 text-sm font-medium">{ota}</span>
@@ -293,16 +293,16 @@ export default function RentalIncomeCalculator() {
 
         {/* Rental yield context */}
         <div className="bg-surface rounded-2xl border border-surface3 p-6 mb-8">
-          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">What is a good rental yield in India?</h2>
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-3">What is a good rental yield for a short-term property?</h2>
           <p className="text-text-2 text-sm leading-relaxed mb-3">
-            Net rental yield = (Annual Net Income ÷ Property Value) × 100. For short-term holiday rentals in India:
+            Net rental yield = (Annual Net Income ÷ Property Value) × 100. For short-term holiday rentals globally:
           </p>
           <div className="space-y-2 mb-4">
             {[
-              { type: 'Hill station / mountain property', yield: '8–12%' },
-              { type: 'Coastal / beach property', yield: '7–10%' },
+              { type: 'Mountain / ski resort property', yield: '8–12%' },
+              { type: 'Coastal / beach villa or resort', yield: '7–10%' },
               { type: 'Heritage / boutique property', yield: '6–9%' },
-              { type: 'City guesthouse', yield: '5–8%' },
+              { type: 'City guesthouse or B&B', yield: '5–8%' },
               { type: 'Long-term residential rental', yield: '2–4%' },
             ].map(({ type, yield: y }) => (
               <div key={type} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
