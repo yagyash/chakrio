@@ -1,0 +1,35 @@
+# Chakrio
+
+> AI-powered property booking automation for boutique hotels, villas, homestays, and guesthouses worldwide. Property managers record bookings, cancellations, and expenses by sending plain-language messages via WhatsApp or Telegram. The dashboard updates automatically.
+
+## What is Chakrio?
+
+Chakrio is a SaaS tool for independent hospitality operators. You send a message like "Alex, 3 nights from 15 June, $200 advance" and Chakrio logs the booking instantly. No spreadsheets, no forms, no manual entry.
+
+## Key Features
+
+- Booking, cancellation, and expense recording via WhatsApp or Telegram chat message
+- AI extracts guest name, dates, amounts, and booking type from plain-language messages
+- Real-time dashboard with revenue, expenses, and occupancy
+- Automated guest experience: booking confirmation → payment reminder → mid-stay care → review request
+- OTA iCal calendar sync (Airbnb, Booking.com, Vrbo, etc.)
+- WhatsApp broadcast campaigns to past guests
+- Monthly P&L report delivered automatically on the 1st
+- Multi-property support under one account
+- 14-day free trial, no credit card required
+
+## Who uses Chakrio?
+
+Owner-operators of boutique hotels, villas, homestays, guesthouses, B&Bs, and vacation rentals. Used by property managers across Asia, the Middle East, and Europe.
+
+## Key Pages
+
+- [Home](https://chakrio.com/)
+- [Occupancy Rate Calculator](https://chakrio.com/tools/occupancy-calculator)
+- [Rental Income Calculator](https://chakrio.com/tools/rental-income-calculator)
+- [Cancellation Policy Generator](https://chakrio.com/tools/cancellation-policy)
+- [Invoice Generator](https://chakrio.com/tools/invoice-generator)
+
+## Contact
+
+Contact via WhatsApp to get started. Setup takes less than 24 hours.

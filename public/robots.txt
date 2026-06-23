@@ -6,3 +6,16 @@ Allow: /
 Allow: /tools/
 
 Sitemap: https://chakrio.com/sitemap.xml
+
+# AI search crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
