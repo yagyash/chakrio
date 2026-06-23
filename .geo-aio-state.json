@@ -272,5 +272,9 @@
       "build_status": "PASSED"
     },
     "timestamp": "2026-04-09T12:16:25.431938"
+  },
+  "pipeline_complete": {
+    "done": true,
+    "timestamp": "2026-04-09T12:18:02.351621"
   }
 }

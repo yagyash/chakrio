@@ -1,5 +1,5 @@
 # GEO + AIO Audit Report
-Generated: 2026-04-09 12:16
+Generated: 2026-06-23 13:04
 Business: Chakrio
 Stack: react
 Pages scanned: 37
