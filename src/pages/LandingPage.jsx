@@ -264,9 +264,11 @@ function HeroChatPanel() {
     }}>
       {/* WhatsApp-style header */}
       <div style={{ background: '#1f2c33', padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b141a', fontWeight: 700, fontSize: 13 }}>C</div>
+        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1a1a2e', border: '1px solid rgba(201,162,75,.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+          <img src="/chakrio.svg" alt="Chakrio" style={{ width: 20, height: 20, objectFit: 'contain' }} />
+        </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf2ee', fontFamily: "'Hanken Grotesk', sans-serif" }}>Chakrio Assistant</div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf2ee', fontFamily: "'Hanken Grotesk', sans-serif" }}>Chakrio</div>
           <div style={{ fontSize: 10.5, color: '#7fa890' }}>online</div>
         </div>
       </div>
@@ -605,16 +607,9 @@ export default function LandingPage() {
           }} />
           <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '320px 1fr', gap: 14 }}>
             <HeroChatPanel />
-            {/* Dashboard placeholder */}
-            <div style={{
-              borderRadius: 14, overflow: 'hidden',
-              border: '1px solid rgba(255,255,255,.08)',
-              background: 'repeating-linear-gradient(45deg,#17131f 0 14px,#1b1626 14px 28px)',
-              minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <div style={{ border: '1px solid rgba(255,255,255,.1)', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: '#6a6480', letterSpacing: '.08em', textTransform: 'uppercase' }}>
-                live dashboard · 1100×680
-              </div>
+            {/* Live dashboard screenshot */}
+            <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,.08)', minHeight: 300 }}>
+              <img src="/screenshot.png" alt="Chakrio live dashboard" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </div>
           </div>
         </div>
@@ -745,15 +740,6 @@ export default function LandingPage() {
             </ul>
           </div>
         </div>
-        <div className="mt-10 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,.1)', aspectRatio: '16/9' }}>
-          <iframe
-            className="w-full h-full"
-            src="https://www.youtube.com/embed/aLTnEKfp_7c"
-            title="Chakrio demo"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
       </section>
 
       {/* ── Free Tools ───────────────────────────────────────── */}
@@ -780,18 +766,6 @@ export default function LandingPage() {
               </Link>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── Dashboard Screenshot ──────────────────────────────── */}
-      <section className="max-w-5xl mx-auto px-6 py-20 w-full">
-        <div className="reveal text-center mb-10">
-          <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>The dashboard</p>
-          <h2 className="font-display font-extrabold text-3xl text-text-1 tracking-tight">See your property at a glance</h2>
-          <p className="text-text-2 mt-3 max-w-xl mx-auto text-sm">Revenue, bookings, expenses, and upcoming guests — all in one view, always up to date.</p>
-        </div>
-        <div className="reveal reveal-delay-1 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(201,162,75,.2)' }}>
-          <img src="/screenshot.png" alt="Chakrio property dashboard showing bookings, revenue, and occupancy" className="w-full" />
         </div>
       </section>
 
