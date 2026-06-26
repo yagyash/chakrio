@@ -1,18 +1,4 @@
-import { useEffect } from 'react';
-
-function useScrollReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver(
-      entries => entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('is-visible'); observer.unobserve(e.target); }
-      }),
-      { threshold: 0.12 }
-    );
-    els.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
-}
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
@@ -23,52 +9,46 @@ import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
 
+// ─── Data ────────────────────────────────────────────────────────────────────
+
 const FEATURES = [
   {
     Icon: CalendarCheck,
-    color: '#c8a96e',
     title: 'Instant Booking Records',
     body: 'Send a message like "Alex, 3 nights from 15 June, $200 advance" — Chakrio parses it and logs the booking automatically.',
   },
   {
     Icon: Undo2,
-    color: '#60a5fa',
     title: 'Cancellation Tracking',
     body: 'Chakrio extracts refund amounts and advance retained from cancellation messages and updates your records in real time.',
   },
   {
     Icon: Receipt,
-    color: '#4ecdc4',
     title: 'Expense Logging',
     body: 'Type "pool service $85" or "plumber $220" — Chakrio logs the expense instantly. No dropdowns, no category hunting.',
   },
   {
     Icon: BarChart3,
-    color: '#a896f8',
-    title: 'Monthly Reports',
+    title: 'Monthly P&L Reports',
     body: 'On the 1st of each month, get a full P&L — total revenue, all expenses, and net profit — sent straight to your phone.',
   },
   {
     Icon: Globe,
-    color: '#48c78e',
     title: 'OTA Calendar Sync',
     body: 'Connect iCal feeds from any OTA. Blocked dates flow in automatically — your availability is always accurate, double bookings eliminated.',
   },
   {
     Icon: BellRing,
-    color: '#f59e0b',
     title: 'Guest Experience Automation',
     body: 'Chakrio auto-sends booking confirmations, pre-arrival payment reminders, mid-stay care messages, and post-checkout review requests.',
   },
   {
     Icon: MessageSquare,
-    color: '#ec4899',
     title: 'WhatsApp & Telegram',
     body: 'Your team keeps using WhatsApp or Telegram. No new app required. Chakrio works inside the chat tool you already have open all day.',
   },
   {
     Icon: Megaphone,
-    color: '#f97316',
     title: 'Guest Re-engagement Campaigns',
     body: 'Send WhatsApp broadcasts to past guests — seasonal offers, festival availability, or a personalised "we miss you" message. Track delivery in real time.',
   },
@@ -83,14 +63,14 @@ const STEPS = [
   },
   {
     step: '02',
-    title: 'AI parses it',
-    body: "Chakrio's AI reads your message and extracts every detail — guest name, dates, amounts, booking type — without you lifting another finger.",
+    title: 'Chakrio parses it',
+    body: "AI pulls out the guest name, dates, room, and advance — and logs the booking in under a second.",
     example: 'Extracted: Guest · Alex | Check-in · 15 Jun | Nights · 3 | Advance · $200',
   },
   {
     step: '03',
     title: 'Auto-recorded',
-    body: 'The record is saved instantly. Your dashboard reflects the change in real time — bookings, revenue, balance — always accurate, always current.',
+    body: 'Your dashboard, calendar, and monthly P&L update themselves. No spreadsheets, ever.',
     example: 'Dashboard updated: 1 new booking · Balance $0 due · Revenue +$200',
   },
 ];
@@ -107,7 +87,6 @@ const TESTIMONIALS = [
       { value: 'Physical register', label: 'Was using before' },
       { value: '1 hr/day', label: 'Saved on record-keeping' },
     ],
-    note: 'Manager-level daily usage — bookings, expenses, and availability tracking',
   },
   {
     initials: 'NC',
@@ -148,7 +127,7 @@ const GUEST_JOURNEY = [
     message: '"Hi Alex, just a reminder that your balance is due before arrival tomorrow. Please let us know once it\'s settled."',
   },
   {
-    color: '#c8a96e',
+    color: '#C9A24B',
     timing: 'Day 2 of stay',
     title: 'Mid-Stay Care',
     message: '"Hi Alex, hope you\'re settling in wonderfully! Let us know if there\'s anything we can do to make your stay better."',
@@ -161,20 +140,152 @@ const GUEST_JOURNEY = [
   },
 ];
 
-function CapabilitiesStrip() {
+const TRUST_STATS = [
+  { value: '1,000+', label: 'Bookings logged' },
+  { value: '5–8 hrs', label: 'Saved per week' },
+  { value: '12 sec', label: 'Bot response time' },
+  { value: '24 hrs', label: 'Avg setup time' },
+];
+
+const PRICING_TIERS = [
+  {
+    key: 'starter',
+    name: 'Starter',
+    inr: { monthly: '₹2,000', annual: '₹1,660' },
+    usd: { monthly: '~$24', annual: '~$20' },
+    sub: '1 property · up to 12 rooms',
+    cta: 'Start Free Trial →',
+    ctaHref: '/login',
+    featured: false,
+    features: [
+      'Instant booking & expense records',
+      'WhatsApp / Telegram bot',
+      'Real-time dashboard',
+      'Basic monthly P&L',
+    ],
+  },
+  {
+    key: 'growth',
+    name: 'Growth',
+    inr: { monthly: '₹5,000', annual: '₹4,150' },
+    usd: { monthly: '~$60', annual: '~$50' },
+    sub: 'Up to 3 properties · unlimited rooms',
+    cta: 'Start Free Trial →',
+    ctaHref: '/login',
+    featured: true,
+    badge: '★ Most popular',
+    features: [
+      'Everything in Starter, plus:',
+      'OTA iCal calendar sync',
+      'Monthly P&L reports (auto-sent)',
+      'Guest experience automation',
+      'Priority support',
+    ],
+  },
+  {
+    key: 'portfolio',
+    name: 'Portfolio',
+    inr: { monthly: 'Custom', annual: 'Custom' },
+    usd: { monthly: '', annual: '' },
+    sub: '4+ properties · multi-team access',
+    cta: 'Contact for quote →',
+    ctaHref: 'https://wa.me/919461888529',
+    ctaExternal: true,
+    featured: false,
+    features: [
+      'Everything in Growth, plus:',
+      'Dedicated onboarding manager',
+      'Custom integrations',
+      'SLA & account manager',
+    ],
+  },
+];
+
+const FAQS = [
+  {
+    q: 'I already use a spreadsheet — why do I need this?',
+    a: 'Spreadsheets work, but they require you to open them, find the right tab, and type every field manually — every single booking. With Chakrio, you just send a message in plain language and the record is created automatically. No switching apps, no formatting, no errors from fat-fingering a date.',
+  },
+  {
+    q: 'What if I have multiple properties?',
+    a: 'Chakrio supports multiple properties under one account. Each property has its own booking records and dashboard. You can switch between them instantly from the same login.',
+  },
+  {
+    q: 'What types of properties can use Chakrio?',
+    a: 'Chakrio is built for owner-operators running boutique hotels, villas, homestays, guesthouses, B&Bs, and vacation rentals. It works for single-property owners as well as those managing multiple properties.',
+  },
+  {
+    q: 'Does Chakrio work outside India?',
+    a: 'Yes. Chakrio works with any WhatsApp or Telegram account worldwide. Bookings, expenses, and guest messages work in any language your team types in. We onboard properties globally.',
+  },
+  {
+    q: 'Do I need technical knowledge to use Chakrio?',
+    a: 'None at all. If you can send a text message, you can use Chakrio. You simply type bookings in natural language — the AI handles the rest.',
+  },
+  {
+    q: 'How do I get started?',
+    a: 'We onboard every property personally. Contact us via WhatsApp and we\'ll get your booking bot live — usually within 24 hours.',
+  },
+  {
+    q: 'How long does setup take?',
+    a: 'Most properties are live within 24 hours of contacting us. We handle the entire setup — bot configuration, dashboard access, and a walkthrough with your team. You don\'t need to do anything technical.',
+  },
+  {
+    q: 'What if I send a wrong message or make a mistake?',
+    a: 'Just send a correction. For example: "Update Alex check-out to 18th June." Chakrio will find the booking and update it. If you need to cancel, just say so — the bot handles updates, cancellations, and corrections the same way it handles new bookings.',
+  },
+];
+
+// ─── Hooks ───────────────────────────────────────────────────────────────────
+
+function useScrollReveal() {
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('is-visible'); observer.unobserve(e.target); }
+      }),
+      { threshold: 0.08, rootMargin: '0px 0px -6% 0px' }
+    );
+    els.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function HeroChatPanel() {
   return (
-    <div className="border-b border-surface3 bg-surface">
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <p className="text-center text-xs font-medium uppercase tracking-widest mb-6 text-text-3">
-          Everything you need, in one bot
-        </p>
-        <div className="flex flex-wrap justify-center gap-3">
-          {CAPABILITIES.map(({ Icon, label }) => (
-            <div key={label} className="flex items-center gap-2 px-4 py-2 rounded-full border border-surface3 bg-bg-app text-sm text-text-2">
-              <Icon size={13} style={{ color: '#c8a96e' }} />
-              <span>{label}</span>
-            </div>
-          ))}
+    <div style={{
+      borderRadius: 14, overflow: 'hidden',
+      border: '1px solid rgba(255,255,255,.08)',
+      background: '#0b141a', minHeight: 300,
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* WhatsApp-style header */}
+      <div style={{ background: '#1f2c33', padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0b141a', fontWeight: 700, fontSize: 13 }}>C</div>
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: '#eaf2ee', fontFamily: "'Hanken Grotesk', sans-serif" }}>Chakrio Assistant</div>
+          <div style={{ fontSize: 10.5, color: '#7fa890' }}>online</div>
+        </div>
+      </div>
+      {/* Chat bubbles */}
+      <div style={{ flex: 1, padding: 14, display: 'flex', flexDirection: 'column', gap: 9, background: 'repeating-linear-gradient(45deg,#0d161c 0 16px,#0b141a 16px 32px)' }}>
+        <div style={{ alignSelf: 'flex-end', maxWidth: '80%', background: '#056162', color: '#eafff4', fontSize: 12.5, lineHeight: 1.45, borderRadius: '10px 10px 2px 10px', padding: '9px 11px' }}>
+          Alex, 3 nights from 15 June, $200 advance, Sea View room
+        </div>
+        <div style={{ alignSelf: 'flex-start', maxWidth: '85%', background: '#1f2c33', color: '#dfe9e4', fontSize: 12, lineHeight: 1.5, borderRadius: '10px 10px 10px 2px', padding: '10px 11px' }}>
+          ✅ Logged: <b>Alex</b> · Sea View · 15–18 Jun (3 nights) · advance <b>$200</b>. Added to calendar &amp; P&amp;L.
+        </div>
+        <div style={{ alignSelf: 'flex-start', fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#5e7a6b', paddingLeft: 4 }}>
+          parsed in 12s
+        </div>
+        <div style={{ alignSelf: 'flex-end', maxWidth: '80%', background: '#056162', color: '#eafff4', fontSize: 12.5, lineHeight: 1.45, borderRadius: '10px 10px 2px 10px', padding: '9px 11px' }}>
+          Pool maintenance bill — ₹3,500
+        </div>
+        <div style={{ alignSelf: 'flex-start', maxWidth: '85%', background: '#1f2c33', color: '#dfe9e4', fontSize: 12, lineHeight: 1.5, borderRadius: '10px 10px 10px 2px', padding: '10px 11px' }}>
+          ✅ Expense logged: Pool maintenance · ₹3,500. Dashboard updated.
         </div>
       </div>
     </div>
@@ -183,16 +294,15 @@ function CapabilitiesStrip() {
 
 function GuestExperienceSection() {
   return (
-    <section className="border-y border-surface3" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.05) 0%, #0f0e17 60%)' }}>
+    <section style={{ borderTop: '1px solid rgba(255,255,255,.07)', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
       <div className="max-w-5xl mx-auto px-6 py-20">
         <div className="reveal text-center mb-14">
-          <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Guest Experience</p>
-          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Keep guests engaged — automatically</h2>
+          <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Guest Experience</p>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight">Keep guests engaged — automatically</h2>
           <p className="text-text-2 max-w-lg mx-auto">Chakrio sends the right message at the right moment, without you lifting a finger.</p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-10 items-start max-w-4xl mx-auto">
-          {/* Left: explanation */}
           <div className="reveal reveal-delay-1 space-y-4">
             <p className="text-text-2 text-sm leading-relaxed">
               Every guest who books through Chakrio is automatically enrolled in a touchpoint sequence — from the instant confirmation to the post-checkout review ask.
@@ -200,23 +310,19 @@ function GuestExperienceSection() {
             <p className="text-text-2 text-sm leading-relaxed">
               No templates to set up. No scheduling. No extra app. You just log the booking and Chakrio handles every message at exactly the right time.
             </p>
-            <div className="mt-6 p-4 rounded-xl" style={{ background: 'rgba(200,169,110,0.06)', border: '1px solid rgba(200,169,110,0.15)' }}>
-              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Result</p>
+            <div className="mt-6 p-4 rounded-xl" style={{ background: 'rgba(201,162,75,.06)', border: '1px solid rgba(201,162,75,.15)' }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#C9A24B' }}>Result</p>
               <p className="text-text-1 text-sm font-medium">Guests feel looked after. Reviews go up. Repeat bookings increase.</p>
             </div>
           </div>
 
-          {/* Right: timeline */}
           <div className="reveal reveal-delay-2 relative pl-6">
-            {/* Timeline line */}
-            <div className="absolute left-2 top-3 bottom-3 w-px" style={{ background: 'linear-gradient(to bottom, rgba(200,169,110,0.5), rgba(168,150,248,0.2))' }} />
+            <div className="absolute left-2 top-3 bottom-3 w-px" style={{ background: 'linear-gradient(to bottom, rgba(201,162,75,0.5), rgba(168,150,248,0.2))' }} />
             <div className="space-y-7">
-              {GUEST_JOURNEY.map((node, i) => (
+              {GUEST_JOURNEY.map((node) => (
                 <div key={node.title} className="relative">
-                  {/* Dot */}
                   <div className="absolute -left-6 top-1 w-3 h-3 rounded-full flex-shrink-0"
                     style={{ background: node.color, boxShadow: `0 0 6px ${node.color}60` }} />
-                  {/* Content */}
                   <div className="mb-1.5 flex flex-wrap items-center gap-2">
                     <span className="font-display font-extrabold text-sm text-text-1">{node.title}</span>
                     <span className="text-xs px-2 py-0.5 rounded-full font-medium"
@@ -238,78 +344,139 @@ function GuestExperienceSection() {
   );
 }
 
-function TestimonialsSection() {
-  const [ks, nc] = TESTIMONIALS;
+function PricingSection() {
+  const [annual, setAnnual] = useState(false);
+
+  const pillActive = {
+    background: '#C9A24B', color: '#0E0B14', border: 'none',
+    borderRadius: 999, padding: '9px 18px',
+    fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 14,
+    cursor: 'pointer', transition: 'all .2s',
+  };
+  const pillInactive = {
+    background: 'transparent', color: '#CFCAD9', border: 'none',
+    borderRadius: 999, padding: '9px 18px',
+    fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 14,
+    cursor: 'pointer', transition: 'all .2s',
+  };
+
   return (
-    <section className="bg-surface border-y border-surface3">
-      <div className="max-w-5xl mx-auto px-6 py-20">
-        <p className="reveal text-xs font-medium uppercase tracking-widest mb-6 text-center" style={{ color: '#c8a96e' }}>From our clients</p>
-
-        {/* Stats strip */}
-        <div className="reveal grid grid-cols-3 gap-4 max-w-2xl mx-auto mb-10 text-center">
-          {[
-            { value: '3+', label: 'Countries' },
-            { value: '50+', label: 'Properties onboarded' },
-            { value: '24 hr', label: 'Avg setup time' },
-          ].map(s => (
-            <div key={s.label} className="rounded-xl py-4 px-3" style={{ background: 'rgba(200,169,110,0.05)', border: '1px solid rgba(200,169,110,0.12)' }}>
-              <p className="font-display font-extrabold text-xl text-text-1 mb-0.5">{s.value}</p>
-              <p className="text-text-3 text-xs">{s.label}</p>
-            </div>
-          ))}
+    <section id="pricing" className="max-w-6xl mx-auto px-6 py-20">
+      <div className="reveal text-center mb-10">
+        <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Pricing</p>
+        <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight">Simple, transparent pricing.</h2>
+        <p className="text-text-2 mt-2 max-w-xl mx-auto">Real prices, per property. Cancel anytime — onboarding is on us.</p>
+        {/* Toggle */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 4,
+          background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
+          borderRadius: 999, padding: 5, marginTop: 24,
+        }}>
+          <button onClick={() => setAnnual(false)} style={!annual ? pillActive : pillInactive}>Monthly</button>
+          <button onClick={() => setAnnual(true)} style={annual ? pillActive : pillInactive}>
+            Annual <span style={{ fontSize: 11, opacity: 0.8 }}>−17%</span>
+          </button>
         </div>
+      </div>
 
-        <div className="grid md:grid-cols-2 gap-6 items-start">
+      <div className="reveal grid lg:grid-cols-3 gap-5 items-start">
+        {PRICING_TIERS.map((tier) => {
+          const isCustom = tier.inr.monthly === 'Custom';
+          const displayInr = isCustom ? 'Custom' : (annual ? tier.inr.annual : tier.inr.monthly);
+          const displayUsd = isCustom ? '' : (annual ? tier.usd.annual : tier.usd.monthly);
 
-          {/* Primary card — Koustubh Sharma */}
-          <div className="reveal reveal-delay-1 rounded-2xl border p-8 flex flex-col" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.1) 0%, #16151f 70%)', borderColor: 'rgba(200,169,110,0.35)' }}>
-            <blockquote className="text-sm font-normal text-text-2 leading-relaxed mb-6">
-              "{ks.quote}"
-            </blockquote>
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              {ks.stats.map(s => (
-                <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(200,169,110,0.07)', border: '1px solid rgba(200,169,110,0.15)' }}>
-                  <p className="font-display font-extrabold text-sm text-text-1 mb-0.5">{s.value}</p>
-                  <p className="text-text-3 text-xs leading-tight">{s.label}</p>
+          return (
+            <div key={tier.key} style={{
+              border: tier.featured ? '1.5px solid #C9A24B' : '1px solid rgba(255,255,255,.1)',
+              background: tier.featured
+                ? 'linear-gradient(180deg,rgba(201,162,75,.1),rgba(255,255,255,.02))'
+                : 'rgba(255,255,255,.025)',
+              borderRadius: 18, padding: 34, position: 'relative',
+              boxShadow: tier.featured ? '0 30px 70px -34px #C9A24B' : 'none',
+            }}>
+              {tier.badge && (
+                <div style={{
+                  position: 'absolute', top: -13, left: 34,
+                  background: '#C9A24B', color: '#0E0B14',
+                  font: "700 11px 'Hanken Grotesk', sans-serif",
+                  padding: '5px 11px', borderRadius: 7, whiteSpace: 'nowrap',
+                }}>
+                  {tier.badge}
                 </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-4 mt-auto">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17' }}>
-                {ks.initials}
-              </div>
-              <div>
-                <p className="font-display font-extrabold text-base text-text-1">{ks.name}</p>
-                <p className="text-sm font-medium" style={{ color: '#c8a96e' }}>{ks.title}</p>
-                <p className="text-text-3 text-xs mt-0.5">{ks.location}</p>
-              </div>
-            </div>
-          </div>
+              )}
+              <div style={{ fontWeight: 600, color: tier.featured ? '#C9A24B' : '#CFCAD9', fontSize: 15, marginBottom: 14 }}>{tier.name}</div>
 
-          {/* Secondary card — Nupur Choubisa */}
-          <div className="reveal reveal-delay-2 bg-bg-app rounded-2xl border border-surface3 p-8 flex flex-col">
-            <blockquote className="text-sm font-normal text-text-2 leading-relaxed mb-6">
-              "{nc.quote}"
-            </blockquote>
-            <div className="flex items-center gap-4 mt-auto">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17' }}>
-                {nc.initials}
+              {/* Price */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
+                <span className="font-display font-extrabold" style={{ fontSize: 44, letterSpacing: '-.03em', color: '#F4F1EA', lineHeight: 1 }}>
+                  {displayInr}
+                </span>
+                {!isCustom && <span style={{ fontSize: 15, color: '#9D98AC' }}>/mo</span>}
               </div>
-              <div>
-                <p className="font-display font-extrabold text-base text-text-1">{nc.name}</p>
-                <p className="text-sm font-medium" style={{ color: '#c8a96e' }}>{nc.title}</p>
-                <p className="text-text-3 text-xs mt-0.5">{nc.location}</p>
+              {!isCustom && (
+                <div style={{ fontSize: 14, color: '#C9A24B', marginBottom: 4, fontWeight: 600 }}>
+                  {displayUsd}<span style={{ color: '#9D98AC', fontWeight: 400 }}>/mo</span>
+                  {annual && <span style={{ fontSize: 11, color: '#9D98AC', marginLeft: 6 }}>billed annually</span>}
+                </div>
+              )}
+              <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 22 }}>{tier.sub}</div>
+
+              {/* CTA */}
+              {tier.ctaExternal ? (
+                <a href={tier.ctaHref} target="_blank" rel="noopener noreferrer" style={{
+                  display: 'block', textAlign: 'center', width: '100%',
+                  padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                  fontFamily: "'Hanken Grotesk', sans-serif",
+                  background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
+                  border: '1px solid rgba(255,255,255,.16)',
+                  marginBottom: 20,
+                }}>
+                  {tier.cta}
+                </a>
+              ) : (
+                <Link to={tier.ctaHref} style={{
+                  display: 'block', textAlign: 'center', width: '100%',
+                  padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                  fontFamily: "'Hanken Grotesk', sans-serif",
+                  background: tier.featured ? '#C9A24B' : 'rgba(255,255,255,.06)',
+                  color: tier.featured ? '#0E0B14' : '#F4F1EA',
+                  border: tier.featured ? 'none' : '1px solid rgba(255,255,255,.16)',
+                  marginBottom: 20,
+                }}>
+                  {tier.cta}
+                </Link>
+              )}
+
+              {/* Features */}
+              <div style={{ fontSize: 14, color: '#CFCAD9', lineHeight: 2.1 }}>
+                {tier.features.map((f, i) => (
+                  <div key={i} style={{ color: i === 0 && f.endsWith(':') ? '#9D98AC' : '#CFCAD9' }}>{f}</div>
+                ))}
               </div>
             </div>
-          </div>
+          );
+        })}
+      </div>
 
+      {/* Setup fee note */}
+      <div className="reveal mt-8 rounded-xl p-5" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.08)' }}>
+        <p className="text-center text-sm text-text-2 mb-2">
+          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee</span> — included free during onboarding when you book a call
+        </p>
+        <div className="flex flex-wrap justify-center gap-4 text-sm">
+          <span className="text-text-2">1–10 rooms: <strong className="text-text-1">₹9,000 (~$108)</strong></span>
+          <span className="text-text-3">·</span>
+          <span className="text-text-2">11–25 rooms: <strong className="text-text-1">₹17,000 (~$200)</strong></span>
+          <span className="text-text-3">·</span>
+          <span className="text-text-2">26+ rooms: <strong className="text-text-1">Custom</strong></span>
         </div>
+        <p className="text-center text-xs text-text-3 mt-3">Add-ons: Channel manager +₹2,000/mo · Guest campaigns ₹1/message · Room charge +₹100/room/mo</p>
       </div>
     </section>
   );
 }
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function LandingPage() {
   const { profileStatus } = useAuth();
@@ -322,7 +489,7 @@ export default function LandingPage() {
   useScrollReveal();
 
   return (
-    <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
+    <div className="min-h-screen text-text-1 flex flex-col" style={{ background: '#0E0B14' }}>
       <Helmet>
         <title>Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays</title>
         <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
@@ -341,21 +508,9 @@ export default function LandingPage() {
           "@type": "Organization",
           "name": "Chakrio",
           "url": "https://chakrio.com",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://chakrio.com/og-image.png",
-            "width": 1200,
-            "height": 630
-          },
-          "description": "Chakrio is an AI-powered property booking automation tool for boutique hotels, villas, homestays, and guesthouses. Property managers record bookings, cancellations, and expenses by sending plain-language chat messages via WhatsApp or Telegram.",
-          "serviceType": "Property Management Software"
-        })}</script>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "Chakrio",
-          "url": "https://chakrio.com",
-          "description": "AI-powered property booking automation for boutique hotels, villas, and guesthouses"
+          "logo": { "@type": "ImageObject", "url": "https://chakrio.com/og-image.png", "width": 1200, "height": 630 },
+          "description": "Chakrio is an AI-powered property booking automation tool for boutique hotels, villas, homestays, and guesthouses.",
+          "serviceType": "Property Management Software",
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -365,7 +520,7 @@ export default function LandingPage() {
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
           "url": "https://chakrio.com",
-          "offers": { "@type": "Offer", "price": "0", "description": "14-day free trial" }
+          "offers": { "@type": "Offer", "price": "0", "description": "14-day free trial" },
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -373,129 +528,199 @@ export default function LandingPage() {
           "name": "How Chakrio automates property booking records",
           "description": "Three steps to automate your property booking records using Chakrio's AI chatbot.",
           "step": [
-            { "@type": "HowToStep", "position": 1, "name": "Send a message", "text": "You type a booking or expense in plain language to the Chakrio chatbot — exactly how you would say it out loud." },
+            { "@type": "HowToStep", "position": 1, "name": "Send a message", "text": "Type a booking or expense in plain language to the Chakrio chatbot — exactly how you would say it out loud." },
             { "@type": "HowToStep", "position": 2, "name": "AI parses it", "text": "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed." },
-            { "@type": "HowToStep", "position": 3, "name": "Auto-recorded", "text": "The data is recorded automatically and your dashboard updates in real time." }
-          ]
+            { "@type": "HowToStep", "position": 3, "name": "Auto-recorded", "text": "The data is recorded automatically and your dashboard updates in real time." },
+          ],
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "I already use a spreadsheet — why do I need Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Spreadsheets require you to open them, find the right tab, and type every field manually for every booking. With Chakrio, you send a message in plain language and the record is created automatically — no switching apps, no formatting, no errors." }
-            },
-            {
-              "@type": "Question",
-              "name": "What if I have multiple properties?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio supports multiple properties under one account. Each property has its own booking records and dashboard. You can switch between them instantly from the same login." }
-            },
-            {
-              "@type": "Question",
-              "name": "What types of properties can use Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Chakrio is built for owner-operators running boutique hotels, homestays, villas, guesthouses, B&Bs, and vacation rentals. It works for single-property owners as well as those managing multiple properties." }
-            },
-            {
-              "@type": "Question",
-              "name": "Do I need technical knowledge to use Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "None at all. If you can send a text message, you can use Chakrio. You simply type bookings in natural language — the AI handles the rest." }
-            },
-            {
-              "@type": "Question",
-              "name": "Does Chakrio work outside India?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Chakrio works with any WhatsApp or Telegram account worldwide. Bookings, expenses, and guest messages work in any language your team types in. We onboard properties globally." }
-            },
-            {
-              "@type": "Question",
-              "name": "How do I get started with Chakrio?",
-              "acceptedAnswer": { "@type": "Answer", "text": "We onboard every property personally. Contact us via WhatsApp and we'll get your booking bot live — usually within 24 hours." }
-            }
-          ]
+          "mainEntity": FAQS.map(({ q, a }) => ({
+            "@type": "Question",
+            "name": q,
+            "acceptedAnswer": { "@type": "Answer", "text": a },
+          })),
         })}</script>
       </Helmet>
+
       <Navbar />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden grain-overlay">
-        {/* Gold glow */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full blur-[140px]"
-            style={{ background: 'radial-gradient(ellipse, rgba(200,169,110,0.18) 0%, transparent 70%)' }} />
-        </div>
-        {/* Decorative rings — echoing Chakrio logo motif */}
-        <div className="absolute top-0 right-0 pointer-events-none overflow-hidden w-[480px] h-[480px] opacity-[0.045]">
-          {[380, 280, 190, 100].map(r => (
-            <div key={r} className="absolute rounded-full border"
-              style={{ width: r, height: r, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', borderColor: '#c8a96e' }} />
-          ))}
-        </div>
-        {/* Mirror rings left */}
-        <div className="absolute bottom-0 left-0 pointer-events-none overflow-hidden w-[300px] h-[300px] opacity-[0.025]">
-          {[240, 160, 80].map(r => (
-            <div key={r} className="absolute rounded-full border"
-              style={{ width: r, height: r, top: '50%', left: '50%', transform: 'translate(-50%, -50%)', borderColor: '#c8a96e' }} />
-          ))}
+      {/* ── Hero ─────────────────────────────────────────────── */}
+      <header className="max-w-5xl mx-auto px-6 pt-20 pb-10 w-full text-center">
+        {/* Status pill */}
+        <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm mb-8"
+          style={{ background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)', color: '#CFCAD9' }}>
+          <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#25D366', boxShadow: '0 0 9px #25D366', display: 'inline-block', flexShrink: 0 }} />
+          Automate your property bookings with an AI chatbot
         </div>
 
-        <div className="relative max-w-4xl mx-auto px-6 py-24 sm:py-32 text-center">
-          <div className="animate-fade-in-up stagger-1 inline-flex items-center gap-2 bg-surface2 border border-surface3 rounded-full px-4 py-1.5 text-xs text-text-2 mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-ch-green inline-block" />
-            Automate your property bookings with an AI chatbot
+        <h1 className="font-display font-extrabold tracking-tight text-text-1" style={{ fontSize: 'clamp(40px,7vw,88px)', lineHeight: .97, letterSpacing: '-.035em', maxWidth: '15ch', margin: '0 auto 24px' }}>
+          WhatsApp booking automation for{' '}
+          <span style={{ color: '#C9A24B' }}>boutique hotels, villas &amp; homestays</span>
+        </h1>
+
+        <p className="text-text-2 leading-relaxed mx-auto mb-8" style={{ fontSize: 19, maxWidth: '54ch' }}>
+          Just send a message —{' '}
+          <span className="text-text-1 font-semibold">"Alex, 3 nights from 15 June, $200 advance"</span>
+          {' '}— and Chakrio logs the booking instantly. No spreadsheets, no missed records.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
+          <Link to="/login" style={{
+            background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
+            padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
+            fontFamily: "'Hanken Grotesk', sans-serif",
+            boxShadow: '0 14px 34px -14px #C9A24B',
+          }}>
+            Start Free Trial →
+          </Link>
+          <a href="#how-it-works" style={{
+            background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
+            border: '1px solid rgba(255,255,255,.14)', borderRadius: 11,
+            padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
+            fontFamily: "'Hanken Grotesk', sans-serif",
+          }}>
+            See how it works
+          </a>
+        </div>
+        <p style={{ color: '#9D98AC', fontSize: 13.5 }}>14-day free trial · No credit card required</p>
+      </header>
+
+      {/* ── Hero Product Visual ───────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 pb-4 w-full">
+        <div style={{
+          position: 'relative', borderRadius: 20,
+          border: '1px solid rgba(255,255,255,.1)',
+          background: 'linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015))',
+          padding: 14,
+          boxShadow: '0 50px 120px -50px #C9A24B55',
+        }}>
+          {/* Glow pulse */}
+          <div style={{
+            position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)',
+            width: '60%', height: '120%', pointerEvents: 'none',
+            background: 'radial-gradient(ellipse at center,#C9A24B,transparent 70%)',
+            opacity: .12, filter: 'blur(40px)',
+          }} />
+          <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: '320px 1fr', gap: 14 }}>
+            <HeroChatPanel />
+            {/* Dashboard placeholder */}
+            <div style={{
+              borderRadius: 14, overflow: 'hidden',
+              border: '1px solid rgba(255,255,255,.08)',
+              background: 'repeating-linear-gradient(45deg,#17131f 0 14px,#1b1626 14px 28px)',
+              minHeight: 300, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{ border: '1px solid rgba(255,255,255,.1)', padding: '8px 14px', borderRadius: 8, fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: '#6a6480', letterSpacing: '.08em', textTransform: 'uppercase' }}>
+                live dashboard · 1100×680
+              </div>
+            </div>
           </div>
-
-          <h1 className="animate-fade-in-up stagger-2 font-display font-extrabold text-4xl sm:text-6xl text-text-1 mb-6 tracking-tight leading-tight">
-            WhatsApp booking automation for{' '}
-            <span style={{ background: 'linear-gradient(135deg, #c8a96e, #e8c98a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              boutique hotels, villas &amp; homestays
-            </span>
-          </h1>
-
-          <p className="animate-fade-in-up stagger-3 text-text-2 text-lg leading-relaxed max-w-2xl mx-auto mb-10">
-            Just send a message — <span className="text-text-1 font-medium">"Alex, 3 nights from 15 June, $200 advance"</span> — and Chakrio logs the booking instantly. No spreadsheets, no missed records.
-          </p>
-
-          <div className="animate-fade-in-up stagger-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/login"
-              style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', fontWeight: 600, padding: '14px 32px', borderRadius: '12px', fontSize: '14px', textDecoration: 'none' }}
-            >
-              Start Free Trial →
-            </Link>
-            <a
-              href="#how-it-works"
-              className="px-8 py-4 rounded-xl font-medium text-text-2 bg-surface hover:bg-surface2 transition-colors border border-surface3 text-sm"
-            >
-              See how it works
-            </a>
-          </div>
-          <p style={{ color: '#a0aec0', fontSize: '0.8rem', marginTop: '10px' }}>
-            14-day free trial · No credit card required
-          </p>
-          <p className="text-text-3 text-xs mt-5 max-w-lg mx-auto leading-relaxed">
-            Used by property managers across Asia, the Middle East, and Europe to record bookings, track expenses, and manage availability — all from a single chat message.
-          </p>
         </div>
       </section>
 
-      {/* Capabilities Strip */}
-      <CapabilitiesStrip />
+      {/* ── Trust Strip ───────────────────────────────────────── */}
+      <section className="reveal max-w-5xl mx-auto px-6 py-14 w-full">
+        <p className="text-center text-sm text-text-3 mb-8">Used by property managers across Asia, the Middle East &amp; Europe</p>
+        <div className="flex flex-wrap justify-center gap-12">
+          {TRUST_STATS.map(s => (
+            <div key={s.label} className="text-center">
+              <div className="font-display font-extrabold" style={{ fontSize: 34, color: '#C9A24B' }}>{s.value}</div>
+              <div style={{ fontSize: 13, color: '#B6B1C4', marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Before / After */}
-      <section className="max-w-5xl mx-auto px-6 py-16">
+      {/* ── How It Works — light section ─────────────────────── */}
+      <section id="how-it-works" style={{ background: '#F4F1EA', color: '#16121d' }}>
+        <div className="max-w-5xl mx-auto px-6 py-20">
+          <div className="reveal text-center mb-12">
+            <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, fontWeight: 500, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a7d2e', marginBottom: 12 }}>How it works</p>
+            <h2 className="font-display font-extrabold tracking-tight" style={{ fontSize: 'clamp(28px,4vw,48px)', letterSpacing: '-.03em', color: '#16121d' }}>
+              From WhatsApp message to recorded booking.
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {STEPS.map((s, i) => (
+              <div key={s.step} className={`reveal reveal-delay-${i + 1}`} style={{
+                background: '#fff', border: '1px solid rgba(0,0,0,.07)',
+                borderRadius: 18, padding: 32,
+                boxShadow: '0 20px 40px -32px rgba(0,0,0,.5)',
+              }}>
+                <div className="font-display font-extrabold" style={{ fontSize: 38, color: '#C9A24B', marginBottom: 14 }}>{s.step}</div>
+                <h3 className="font-display font-extrabold" style={{ fontSize: 20, color: '#16121d', marginBottom: 8, letterSpacing: '-.01em' }}>{s.title}</h3>
+                <p style={{ fontSize: 14.5, lineHeight: 1.6, color: '#55505f', margin: '0 0 14px' }}>{s.body}</p>
+                <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, background: 'rgba(201,162,75,.1)', color: '#9a7d2e', border: '1px solid rgba(201,162,75,.2)', borderRadius: 8, padding: '8px 10px' }}>
+                  {s.example}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Capabilities Strip ───────────────────────────────── */}
+      <div style={{ borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+        <div className="max-w-5xl mx-auto px-6 py-8">
+          <p className="text-center text-xs font-mono font-medium uppercase tracking-widest mb-5 text-text-3">Everything you need, in one bot</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            {CAPABILITIES.map(({ Icon, label }) => (
+              <div key={label} className="flex items-center gap-2 px-4 py-2 rounded-full text-sm" style={{ border: '1px solid rgba(201,162,75,.3)', background: 'rgba(201,162,75,.06)', color: '#CFCAD9' }}>
+                <Icon size={13} style={{ color: '#C9A24B' }} />
+                <span>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Features ─────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 py-20 w-full">
+        <div className="reveal text-center mb-12">
+          <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Everything you need</p>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 tracking-tight">One quiet app that runs the back office.</h2>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {FEATURES.map((f, i) => (
+            <div key={f.title} className={`reveal reveal-delay-${(i % 3) + 1}`} style={{
+              border: '1px solid rgba(255,255,255,.09)',
+              background: 'rgba(255,255,255,.025)',
+              borderRadius: 16, padding: 28,
+            }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 11,
+                background: 'rgba(201,162,75,.12)',
+                border: '1px solid rgba(201,162,75,.3)',
+                marginBottom: 18, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <f.Icon size={20} style={{ color: '#C9A24B' }} />
+              </div>
+              <h3 className="font-display font-extrabold text-text-1" style={{ fontSize: 17, marginBottom: 8, letterSpacing: '-.01em' }}>{f.title}</h3>
+              <p style={{ fontSize: 14, lineHeight: 1.6, color: '#B6B1C4', margin: 0 }}>{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Guest Experience Timeline ─────────────────────────── */}
+      <GuestExperienceSection />
+
+      {/* ── Before / After ───────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 py-16 w-full">
         <div className="reveal text-center mb-10">
-          <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Why Chakrio</p>
-          <h2 className="font-display font-extrabold text-3xl text-text-1">Before vs After</h2>
+          <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Why Chakrio</p>
+          <h2 className="font-display font-extrabold text-3xl text-text-1 tracking-tight">Before vs After</h2>
         </div>
         <div className="grid sm:grid-cols-2 gap-6">
-          <div className="reveal reveal-delay-1 bg-surface rounded-2xl border p-7" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+          <div className="reveal reveal-delay-1 rounded-2xl border p-7" style={{ background: 'rgba(255,255,255,.025)', borderColor: 'rgba(239,68,68,0.3)' }}>
             <div className="flex items-center gap-2 mb-5">
               <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 font-bold"
                 style={{ background: 'rgba(239,68,68,0.12)', color: '#f87171', border: '1px solid rgba(239,68,68,0.3)' }}>✕</span>
               <p className="text-sm font-semibold" style={{ color: '#f87171' }}>Before Chakrio</p>
             </div>
-            <ul className="space-y-4 text-text-2 text-base">
+            <ul className="space-y-4 text-text-2 text-sm">
               <li>• WhatsApp screenshots piling up — no organised record</li>
               <li>• Writing bookings in a register after every call</li>
               <li>• Forgot to log a booking? Guest arrived, no record found</li>
@@ -504,13 +729,13 @@ export default function LandingPage() {
               <li>• Expenses written on paper, lost by month-end</li>
             </ul>
           </div>
-          <div className="reveal reveal-delay-2 rounded-2xl border p-7" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.08) 0%, #16151f 70%)', borderColor: 'rgba(200,169,110,0.35)' }}>
+          <div className="reveal reveal-delay-2 rounded-2xl border p-7" style={{ background: 'radial-gradient(ellipse at 50% 0%,rgba(201,162,75,.08) 0%,rgba(255,255,255,.02) 70%)', borderColor: 'rgba(201,162,75,0.35)' }}>
             <div className="flex items-center gap-2 mb-5">
               <span className="w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0 font-bold"
-                style={{ background: 'rgba(200,169,110,0.15)', color: '#c8a96e', border: '1px solid rgba(200,169,110,0.4)' }}>✓</span>
-              <p className="text-sm font-semibold" style={{ color: '#c8a96e' }}>After Chakrio</p>
+                style={{ background: 'rgba(201,162,75,.15)', color: '#C9A24B', border: '1px solid rgba(201,162,75,.4)' }}>✓</span>
+              <p className="text-sm font-semibold" style={{ color: '#C9A24B' }}>After Chakrio</p>
             </div>
-            <ul className="space-y-4 text-text-2 text-base">
+            <ul className="space-y-4 text-text-2 text-sm">
               <li>• Send a message → booking is recorded in seconds</li>
               <li>• Dashboard updates automatically — no manual entry</li>
               <li>• Every booking, cancellation, and refund logged</li>
@@ -520,7 +745,7 @@ export default function LandingPage() {
             </ul>
           </div>
         </div>
-        <div className="mt-10 rounded-2xl overflow-hidden border border-surface3 aspect-video">
+        <div className="mt-10 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,.1)', aspectRatio: '16/9' }}>
           <iframe
             className="w-full h-full"
             src="https://www.youtube.com/embed/aLTnEKfp_7c"
@@ -531,225 +756,107 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Free Tools — trust builder, above the fold */}
-      <section id="tools" className="border-y border-surface3 bg-surface">
+      {/* ── Free Tools ───────────────────────────────────────── */}
+      <section id="tools" style={{ borderTop: '1px solid rgba(255,255,255,.07)', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
         <div className="max-w-5xl mx-auto px-6 py-14">
           <div className="reveal flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
-              <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Free resources</p>
-              <h2 className="font-display font-extrabold text-2xl text-text-1">Free Tools for Property Managers</h2>
+              <p className="text-xs font-mono font-medium uppercase tracking-widest mb-1" style={{ color: '#C9A24B' }}>Free resources</p>
+              <h2 className="font-display font-extrabold text-2xl text-text-1 tracking-tight">Free Tools for Property Managers</h2>
             </div>
             <p className="text-text-3 text-sm">No sign-up required.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {TOOLS.map(t => (
-              <Link
-                key={t.href}
-                to={t.href}
-                className="card-hover bg-bg-app rounded-2xl border border-surface3 p-6 group reveal"
-                style={{ textDecoration: 'none' }}
-              >
-                <h3 className="font-display font-extrabold text-base text-text-1 mb-2 transition-colors group-hover:text-accent">
-                  {t.title}
-                </h3>
+              <Link key={t.href} to={t.href} className="reveal group" style={{
+                background: 'rgba(255,255,255,.025)', borderRadius: 16,
+                border: '1px solid rgba(255,255,255,.09)',
+                padding: 24, textDecoration: 'none', display: 'block',
+                transition: 'border-color .2s',
+              }}>
+                <h3 className="font-display font-extrabold text-base text-text-1 mb-2" style={{ letterSpacing: '-.01em' }}>{t.title}</h3>
                 <p className="text-text-2 text-sm leading-relaxed mb-4">{t.desc}</p>
-                <span className="text-sm font-medium" style={{ color: '#c8a96e' }}>Use free tool →</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#C9A24B' }}>Use free tool →</span>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="max-w-5xl mx-auto px-6 py-20">
-        <div className="reveal text-center mb-12">
-          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">How it works</h2>
-          <p className="text-text-2 max-w-xl mx-auto">Three steps from a chat message to a recorded booking.</p>
+      {/* ── Dashboard Screenshot ──────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 py-20 w-full">
+        <div className="reveal text-center mb-10">
+          <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>The dashboard</p>
+          <h2 className="font-display font-extrabold text-3xl text-text-1 tracking-tight">See your property at a glance</h2>
+          <p className="text-text-2 mt-3 max-w-xl mx-auto text-sm">Revenue, bookings, expenses, and upcoming guests — all in one view, always up to date.</p>
         </div>
-        <div className="grid sm:grid-cols-3 gap-6">
-          {STEPS.map((s, i) => (
-            <div key={s.step} className={`reveal reveal-delay-${i + 1} bg-surface rounded-2xl border border-surface3 p-7`}>
-              <div className="relative">
-                <div className="absolute -top-2 -left-2 w-16 h-16 rounded-full blur-xl pointer-events-none"
-                  style={{ background: 'rgba(200,169,110,0.12)' }} />
-                <div className="font-display font-extrabold text-4xl mb-4 relative" style={{ color: 'rgba(200,169,110,0.7)' }}>{s.step}</div>
-              </div>
-              <h3 className="font-display font-extrabold text-lg text-text-1 mb-2">{s.title}</h3>
-              <p className="text-text-2 text-sm leading-relaxed mb-4">{s.body}</p>
-              <p className="text-xs px-3 py-2 rounded-lg font-mono" style={{ background: 'rgba(200,169,110,0.07)', color: '#c8a96e', border: '1px solid rgba(200,169,110,0.15)' }}>
-                {s.example}
-              </p>
-            </div>
-          ))}
+        <div className="reveal reveal-delay-1 rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(201,162,75,.2)' }}>
+          <img src="/screenshot.png" alt="Chakrio property dashboard showing bookings, revenue, and occupancy" className="w-full" />
         </div>
       </section>
 
-      {/* Features */}
-      <section className="bg-surface border-y border-surface3">
+      {/* ── Pricing ──────────────────────────────────────────── */}
+      <PricingSection />
+
+      {/* ── Testimonials ─────────────────────────────────────── */}
+      <section style={{ borderTop: '1px solid rgba(255,255,255,.07)', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
         <div className="max-w-5xl mx-auto px-6 py-20">
-          <div className="reveal text-center mb-12">
-            <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Everything you need</h2>
-            <p className="text-text-2 max-w-xl mx-auto">Built for independent property managers who handle everything on their phone.</p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-6">
-            {FEATURES.map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${(i % 2) + 1} bg-bg-app rounded-2xl border border-surface3 p-7 flex gap-4`}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${f.color}18`, border: `1px solid ${f.color}35` }}>
-                  <f.Icon size={20} style={{ color: f.color }} />
+          <p className="reveal text-xs font-mono font-medium uppercase tracking-widest mb-10 text-center" style={{ color: '#C9A24B' }}>From our clients</p>
+          <div className="grid md:grid-cols-2 gap-6 items-start">
+
+            {/* Primary — Koustubh */}
+            <div className="reveal reveal-delay-1 rounded-2xl border p-8 flex flex-col" style={{ background: 'radial-gradient(ellipse at 50% 0%,rgba(201,162,75,.1) 0%,rgba(255,255,255,.02) 70%)', borderColor: 'rgba(201,162,75,.35)', borderTop: '2px solid #C9A24B' }}>
+              <blockquote className="text-sm text-text-2 leading-relaxed mb-6">"{TESTIMONIALS[0].quote}"</blockquote>
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {TESTIMONIALS[0].stats.map(s => (
+                  <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: 'rgba(201,162,75,.07)', border: '1px solid rgba(201,162,75,.15)' }}>
+                    <p className="font-display font-extrabold text-sm text-text-1 mb-0.5">{s.value}</p>
+                    <p className="text-text-3 text-xs leading-tight">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-4 mt-auto">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg,#C9A24B,#b8934a)', color: '#0E0B14' }}>
+                  {TESTIMONIALS[0].initials}
                 </div>
                 <div>
-                  <h3 className="font-display font-extrabold text-base text-text-1 mb-2">{f.title}</h3>
-                  <p className="text-text-2 text-base leading-relaxed">{f.body}</p>
+                  <p className="font-display font-extrabold text-base text-text-1">{TESTIMONIALS[0].name}</p>
+                  <p className="text-sm font-medium" style={{ color: '#C9A24B' }}>{TESTIMONIALS[0].title}</p>
+                  <p className="text-text-3 text-xs mt-0.5">{TESTIMONIALS[0].location}</p>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Secondary — Nupur */}
+            <div className="reveal reveal-delay-2 rounded-2xl border border-surface3 p-8 flex flex-col" style={{ background: 'rgba(255,255,255,.025)', borderTop: '2px solid rgba(201,162,75,.4)' }}>
+              <blockquote className="text-sm text-text-2 leading-relaxed mb-6">"{TESTIMONIALS[1].quote}"</blockquote>
+              <div className="flex items-center gap-4 mt-auto">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center font-display font-extrabold text-sm flex-shrink-0"
+                  style={{ background: 'linear-gradient(135deg,#C9A24B,#b8934a)', color: '#0E0B14' }}>
+                  {TESTIMONIALS[1].initials}
+                </div>
+                <div>
+                  <p className="font-display font-extrabold text-base text-text-1">{TESTIMONIALS[1].name}</p>
+                  <p className="text-sm font-medium" style={{ color: '#C9A24B' }}>{TESTIMONIALS[1].title}</p>
+                  <p className="text-text-3 text-xs mt-0.5">{TESTIMONIALS[1].location}</p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Guest Experience Timeline */}
-      <GuestExperienceSection />
-
-      {/* Dashboard Screenshot */}
-      <section className="bg-surface border-y border-surface3">
-        <div className="max-w-6xl mx-auto px-6 py-20">
-          <div className="reveal text-center mb-10">
-            <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>The dashboard</p>
-            <h2 className="font-display font-extrabold text-3xl text-text-1">See your property at a glance</h2>
-            <p className="text-text-2 mt-3 max-w-xl mx-auto text-sm">Revenue, bookings, expenses, and upcoming guests — all in one view, always up to date.</p>
-          </div>
-          <div className="reveal reveal-delay-1 rounded-2xl overflow-hidden border" style={{ borderColor: 'rgba(200,169,110,0.2)' }}>
-            <img
-              src="/screenshot.png"
-              alt="Chakrio property dashboard showing bookings, revenue, and occupancy"
-              className="w-full"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="max-w-5xl mx-auto px-6 py-20">
-        <div className="reveal text-center mb-12">
-          <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: '#c8a96e' }}>Pricing</p>
-          <h2 className="font-display font-extrabold text-3xl text-text-1">Simple, transparent pricing</h2>
-          <p className="text-text-2 mt-3 max-w-xl mx-auto text-sm">No hidden fees. Pay for the rooms you operate.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-stretch gap-0 max-w-3xl mx-auto">
-          {/* Setup card */}
-          <div className="flex-1 bg-surface rounded-2xl sm:rounded-r-none border border-surface3 p-8 flex flex-col">
-            <p className="text-xs font-semibold uppercase tracking-widest text-text-3 mb-3">One-time setup</p>
-            <div className="mb-1">
-              <span className="font-display font-extrabold text-4xl text-text-1">Custom</span>
-            </div>
-            <p className="text-text-3 text-sm mb-6">Scoped to your property type &amp; room count</p>
-            <ul className="space-y-2 text-text-2 text-sm mb-8 flex-1">
-              <li>✓ Bot configuration &amp; testing</li>
-              <li>✓ Dashboard onboarding</li>
-              <li>✓ WhatsApp / Telegram setup</li>
-              <li>✓ Team walkthrough</li>
-              <li>✓ 30-day handholding</li>
-            </ul>
-            <a
-              href="https://wa.me/919461888529"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center border border-surface3 rounded-xl py-3 text-sm font-medium text-text-2 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'; e.currentTarget.style.color = '#f0eee8'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}
-            >
-              Contact for quote →
-            </a>
-          </div>
-
-          {/* Plus divider */}
-          <div className="hidden sm:flex items-center justify-center px-4 py-0 text-2xl font-display font-extrabold flex-shrink-0" style={{ color: 'rgba(200,169,110,0.5)' }}>
-            +
-          </div>
-
-          {/* Subscription card */}
-          <div className="flex-1 rounded-2xl sm:rounded-l-none border p-8 flex flex-col" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(200,169,110,0.08) 0%, #16151f 70%)', borderColor: 'rgba(200,169,110,0.3)' }}>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-3 self-start"
-              style={{ background: 'rgba(200,169,110,0.15)', color: '#c8a96e', border: '1px solid rgba(200,169,110,0.35)' }}>
-              ★ Most Popular
-            </div>
-            <span style={{ background: 'rgba(72,199,142,0.15)', color: '#48c78e', border: '1px solid rgba(72,199,142,0.3)', borderRadius: '20px', padding: '3px 12px', fontSize: '0.75rem', fontWeight: 600, display: 'inline-block', marginBottom: '10px' }}>
-              14-day free trial included
-            </span>
-            <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#c8a96e' }}>Monthly subscription</p>
-            <div className="mb-1">
-              <span className="font-display font-extrabold text-5xl text-text-1">Custom</span>
-            </div>
-            <p className="text-sm font-medium mb-6 text-text-3">Priced per property + room — contact us for a quote</p>
-            <ul className="space-y-2 text-text-2 text-sm mb-8 flex-1">
-              <li>✓ AI booking &amp; expense logging</li>
-              <li>✓ Real-time dashboard</li>
-              <li>✓ Monthly P&amp;L reports</li>
-              <li>✓ Multi-property support</li>
-              <li>✓ Telegram &amp; WhatsApp bot access</li>
-            </ul>
-            <a
-              href="https://wa.me/919461888529"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-center border border-surface3 rounded-xl py-3 text-sm font-medium text-text-2 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'; e.currentTarget.style.color = '#f0eee8'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = ''; e.currentTarget.style.color = ''; }}
-            >
-              Contact for quote →
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <TestimonialsSection />
-
-      {/* FAQ */}
+      {/* ── FAQ ──────────────────────────────────────────────── */}
       <section id="faq" className="max-w-3xl mx-auto px-6 py-20 w-full">
         <div className="reveal text-center mb-12">
-          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3">Frequently Asked Questions</h2>
+          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-3 tracking-tight">Frequently Asked Questions</h2>
           <p className="text-text-2 max-w-xl mx-auto">Everything you need to know about Chakrio.</p>
         </div>
         <div className="space-y-3">
-          {[
-            {
-              q: 'I already use a spreadsheet — why do I need this?',
-              a: 'Spreadsheets work, but they require you to open them, find the right tab, and type every field manually — every single booking. With Chakrio, you just send a message in plain language and the record is created automatically. No switching apps, no formatting, no errors from fat-fingering a date.',
-            },
-            {
-              q: 'What if I have multiple properties?',
-              a: 'Chakrio supports multiple properties under one account. Each property has its own booking records and dashboard. You can switch between them instantly from the same login.',
-            },
-            {
-              q: 'What types of properties can use Chakrio?',
-              a: 'Chakrio is built for owner-operators running boutique hotels, villas, homestays, guesthouses, B&Bs, and vacation rentals. It works for single-property owners as well as those managing multiple properties.',
-            },
-            {
-              q: 'Does Chakrio work outside India?',
-              a: 'Yes. Chakrio works with any WhatsApp or Telegram account worldwide. Bookings, expenses, and guest messages work in any language your team types in. We onboard properties globally.',
-            },
-            {
-              q: 'Do I need technical knowledge to use Chakrio?',
-              a: 'None at all. If you can send a text message, you can use Chakrio. You simply type bookings in natural language — the AI handles the rest.',
-            },
-            {
-              q: 'How do I get started?',
-              a: 'We onboard every property personally. Contact us via WhatsApp and we\'ll get your booking bot live — usually within 24 hours.',
-            },
-            {
-              q: 'How long does setup take?',
-              a: 'Most properties are live within 24 hours of contacting us. We handle the entire setup — bot configuration, dashboard access, and a walkthrough with your team. You don\'t need to do anything technical.',
-            },
-            {
-              q: 'What if I send a wrong message or make a mistake?',
-              a: 'Just send a correction. For example: "Update Alex check-out to 18th June." Chakrio will find the booking and update it. If you need to cancel, just say so — the bot handles updates, cancellations, and corrections the same way it handles new bookings.',
-            },
-          ].map(({ q, a }) => (
-            <details key={q} className="bg-surface border border-surface3 rounded-2xl group">
+          {FAQS.map(({ q, a }) => (
+            <details key={q} className="group" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.09)', borderRadius: 16 }}>
               <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none select-none">
                 <span className="font-medium text-text-1 pr-4">{q}</span>
                 <span className="text-text-3 text-lg flex-shrink-0 transition-transform group-open:rotate-45">+</span>
@@ -760,34 +867,40 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Strip */}
-      <section className="max-w-4xl mx-auto px-6 pb-20 w-full">
-        <div className="reveal rounded-2xl p-8 sm:p-12 text-center border" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(37,211,102,0.07) 0%, rgba(200,169,110,0.05) 50%, transparent 70%), #16151f', borderColor: 'rgba(37,211,102,0.25)' }}>
-          <div className="w-16 h-px mx-auto mb-6" style={{ background: 'linear-gradient(90deg, transparent, #c8a96e, transparent)' }} />
-          <h2 className="font-display font-extrabold text-3xl text-text-1 mb-4">
+      {/* ── Final CTA ────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-6 pb-20 w-full">
+        <div className="reveal rounded-2xl p-10 sm:p-16 text-center" style={{
+          border: '1px solid rgba(201,162,75,.3)',
+          background: 'radial-gradient(ellipse at 50% 0%,rgba(201,162,75,.16),transparent 70%), rgba(255,255,255,.02)',
+          borderRadius: 24,
+        }}>
+          <h2 className="font-display font-extrabold tracking-tight text-text-1" style={{ fontSize: 'clamp(28px,4.5vw,56px)', letterSpacing: '-.03em', marginBottom: 16, lineHeight: 1.05 }}>
             We onboard every property personally.
           </h2>
-          <p className="text-text-2 mb-2 max-w-lg mx-auto">
-            We onboard every property personally — wherever you are. Get your booking bot live within 24 hours, no technical setup on your end.
+          <p className="text-text-2 max-w-lg mx-auto mb-8" style={{ fontSize: 17, lineHeight: 1.6 }}>
+            No setup forms, no waiting room. Book a 20-minute call and we'll have your bookings flowing through WhatsApp the same week.
           </p>
-          <p style={{ color: '#a0aec0', fontSize: '0.85rem', marginBottom: '24px' }}>
-            Start with a 14-day free trial. No credit card needed.
-          </p>
-          <a
-            href="https://wa.me/919461888529"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', fontWeight: 600, padding: '14px 32px', borderRadius: '12px', fontSize: '14px', textDecoration: 'none', display: 'inline-block' }}
-          >
-            WhatsApp us to get set up →
-          </a>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link to="/login" style={{
+              background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
+              padding: '16px 32px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
+              fontFamily: "'Hanken Grotesk', sans-serif",
+              boxShadow: '0 14px 34px -14px #C9A24B',
+            }}>
+              Start Free Trial →
+            </Link>
+            <a href="https://wa.me/919461888529" target="_blank" rel="noopener noreferrer" style={{
+              background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
+              border: '1px solid rgba(255,255,255,.14)', borderRadius: 11,
+              padding: '16px 32px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
+              fontFamily: "'Hanken Grotesk', sans-serif",
+            }}>
+              Book a call
+            </a>
+          </div>
           <p className="text-text-3 text-sm mt-6">
             Or{' '}
-            <Link
-              to="/login"
-              style={{ color: '#c8a96e' }}
-              className="hover:underline"
-            >
+            <Link to="/login" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
               sign in
             </Link>
             {' '}if you already have an account.

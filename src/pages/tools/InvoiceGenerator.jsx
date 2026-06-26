@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -39,7 +39,7 @@ function genInvoiceNo() {
 
 const inputCls = 'w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors text-sm';
 const labelCls = 'block text-xs font-medium text-text-2 mb-1';
-const GOLD = '#c8a96e';
+const GOLD = '#C9A24B';
 const GST_RATES = [0, 12, 18];
 
 // ---------------------------------------------------------------------------
@@ -448,7 +448,7 @@ export default function InvoiceGenerator() {
                       onClick={() => setGstRate(r)}
                       className="flex-1 py-3 rounded-lg text-sm font-semibold border transition-colors"
                       style={{
-                        background: gstRate === r ? 'rgba(200,169,110,0.15)' : 'rgba(255,255,255,0.04)',
+                        background: gstRate === r ? 'rgba(201,162,75,0.15)' : 'rgba(255,255,255,0.04)',
                         borderColor: gstRate === r ? GOLD : 'rgba(255,255,255,0.08)',
                         color: gstRate === r ? GOLD : '#8c8a9e',
                       }}
@@ -504,7 +504,7 @@ export default function InvoiceGenerator() {
           </section>
 
           {/* Summary */}
-          <section className="rounded-xl p-5 space-y-2" style={{ background: 'rgba(200,169,110,0.06)', border: '1px solid rgba(200,169,110,0.18)' }}>
+          <section className="rounded-xl p-5 space-y-2" style={{ background: 'rgba(201,162,75,0.06)', border: '1px solid rgba(201,162,75,0.18)' }}>
             <h2 className="text-sm font-bold mb-3" style={{ color: GOLD }}>Invoice Summary</h2>
             {[
               { label: 'Stay Charges', val: stayNum },
@@ -516,7 +516,7 @@ export default function InvoiceGenerator() {
                 <span>₹{row.val.toLocaleString('en-IN')}</span>
               </div>
             ))}
-            <div className="border-t pt-2 mt-2" style={{ borderColor: 'rgba(200,169,110,0.2)' }}>
+            <div className="border-t pt-2 mt-2" style={{ borderColor: 'rgba(201,162,75,0.2)' }}>
               <div className="flex justify-between font-bold text-base" style={{ color: GOLD }}>
                 <span>Total</span>
                 <span>₹{total.toLocaleString('en-IN')}</span>
@@ -538,8 +538,8 @@ export default function InvoiceGenerator() {
             disabled={!propertyName || !guestName || !checkIn || !checkOut || !stayCharges}
             className="w-full py-4 rounded-xl font-bold text-sm transition-opacity"
             style={{
-              background: 'linear-gradient(135deg, #c8a96e, #b8934a)',
-              color: '#0f0e17',
+              background: 'linear-gradient(135deg, #C9A24B, #b8934a)',
+              color: '#0E0B14',
               opacity: (!propertyName || !guestName || !checkIn || !checkOut || !stayCharges) ? 0.45 : 1,
               cursor: (!propertyName || !guestName || !checkIn || !checkOut || !stayCharges) ? 'not-allowed' : 'pointer',
             }}
@@ -567,7 +567,7 @@ export default function InvoiceGenerator() {
             <Link to="/tools/occupancy-calculator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Hotel Occupancy Rate Calculator</p>
               <p className="text-text-2 text-sm">Calculate your property's occupancy rate for any period.</p>
@@ -575,7 +575,7 @@ export default function InvoiceGenerator() {
             <Link to="/tools/rental-income-calculator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Rental Income Calculator</p>
               <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
@@ -583,7 +583,7 @@ export default function InvoiceGenerator() {
             <Link to="/tools/cancellation-policy"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
               <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
@@ -609,7 +609,7 @@ export default function InvoiceGenerator() {
         >
           <div
             onClick={e => e.stopPropagation()}
-            style={{ background: '#16151f', borderRadius: '20px', border: '1px solid rgba(200,169,110,0.2)', width: '100%', maxWidth: '420px', padding: '32px' }}
+            style={{ background: '#16151f', borderRadius: '20px', border: '1px solid rgba(201,162,75,0.2)', width: '100%', maxWidth: '420px', padding: '32px' }}
           >
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               <div style={{ fontSize: '28px', marginBottom: '8px' }}>📄</div>
@@ -660,8 +660,8 @@ export default function InvoiceGenerator() {
                 onClick={handleLeadSubmit}
                 disabled={submitting}
                 style={{
-                  background: 'linear-gradient(135deg, #c8a96e, #b8934a)',
-                  color: '#0f0e17', border: 'none', borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #C9A24B, #b8934a)',
+                  color: '#0E0B14', border: 'none', borderRadius: '10px',
                   padding: '13px', fontSize: '14px', fontWeight: 700,
                   cursor: submitting ? 'not-allowed' : 'pointer',
                   opacity: submitting ? 0.7 : 1, marginTop: '4px',

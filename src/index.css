@@ -14,17 +14,17 @@
 
 /* ── Design system CSS variables ─────────────────────────────────────────── */
 :root {
-  --bg:       #0f0e17;
+  --bg:       #0E0B14;
   --surface:  #16151f;
   --surface2: #1e1c2a;
   --surface3: #252336;
   --border:   rgba(255,255,255,0.07);
-  --accent:   #c8a96e;
+  --accent:   #C9A24B;
   --accent2:  #7c6af5;
   --accent3:  #4ecdc4;
-  --text-1:   #f0eee8;
-  --text-2:   #8c8a9e;
-  --text-3:   #56546a;
+  --text-1:   #F4F1EA;
+  --text-2:   #CFCAD9;
+  --text-3:   #9D98AC;
   --green:    #5cb88a;
   --red:      #e07070;
   --amber:    #e8a86a;

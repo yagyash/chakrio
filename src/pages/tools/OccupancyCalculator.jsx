@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
@@ -145,20 +145,20 @@ export default function OccupancyCalculator() {
             <div>
               <label className="block text-sm font-medium text-text-2 mb-2">Total Rooms</label>
               <input type="number" min="1" value={rooms} onChange={e => setRooms(e.target.value)} placeholder="e.g. 10"
-                className={inputCls} style={{ '--tw-ring-color': '#c8a96e' }}
-                onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+                className={inputCls} style={{ '--tw-ring-color': '#C9A24B' }}
+                onFocus={e => e.target.style.borderColor = '#C9A24B'} onBlur={e => e.target.style.borderColor = ''} />
             </div>
             <div>
               <label className="block text-sm font-medium text-text-2 mb-2">Period (days)</label>
               <input type="number" min="1" value={days} onChange={e => setDays(e.target.value)} placeholder="e.g. 30"
                 className={inputCls}
-                onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+                onFocus={e => e.target.style.borderColor = '#C9A24B'} onBlur={e => e.target.style.borderColor = ''} />
             </div>
             <div>
               <label className="block text-sm font-medium text-text-2 mb-2">Booked Room-Nights</label>
               <input type="number" min="0" value={bookedNights} onChange={e => setBookedNights(e.target.value)} placeholder="e.g. 210"
                 className={inputCls}
-                onFocus={e => e.target.style.borderColor = '#c8a96e'} onBlur={e => e.target.style.borderColor = ''} />
+                onFocus={e => e.target.style.borderColor = '#C9A24B'} onBlur={e => e.target.style.borderColor = ''} />
             </div>
           </div>
 
@@ -170,7 +170,7 @@ export default function OccupancyCalculator() {
 
           <div className="flex gap-3">
             <button onClick={calculate}
-              style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+              style={{ background: 'linear-gradient(135deg, #C9A24B, #b8934a)', color: '#0E0B14', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
               Calculate
             </button>
             {result && (
@@ -185,7 +185,7 @@ export default function OccupancyCalculator() {
             <div className="mt-8 pt-8 border-t border-surface3 grid sm:grid-cols-2 gap-6">
               <div className="bg-surface2 rounded-xl p-6 text-center">
                 <p className="text-text-3 text-xs uppercase tracking-widest mb-1">Occupancy Rate</p>
-                <p className="font-display font-extrabold text-4xl" style={{ color: '#c8a96e' }}>{result.occupancy}%</p>
+                <p className="font-display font-extrabold text-4xl" style={{ color: '#C9A24B' }}>{result.occupancy}%</p>
               </div>
               <div className="bg-surface2 rounded-xl p-6 text-center">
                 <p className="text-text-3 text-xs uppercase tracking-widest mb-1">Avg Rooms Occupied / Night</p>
@@ -234,7 +234,7 @@ export default function OccupancyCalculator() {
             ].map(({ label, range }) => (
               <div key={label} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
                 <span className="text-text-2 text-sm">{label}</span>
-                <span className="font-display font-extrabold text-sm" style={{ color: '#c8a96e' }}>{range}</span>
+                <span className="font-display font-extrabold text-sm" style={{ color: '#C9A24B' }}>{range}</span>
               </div>
             ))}
           </div>
@@ -272,7 +272,7 @@ export default function OccupancyCalculator() {
               { step: '05', title: 'Add value packages', body: 'Breakfast-included or airport-transfer bundles justify a higher rate and attract guests who compare value, not just price.' },
             ].map(({ step, title, body }) => (
               <div key={step} className="flex gap-4 bg-surface2 rounded-lg p-4">
-                <span className="font-display font-extrabold text-lg flex-shrink-0" style={{ color: 'rgba(200,169,110,0.4)' }}>{step}</span>
+                <span className="font-display font-extrabold text-lg flex-shrink-0" style={{ color: 'rgba(201,162,75,0.4)' }}>{step}</span>
                 <div>
                   <p className="font-medium text-text-1 text-sm mb-1">{title}</p>
                   <p className="text-text-2 text-sm leading-relaxed">{body}</p>
@@ -298,7 +298,7 @@ export default function OccupancyCalculator() {
             <Link to="/tools/rental-income-calculator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors group"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1 transition-colors">Rental Income Calculator</p>
               <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
@@ -306,7 +306,7 @@ export default function OccupancyCalculator() {
             <Link to="/tools/cancellation-policy"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors group"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
               <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
@@ -314,7 +314,7 @@ export default function OccupancyCalculator() {
             <Link to="/tools/invoice-generator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors group"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Villa & Homestay Invoice Generator</p>
               <p className="text-text-2 text-sm">Generate a professional PDF invoice for your guests. No sign-up required.</p>

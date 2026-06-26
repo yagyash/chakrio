@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../../components/marketing/Navbar';
@@ -43,7 +43,7 @@ export default function RentalIncomeCalculator() {
   }
 
   const focusGold = {
-    onFocus: e => e.target.style.borderColor = '#c8a96e',
+    onFocus: e => e.target.style.borderColor = '#C9A24B',
     onBlur: e => e.target.style.borderColor = '',
   };
 
@@ -166,7 +166,7 @@ export default function RentalIncomeCalculator() {
             </div>
             <div>
               <label className="block text-sm font-medium text-text-2 mb-2">
-                Occupancy Rate (%) <span className="text-text-3 font-normal">— use our <Link to="/tools/occupancy-calculator" style={{ color: '#c8a96e' }} className="hover:underline">calculator</Link></span>
+                Occupancy Rate (%) <span className="text-text-3 font-normal">— use our <Link to="/tools/occupancy-calculator" style={{ color: '#C9A24B' }} className="hover:underline">calculator</Link></span>
               </label>
               <input type="number" min="0" max="100" value={occupancy} onChange={e => setOccupancy(e.target.value)} placeholder="e.g. 70" className={inputCls} {...focusGold} />
             </div>
@@ -182,8 +182,8 @@ export default function RentalIncomeCalculator() {
             </label>
             <div className="flex items-center gap-4">
               <input type="range" min="0" max="80" value={expensePct} onChange={e => setExpensePct(e.target.value)}
-                className="flex-1" style={{ accentColor: '#c8a96e' }} />
-              <span className="font-display font-extrabold text-lg w-14 text-right" style={{ color: '#c8a96e' }}>
+                className="flex-1" style={{ accentColor: '#C9A24B' }} />
+              <span className="font-display font-extrabold text-lg w-14 text-right" style={{ color: '#C9A24B' }}>
                 {expensePct}%
               </span>
             </div>
@@ -197,7 +197,7 @@ export default function RentalIncomeCalculator() {
 
           <div className="flex gap-3">
             <button onClick={calculate}
-              style={{ background: 'linear-gradient(135deg, #c8a96e, #b8934a)', color: '#0f0e17', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+              style={{ background: 'linear-gradient(135deg, #C9A24B, #b8934a)', color: '#0E0B14', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
               Calculate
             </button>
             {result && (
@@ -258,7 +258,7 @@ export default function RentalIncomeCalculator() {
             ].map(({ category, range }) => (
               <div key={category} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
                 <span className="text-text-2 text-sm">{category}</span>
-                <span className="font-display font-extrabold text-sm" style={{ color: '#c8a96e' }}>{range}</span>
+                <span className="font-display font-extrabold text-sm" style={{ color: '#C9A24B' }}>{range}</span>
               </div>
             ))}
           </div>
@@ -307,7 +307,7 @@ export default function RentalIncomeCalculator() {
             ].map(({ type, yield: y }) => (
               <div key={type} className="flex items-center justify-between bg-surface2 rounded-lg px-4 py-3">
                 <span className="text-text-2 text-sm">{type}</span>
-                <span className="font-display font-extrabold text-sm" style={{ color: '#c8a96e' }}>{y}</span>
+                <span className="font-display font-extrabold text-sm" style={{ color: '#C9A24B' }}>{y}</span>
               </div>
             ))}
           </div>
@@ -332,7 +332,7 @@ export default function RentalIncomeCalculator() {
             <Link to="/tools/occupancy-calculator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Occupancy Rate Calculator</p>
               <p className="text-text-2 text-sm">Calculate your property's occupancy rate for any period.</p>
@@ -340,7 +340,7 @@ export default function RentalIncomeCalculator() {
             <Link to="/tools/cancellation-policy"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
               <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
@@ -348,7 +348,7 @@ export default function RentalIncomeCalculator() {
             <Link to="/tools/invoice-generator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(200,169,110,0.4)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Villa & Homestay Invoice Generator</p>
               <p className="text-text-2 text-sm">Generate a professional PDF invoice for your guests. No sign-up required.</p>
