@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { getIdToken } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useAuthContext } from '../context/AuthContext';
+import { CAMPAIGN_COSTS } from '../config/campaignCosts';
 
 // ── Template definitions ──────────────────────────────────────────
 const TEMPLATES = {
@@ -17,7 +18,7 @@ const TEMPLATES = {
     label: 'Welcome Back',
     description: 'Re-engage past guests with a warm personal invite',
     fields: [
-      { key: 'location', label: 'Location', placeholder: 'e.g. Bali, Santorini, Tuscany' },
+      { key: 'location', label: 'Location', placeholder: 'e.g. Udaipur, Pushkar' },
     ],
   },
   seasonal_offer: {
@@ -33,16 +34,20 @@ const TEMPLATES = {
     label: 'We Miss You',
     description: 'Reach out to guests who haven\'t visited in a while',
     fields: [
-      { key: 'location', label: 'Location', placeholder: 'e.g. Bali, the Maldives, Tuscany' },
+      { key: 'location', label: 'Location', placeholder: 'e.g. Udaipur, Manali' },
     ],
   },
 };
 
 const STATUS_COLOR = {
-  pending:   { bg: 'rgba(200,169,110,0.12)', color: '#c8a96e',  label: 'Pending'   },
-  running:   { bg: 'rgba(108,99,255,0.15)',  color: '#a896f8',  label: 'Running'   },
-  completed: { bg: 'rgba(72,199,142,0.12)',  color: '#48c78e',  label: 'Completed' },
-  failed:    { bg: 'rgba(239,68,68,0.12)',   color: '#f87171',  label: 'Failed'    },
+  pending:                    { bg: 'rgba(200,169,110,0.12)', color: '#c8a96e',  label: 'Pending'             },
+  queued:                     { bg: 'rgba(200,169,110,0.12)', color: '#c8a96e',  label: 'Queued'              },
+  running:                    { bg: 'rgba(108,99,255,0.15)',  color: '#a896f8',  label: 'Running'             },
+  sending:                    { bg: 'rgba(108,99,255,0.15)',  color: '#a896f8',  label: 'Sending'             },
+  completed:                  { bg: 'rgba(72,199,142,0.12)',  color: '#48c78e',  label: 'Completed'           },
+  failed:                     { bg: 'rgba(239,68,68,0.12)',   color: '#f87171',  label: 'Failed'              },
+  paused_by_user:             { bg: 'rgba(200,169,110,0.10)', color: '#8c8a9e',  label: 'Paused'              },
+  paused_insufficient_funds:  { bg: 'rgba(239,68,68,0.10)',   color: '#f87171',  label: 'Paused (low funds)'  },
 };
 
 // ── Styles ────────────────────────────────────────────────────────
@@ -109,18 +114,24 @@ export default function Campaigns() {
   const propertyId = selectedProperty?.supabase_property_id ?? null;
 
   const [campaigns,    setCampaigns]    = useState([]);
+  const [wallet,       setWallet]       = useState(null);   // { balance, transactions }
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState('');
   const [showModal,    setShowModal]    = useState(false);
-  const [activeCampaign, setActiveCampaign] = useState(null); // campaign being polled
+  const [showTopup,    setShowTopup]    = useState(false);
+  const [activeCampaign, setActiveCampaign] = useState(null);
   const pollRef = useRef(null);
 
-  // ── Load campaign list ─────────────────────────────────────────
-  const loadCampaigns = useCallback(async () => {
+  // ── Load campaigns + wallet ────────────────────────────────────
+  const loadData = useCallback(async () => {
     if (!propertyId) return;
     try {
-      const data = await apiFetch(`/api/campaigns?propertyId=${propertyId}`);
-      setCampaigns(Array.isArray(data) ? data : []);
+      const [campaignData, walletData] = await Promise.all([
+        apiFetch(`/api/campaigns?propertyId=${propertyId}`),
+        apiFetch(`/api/wallet?propertyId=${propertyId}`).catch(() => null),
+      ]);
+      setCampaigns(Array.isArray(campaignData) ? campaignData : []);
+      if (walletData) setWallet(walletData);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -128,30 +139,54 @@ export default function Campaigns() {
     }
   }, [propertyId]);
 
-  useEffect(() => {
-    loadCampaigns();
-  }, [loadCampaigns]);
+  useEffect(() => { loadData(); }, [loadData]);
 
-  // ── Poll running campaign ──────────────────────────────────────
+  // ── Poll active campaign ───────────────────────────────────────
   useEffect(() => {
     if (!activeCampaign) { clearInterval(pollRef.current); return; }
     pollRef.current = setInterval(async () => {
       try {
         const c = await apiFetch(`/api/campaigns?campaignId=${activeCampaign}`);
         setCampaigns(prev => prev.map(x => x.id === c.id ? c : x));
-        if (c.status === 'completed' || c.status === 'failed') {
+        if (['completed', 'failed', 'paused_by_user', 'paused_insufficient_funds'].includes(c.status)) {
           setActiveCampaign(null);
+          loadData(); // refresh wallet balance after campaign activity
         }
-      } catch { /* silent — keep polling */ }
-    }, 3000);
+      } catch { /* silent */ }
+    }, 5000);
     return () => clearInterval(pollRef.current);
-  }, [activeCampaign]);
+  }, [activeCampaign, loadData]);
 
-  // ── Handle new campaign launched from modal ────────────────────
   const handleLaunched = (campaign) => {
     setCampaigns(prev => [campaign, ...prev]);
     setActiveCampaign(campaign.campaign_id ?? campaign.id);
     setShowModal(false);
+    loadData();
+  };
+
+  const handlePause = async (campaignId) => {
+    try {
+      await apiFetch(`/api/campaigns?campaignId=${campaignId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ action: 'pause' }),
+      });
+      setCampaigns(prev => prev.map(c => c.id === campaignId ? { ...c, status: 'paused_by_user' } : c));
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const handleResume = async (campaignId) => {
+    try {
+      await apiFetch(`/api/campaigns?campaignId=${campaignId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ action: 'resume' }),
+      });
+      setCampaigns(prev => prev.map(c => c.id === campaignId ? { ...c, status: 'sending' } : c));
+      setActiveCampaign(campaignId);
+    } catch (e) {
+      setError(e.message);
+    }
   };
 
   if (!propertyId) {
@@ -161,6 +196,8 @@ export default function Campaigns() {
       </div>
     );
   }
+
+  const balance = wallet?.balance ?? 0;
 
   return (
     <div style={{ padding: '24px 28px', overflowY: 'auto', height: '100%' }}>
@@ -175,10 +212,49 @@ export default function Campaigns() {
             WhatsApp broadcast to past guests
           </p>
         </div>
-        <button style={btnPrimary} onClick={() => setShowModal(true)}>
-          + New Campaign
-        </button>
+
+        {/* Wallet + New Campaign */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '11px', color: '#56546a', marginBottom: '2px' }}>Marketing wallet</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '16px', fontWeight: 700, color: balance > 0 ? '#48c78e' : '#f87171' }}>
+                ₹{balance.toFixed(2)}
+              </span>
+              <button
+                style={{ ...btnGhost, padding: '4px 10px', fontSize: '11px' }}
+                onClick={() => setShowTopup(true)}
+              >
+                + Add funds
+              </button>
+            </div>
+          </div>
+          <button
+            style={{ ...btnPrimary, opacity: balance <= 0 ? 0.5 : 1 }}
+            disabled={balance <= 0}
+            title={balance <= 0 ? 'Top up your wallet to launch campaigns' : undefined}
+            onClick={() => setShowModal(true)}
+          >
+            + New Campaign
+          </button>
+        </div>
       </div>
+
+      {/* Empty wallet notice */}
+      {!loading && balance <= 0 && (
+        <div style={{ ...card, borderColor: 'rgba(239,68,68,0.2)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ fontSize: '20px' }}>💰</span>
+          <div>
+            <div style={{ fontSize: '13px', color: '#f0eee8', fontWeight: 500 }}>Top up your marketing wallet to launch campaigns</div>
+            <div style={{ fontSize: '12px', color: '#56546a', marginTop: '2px' }}>
+              ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)} per delivered message · ₹{CAMPAIGN_COSTS.metaFee.toFixed(2)} WhatsApp fee + ₹{CAMPAIGN_COSTS.chakrioFee.toFixed(2)} service fee
+            </div>
+          </div>
+          <button style={{ ...btnPrimary, marginLeft: 'auto', whiteSpace: 'nowrap' }} onClick={() => setShowTopup(true)}>
+            Add funds
+          </button>
+        </div>
+      )}
 
       {/* Error */}
       {error && (
@@ -199,7 +275,14 @@ export default function Campaigns() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {campaigns.map(c => <CampaignRow key={c.id} campaign={c} />)}
+          {campaigns.map(c => (
+            <CampaignRow
+              key={c.id}
+              campaign={c}
+              onPause={handlePause}
+              onResume={handleResume}
+            />
+          ))}
         </div>
       )}
 
@@ -207,8 +290,21 @@ export default function Campaigns() {
       {showModal && (
         <NewCampaignModal
           propertyId={propertyId}
+          walletBalance={balance}
           onClose={() => setShowModal(false)}
           onLaunched={handleLaunched}
+        />
+      )}
+
+      {/* Topup Modal */}
+      {showTopup && (
+        <TopupModal
+          propertyId={propertyId}
+          onClose={() => setShowTopup(false)}
+          onSuccess={(newBalance) => {
+            setWallet(w => ({ ...w, balance: newBalance }));
+            setShowTopup(false);
+          }}
         />
       )}
     </div>
@@ -216,18 +312,22 @@ export default function Campaigns() {
 }
 
 // ── Campaign row ──────────────────────────────────────────────────
-function CampaignRow({ campaign: c }) {
-  const s     = STATUS_COLOR[c.status] ?? STATUS_COLOR.pending;
+function CampaignRow({ campaign: c, onPause, onResume }) {
+  const s     = STATUS_COLOR[c.status] ?? STATUS_COLOR.queued;
   const tpl   = TEMPLATES[c.template_name];
   const label = tpl?.label ?? c.template_name;
-  const date  = c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
-  const pct   = c.total_recipients > 0
-    ? Math.round((c.sent_count / c.total_recipients) * 100)
-    : 0;
+  const dt    = c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+
+  const total   = c.total_recipients || 0;
+  const sent    = c.sent_count       || 0;
+  const spent   = c.spent_amount     || 0;
+  const budget  = c.budget_amount    || 0;
+  const pct     = total > 0 ? Math.round((sent / total) * 100) : 0;
+  const isActive = ['queued', 'sending'].includes(c.status);
+  const isPaused = ['paused_by_user', 'paused_insufficient_funds'].includes(c.status);
 
   return (
-    <div style={{ ...card, display: 'flex', alignItems: 'center', gap: '16px' }}>
-      {/* Template badge */}
+    <div style={{ ...card, display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
       <div style={{
         width: '40px', height: '40px', borderRadius: '10px', flexShrink: 0,
         background: 'rgba(200,169,110,0.1)', border: '1px solid rgba(200,169,110,0.2)',
@@ -236,7 +336,6 @@ function CampaignRow({ campaign: c }) {
         📣
       </div>
 
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
           <span style={{ fontSize: '14px', fontWeight: 500, color: '#f0eee8' }}>{label}</span>
@@ -244,25 +343,51 @@ function CampaignRow({ campaign: c }) {
             {s.label}
           </span>
         </div>
-        <div style={{ fontSize: '12px', color: '#56546a' }}>
-          {date} · {c.total_recipients} recipients
-          {c.total_recipients > 0 && (
-            <span> · <span style={{ color: '#48c78e' }}>{c.sent_count} sent</span>
+
+        <div style={{ fontSize: '12px', color: '#56546a', marginBottom: '6px' }}>
+          {dt}
+          {total > 0 && (
+            <span>
+              {' · '}<span style={{ color: '#f0eee8' }}>{sent}</span>/{total} sent
               {c.failed_count > 0 && <span style={{ color: '#f87171' }}> · {c.failed_count} failed</span>}
-              {c.opted_out_count > 0 && <span> · {c.opted_out_count} opted out</span>}
             </span>
           )}
+          {budget > 0 && (
+            <span> · ₹{spent.toFixed(2)} of ₹{budget.toFixed(2)} spent</span>
+          )}
         </div>
-        {/* Progress bar — shown while running */}
-        {c.status === 'running' && c.total_recipients > 0 && (
-          <div style={{ marginTop: '8px', height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '2px' }}>
-            <div style={{ height: '100%', width: `${pct}%`, background: 'linear-gradient(90deg,#c8a96e,#e8c98a)', borderRadius: '2px', transition: 'width 1s ease' }} />
+
+        {/* Progress bar */}
+        {(isActive || isPaused || c.status === 'sending') && total > 0 && (
+          <div style={{ height: '3px', background: 'rgba(255,255,255,0.07)', borderRadius: '2px', marginBottom: '8px' }}>
+            <div style={{
+              height: '100%', width: `${pct}%`,
+              background: isPaused ? 'rgba(200,169,110,0.4)' : 'linear-gradient(90deg,#c8a96e,#e8c98a)',
+              borderRadius: '2px', transition: 'width 1s ease',
+            }} />
           </div>
+        )}
+
+        {/* Pause / Resume controls */}
+        {isActive && (
+          <button
+            style={{ ...btnGhost, fontSize: '11px', padding: '4px 12px' }}
+            onClick={() => onPause(c.id)}
+          >
+            ⏸ Pause
+          </button>
+        )}
+        {isPaused && (
+          <button
+            style={{ ...btnPrimary, fontSize: '11px', padding: '4px 12px' }}
+            onClick={() => onResume(c.id)}
+          >
+            ▶ Resume
+          </button>
         )}
       </div>
 
-      {/* Percentage complete */}
-      {c.status !== 'pending' && c.total_recipients > 0 && (
+      {total > 0 && (
         <div style={{ fontSize: '14px', fontWeight: 600, color: '#c8a96e', flexShrink: 0 }}>
           {pct}%
         </div>
@@ -271,16 +396,116 @@ function CampaignRow({ campaign: c }) {
   );
 }
 
-// ── New Campaign Modal ────────────────────────────────────────────
-function NewCampaignModal({ propertyId, onClose, onLaunched }) {
-  const [step,         setStep]         = useState('pick');   // 'pick' | 'fill'
-  const [selected,     setSelected]     = useState(null);
-  const [vars,         setVars]         = useState({});
-  const [recipientCount, setRecipientCount] = useState(null);
-  const [launching,    setLaunching]    = useState(false);
-  const [error,        setError]        = useState('');
+// ── Topup Modal ───────────────────────────────────────────────────
+function TopupModal({ propertyId, onClose, onSuccess }) {
+  const [amount,    setAmount]    = useState('');
+  const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState('');
+  const [payUrl,    setPayUrl]    = useState(null);
 
-  // Load recipient count when template is selected
+  const submit = async () => {
+    const val = parseFloat(amount);
+    if (!val || val < 10) { setError('Minimum topup is ₹10'); return; }
+    if (val > 10000)       { setError('Maximum topup is ₹10,000'); return; }
+    setLoading(true); setError('');
+    try {
+      const data = await apiFetch('/api/wallet', {
+        method: 'POST',
+        body: JSON.stringify({ property_uuid: propertyId, amount: val }),
+      });
+      setPayUrl(data.payment_url);
+      window.open(data.payment_url, '_blank');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+    }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{
+        background: '#16151f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px',
+        width: '100%', maxWidth: '400px', padding: '28px',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: '18px', color: '#f0eee8', margin: 0 }}>
+            Add Funds
+          </h2>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#56546a', cursor: 'pointer', fontSize: '20px', lineHeight: 1 }}>×</button>
+        </div>
+
+        <p style={{ fontSize: '12px', color: '#56546a', margin: '0 0 16px' }}>
+          ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)}/message ·{' '}
+          ₹{CAMPAIGN_COSTS.metaFee.toFixed(2)} WhatsApp fee + ₹{CAMPAIGN_COSTS.chakrioFee.toFixed(2)} Chakrio fee
+        </p>
+
+        {!payUrl ? (
+          <>
+            <label style={{ display: 'block', fontSize: '12px', color: '#8c8a9e', marginBottom: '6px', fontWeight: 500 }}>
+              Amount (₹)
+            </label>
+            <input
+              style={{ ...inputStyle, marginBottom: '8px' }}
+              type="number"
+              min="10"
+              max="10000"
+              placeholder="e.g. 500"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+            />
+            {amount && parseFloat(amount) >= 10 && (
+              <div style={{ fontSize: '12px', color: '#56546a', marginBottom: '12px' }}>
+                ≈ {Math.floor(parseFloat(amount) / CAMPAIGN_COSTS.totalPerMessage)} messages
+              </div>
+            )}
+            {error && <div style={{ fontSize: '12px', color: '#f87171', marginBottom: '12px' }}>{error}</div>}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button style={btnGhost} onClick={onClose}>Cancel</button>
+              <button
+                style={{ ...btnPrimary, flex: 1, opacity: loading ? 0.5 : 1 }}
+                disabled={loading}
+                onClick={submit}
+              >
+                {loading ? 'Creating link…' : 'Pay via Razorpay'}
+              </button>
+            </div>
+          </>
+        ) : (
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '32px', marginBottom: '12px' }}>🔗</div>
+            <p style={{ fontSize: '13px', color: '#f0eee8', marginBottom: '8px' }}>
+              Payment link opened in a new tab.
+            </p>
+            <p style={{ fontSize: '12px', color: '#56546a', marginBottom: '20px' }}>
+              Complete the payment to top up your wallet. Balance updates automatically.
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button style={btnGhost} onClick={() => window.open(payUrl, '_blank')}>
+                Reopen link
+              </button>
+              <button style={btnPrimary} onClick={onClose}>Done</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── New Campaign Modal ────────────────────────────────────────────
+function NewCampaignModal({ propertyId, walletBalance, onClose, onLaunched }) {
+  const [step,           setStep]           = useState('pick');
+  const [selected,       setSelected]       = useState(null);
+  const [vars,           setVars]           = useState({});
+  const [budget,         setBudget]         = useState('');
+  const [recipientCount, setRecipientCount] = useState(null);
+  const [launching,      setLaunching]      = useState(false);
+  const [error,          setError]          = useState('');
+
   useEffect(() => {
     if (!selected) return;
     setRecipientCount(null);
@@ -291,8 +516,13 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
 
   const tpl = TEMPLATES[selected];
 
-  const allFilled = tpl?.fields.every(f => (vars[f.key] ?? '').trim());
-  const hasRecipients = typeof recipientCount === 'number' && recipientCount > 0;
+  const budgetVal       = parseFloat(budget) || 0;
+  const maxFromBudget   = budgetVal > 0 ? Math.floor(budgetVal / CAMPAIGN_COSTS.totalPerMessage) : 0;
+  const effectiveMax    = Math.min(maxFromBudget, typeof recipientCount === 'number' ? recipientCount : maxFromBudget);
+  const estimatedDays   = effectiveMax > 0 ? Math.ceil(effectiveMax / 250) : 0;
+  const budgetExceeds   = budgetVal > walletBalance;
+  const allFilled       = tpl?.fields.every(f => (vars[f.key] ?? '').trim());
+  const canLaunch       = allFilled && budgetVal >= CAMPAIGN_COSTS.totalPerMessage && !budgetExceeds && !launching;
 
   const launch = async () => {
     setLaunching(true);
@@ -300,7 +530,12 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
     try {
       const data = await apiFetch('/api/campaigns', {
         method: 'POST',
-        body: JSON.stringify({ property_uuid: propertyId, template_name: selected, template_vars: vars }),
+        body: JSON.stringify({
+          property_uuid:  propertyId,
+          template_name:  selected,
+          template_vars:  vars,
+          budget_amount:  budgetVal,
+        }),
       });
       onLaunched(data);
     } catch (e) {
@@ -316,9 +551,8 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
     }} onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
       <div style={{
         background: '#16151f', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px',
-        width: '100%', maxWidth: '520px', padding: '28px',
+        width: '100%', maxWidth: '520px', padding: '28px', maxHeight: '90vh', overflowY: 'auto',
       }}>
-        {/* Title */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 700, fontSize: '18px', color: '#f0eee8', margin: 0 }}>
             {step === 'pick' ? 'Choose a Template' : tpl?.label}
@@ -332,10 +566,10 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
             {Object.entries(TEMPLATES).map(([key, t]) => (
               <button
                 key={key}
-                onClick={() => { setSelected(key); setVars({}); setStep('fill'); }}
+                onClick={() => { setSelected(key); setVars({}); setBudget(''); setStep('fill'); }}
                 style={{
-                  background: selected === key ? 'rgba(200,169,110,0.12)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${selected === key ? 'rgba(200,169,110,0.3)' : 'rgba(255,255,255,0.07)'}`,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.07)',
                   borderRadius: '10px', padding: '14px 16px', textAlign: 'left', cursor: 'pointer', width: '100%',
                 }}
               >
@@ -346,13 +580,14 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
           </div>
         )}
 
-        {/* Step 2: Fill variables */}
+        {/* Step 2: Fill variables + budget */}
         {step === 'fill' && tpl && (
           <>
             <p style={{ fontSize: '12px', color: '#56546a', marginBottom: '16px', marginTop: 0 }}>
               {tpl.description}. <em>Guest name and property name are filled automatically.</em>
             </p>
 
+            {/* Template fields */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '20px' }}>
               {tpl.fields.map(f => (
                 <div key={f.key}>
@@ -369,10 +604,64 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
               ))}
             </div>
 
-            {/* Recipient estimate */}
-            <div style={{ ...card, padding: '12px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '13px', color: '#8c8a9e' }}>Estimated recipients</span>
-              <span style={{ fontSize: '15px', fontWeight: 600, color: '#c8a96e' }}>
+            {/* Budget section */}
+            <div style={{ ...card, padding: '14px 16px', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontSize: '13px', color: '#8c8a9e', fontWeight: 500 }}>Campaign Budget</span>
+                <span style={{ fontSize: '12px', color: '#56546a' }}>
+                  Wallet: <span style={{ color: walletBalance > 0 ? '#48c78e' : '#f87171', fontWeight: 600 }}>₹{walletBalance.toFixed(2)}</span>
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontSize: '13px', color: '#8c8a9e' }}>₹</span>
+                <input
+                  style={{ ...inputStyle, flex: 1 }}
+                  type="number"
+                  min={CAMPAIGN_COSTS.totalPerMessage}
+                  max={walletBalance}
+                  placeholder="e.g. 200"
+                  value={budget}
+                  onChange={e => setBudget(e.target.value)}
+                />
+              </div>
+
+              {budgetExceeds && (
+                <div style={{ fontSize: '11px', color: '#f87171', marginBottom: '6px' }}>
+                  ⚠️ Budget exceeds wallet balance (₹{walletBalance.toFixed(2)})
+                </div>
+              )}
+
+              {budgetVal >= CAMPAIGN_COSTS.totalPerMessage && !budgetExceeds && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#c8a96e' }}>{effectiveMax}</div>
+                    <div style={{ fontSize: '10px', color: '#56546a' }}>guests</div>
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>₹{budgetVal.toFixed(0)}</div>
+                    <div style={{ fontSize: '10px', color: '#56546a' }}>max spend</div>
+                  </div>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '8px', padding: '8px', textAlign: 'center' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#a896f8' }}>~{estimatedDays}d</div>
+                    <div style={{ fontSize: '10px', color: '#56546a' }}>estimate</div>
+                  </div>
+                </div>
+              )}
+
+              {/* Cost tooltip */}
+              <div style={{ fontSize: '10px', color: '#56546a', marginTop: '8px', lineHeight: 1.5 }}>
+                ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)}/message = ₹{CAMPAIGN_COSTS.metaFee.toFixed(2)} WhatsApp delivery + ₹{CAMPAIGN_COSTS.chakrioFee.toFixed(2)} service fee.
+                Wallet is charged only on delivery, not on send.
+              </div>
+            </div>
+
+            {/* Recipient estimate card */}
+            <div style={{ ...card, padding: '10px 16px', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '12px', color: '#8c8a9e' }}>
+                {budgetVal >= CAMPAIGN_COSTS.totalPerMessage ? 'Top guests selected (by repeat stays)' : 'Total eligible guests'}
+              </span>
+              <span style={{ fontSize: '14px', fontWeight: 600, color: '#c8a96e' }}>
                 {recipientCount === null ? '…' : recipientCount}
               </span>
             </div>
@@ -384,11 +673,11 @@ function NewCampaignModal({ propertyId, onClose, onLaunched }) {
             <div style={{ display: 'flex', gap: '10px' }}>
               <button style={btnGhost} onClick={() => setStep('pick')}>← Back</button>
               <button
-                style={{ ...btnPrimary, flex: 1, opacity: (!allFilled || !hasRecipients || launching) ? 0.5 : 1 }}
-                disabled={!allFilled || !hasRecipients || launching}
+                style={{ ...btnPrimary, flex: 1, opacity: !canLaunch ? 0.5 : 1 }}
+                disabled={!canLaunch}
                 onClick={launch}
               >
-                {launching ? 'Launching…' : `Send to ${recipientCount ?? '…'} guests`}
+                {launching ? 'Queuing…' : effectiveMax > 0 ? `Queue for ${effectiveMax} guests` : 'Set a budget to continue'}
               </button>
             </div>
           </>

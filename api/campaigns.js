@@ -235,5 +235,51 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
   }
 
+  // ── PATCH — pause / resume campaign ─────────────────────────────
+  if (req.method === 'PATCH') {
+    const { campaignId } = req.query;
+    const { action } = req.body ?? {};
+
+    if (!campaignId || !UUID_RE.test(campaignId)) {
+      return res.status(400).json({ error: 'campaignId required' });
+    }
+    if (!['pause', 'resume'].includes(action)) {
+      return res.status(400).json({ error: 'action must be pause or resume' });
+    }
+
+    // Ownership: fetch campaign → verify property ownership
+    try {
+      const rows = await supabaseFetch(
+        `/broadcast_campaigns?id=eq.${campaignId}&select=property_id&limit=1`,
+        supabaseUrl, serviceKey,
+      );
+      if (!rows.length) return res.status(404).json({ error: 'Not found' });
+      const ownedIds = await getOwnerPropertyIds(uid, token, projectId);
+      if (!ownedIds.includes(rows[0].property_id)) return res.status(403).json({ error: 'Forbidden' });
+    } catch {
+      return res.status(502).json({ error: 'Ownership check failed' });
+    }
+
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (!agentUrl || !secret) return res.status(503).json({ error: 'Campaigns not configured' });
+
+    try {
+      const upstream = await fetch(`${agentUrl}/campaigns/${campaignId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type':     'application/json',
+          'X-Onboard-Secret': secret,
+        },
+        body: JSON.stringify({ action }),
+      });
+      const data = await upstream.json().catch(() => ({}));
+      if (!upstream.ok) return res.status(upstream.status).json({ error: data.detail ?? 'Failed' });
+      return res.status(200).json(data);
+    } catch {
+      return res.status(502).json({ error: 'Could not reach campaign server' });
+    }
+  }
+
   return res.status(405).json({ error: 'Method not allowed' });
 }
