@@ -143,7 +143,7 @@ const GUEST_JOURNEY = [
 const TRUST_STATS = [
   { value: '1,000+', label: 'Bookings logged' },
   { value: '5–8 hrs', label: 'Saved per week' },
-  { value: '12 sec', label: 'Bot response time' },
+  { value: '5–10 sec', label: 'Bot response time' },
   { value: '24 hrs', label: 'Avg setup time' },
 ];
 
