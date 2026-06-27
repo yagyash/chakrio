@@ -202,19 +202,8 @@ export default function Campaigns() {
   return (
     <div style={{ padding: '24px 28px', overflowY: 'auto', height: '100%' }}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
-        <div>
-          <h1 style={{ fontFamily: 'Syne,sans-serif', fontWeight: 800, fontSize: '22px', color: '#f0eee8', margin: 0, letterSpacing: '-0.02em' }}>
-            Campaigns
-          </h1>
-          <p style={{ color: '#56546a', fontSize: '13px', margin: '4px 0 0' }}>
-            WhatsApp broadcast to past guests
-          </p>
-        </div>
-
-        {/* Wallet + New Campaign */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      {/* Toolbar — wallet + new campaign */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: '24px', gap: '12px' }}>
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: '11px', color: '#56546a', marginBottom: '2px' }}>Marketing wallet</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -237,7 +226,6 @@ export default function Campaigns() {
           >
             + New Campaign
           </button>
-        </div>
       </div>
 
       {/* Empty wallet notice */}
