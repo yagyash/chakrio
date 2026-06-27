@@ -281,7 +281,7 @@ function HeroChatPanel() {
           ✅ Logged: <b>Alex</b> · Sea View · 15–18 Jun (3 nights) · advance <b>$200</b>. Added to calendar &amp; P&amp;L.
         </div>
         <div style={{ alignSelf: 'flex-start', fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#5e7a6b', paddingLeft: 4 }}>
-          parsed in 12s
+          parsed in 5–10s
         </div>
         <div style={{ alignSelf: 'flex-end', maxWidth: '80%', background: '#056162', color: '#eafff4', fontSize: 12.5, lineHeight: 1.45, borderRadius: '10px 10px 2px 10px', padding: '9px 11px' }}>
           Pool maintenance bill — ₹3,500
