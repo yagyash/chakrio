@@ -190,19 +190,35 @@ function Step2({ data, onChange, errors }) {
         </div>
       </div>
 
+      {/* Primary channel — required */}
       {data.notification_channel === 'telegram' ? (
         <div style={S.row}>
           <label style={S.label}>Telegram Chat ID *</label>
           <input style={S.input} value={data.telegram_chat_id} onChange={e => onChange('telegram_chat_id', e.target.value)} placeholder="5953587554" />
-          <div style={S.hint}>Send /start to @ChakrioPropertyBot and it will show your Chat ID</div>
+          <div style={S.hint}>Send /start to @ChakrioPropertyBot — it will reply with your Chat ID</div>
           {errors.telegram_chat_id && <div style={S.err}>{errors.telegram_chat_id}</div>}
         </div>
       ) : (
         <div style={S.row}>
           <label style={S.label}>Manager WhatsApp Number *</label>
-          <input style={S.input} value={data.manager_whatsapp} onChange={e => onChange('manager_whatsapp', e.target.value)} placeholder="+91 98765 43210" />
-          <div style={S.hint}>Must be registered on WhatsApp. Include country code.</div>
+          <input style={S.input} value={data.manager_whatsapp} onChange={e => onChange('manager_whatsapp', e.target.value)} placeholder="919876543210" />
+          <div style={S.hint}>Include country code (e.g. 91 for India). Must be on WhatsApp.</div>
           {errors.manager_whatsapp && <div style={S.err}>{errors.manager_whatsapp}</div>}
+        </div>
+      )}
+
+      {/* Secondary channel — optional, manager gets alerts on both when set */}
+      {data.notification_channel === 'telegram' ? (
+        <div style={S.row}>
+          <label style={S.label}>Also notify via WhatsApp <span style={{ color: '#56546a', fontWeight: 400 }}>(optional)</span></label>
+          <input style={S.input} value={data.manager_phone} onChange={e => onChange('manager_phone', e.target.value)} placeholder="919876543210" />
+          <div style={S.hint}>If set, manager gets guest alerts on both Telegram AND WhatsApp.</div>
+        </div>
+      ) : (
+        <div style={S.row}>
+          <label style={S.label}>Also notify via Telegram <span style={{ color: '#56546a', fontWeight: 400 }}>(optional)</span></label>
+          <input style={S.input} value={data.telegram_chat_id} onChange={e => onChange('telegram_chat_id', e.target.value)} placeholder="5953587554" />
+          <div style={S.hint}>If set, manager gets guest alerts on both WhatsApp AND Telegram.</div>
         </div>
       )}
 
@@ -480,6 +496,8 @@ function Step4({ client, property, rooms, otaFeeds }) {
     ['Short Name',    property.short_name],
     ['Channel',       property.notification_channel],
     property.notification_channel === 'telegram' ? ['Telegram Chat ID', property.telegram_chat_id] : ['WhatsApp', property.manager_whatsapp],
+    property.notification_channel === 'telegram' && property.manager_phone ? ['Also via WhatsApp', property.manager_phone] : null,
+    property.notification_channel === 'whatsapp' && property.telegram_chat_id ? ['Also via Telegram', property.telegram_chat_id] : null,
     property.address ? ['Address', property.address] : null,
     property.manager_phone ? ['Manager Phone', property.manager_phone] : null,
     property.google_review_link ? ['Google Review', property.google_review_link] : null,
