@@ -173,8 +173,8 @@ export default function Reports() {
       if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
       const cat = String(r['Category'] ?? r['category'] ?? '').toLowerCase().trim();
       const amt = Number(r['Amount'] ?? 0);
-      if (cat === 'construction' || cat === 'maintenance') map[ym].construction += amt;
-      else if (cat === 'owner drawing')                   map[ym].ownerDrawing  += amt;
+      if (cat === 'construction')       map[ym].construction += amt;
+      else if (cat === 'owner drawing') map[ym].ownerDrawing  += amt;
       else {
         map[ym].expense += amt;
         if (cat === 'staff') map[ym].staff += amt;
@@ -353,7 +353,7 @@ export default function Reports() {
           </div>
           {/* Row 2: informational — 5 cards */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-            <PLCard label="Constr. + Maint." value={`₹${fmt(plData.construction ?? 0)}`}                     color="amber" />
+            <PLCard label="Construction"      value={`₹${fmt(plData.construction ?? 0)}`}                     color="amber" />
             <PLCard label="Owner Drawings"   value={`₹${fmt(plData.ownerDrawing ?? 0)}`}                     color="violet" />
             <PLCard label="Staff"            value={`₹${fmt(plData.staff ?? 0)}`}                            color="rose" />
             <PLCard label="Food Revenue"     value={`₹${fmt((extrasMonthly[activeMonth] ?? {}).food ?? 0)}`} color="teal" />
