@@ -16,6 +16,7 @@ import DigitalMenu from './templates/homestay/DigitalMenu';
 // Settings page
 import PropertySettings from './pages/PropertySettings';
 import Campaigns from './pages/Campaigns';
+import Guests from './pages/Guests';
 
 // Bakery placeholder
 import BakeryComingSoon from './templates/bakery/index';
@@ -65,6 +66,7 @@ export default function AppShell() {
               <Route path="/reports" element={<Reports />} />
               <Route path="/menu" element={<DigitalMenu />} />
               <Route path="/campaigns" element={<Campaigns />} />
+              <Route path="/guests" element={<Guests />} />
               <Route path="/settings" element={<PropertySettings />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
