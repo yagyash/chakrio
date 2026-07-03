@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { db } from '../services/firebase';
 import { useAuthContext } from '../context/AuthContext';
+import { QRCodeCanvas } from 'qrcode.react';
 
 async function apiFetch(path, options = {}) {
   const auth = getAuth();
@@ -42,6 +43,11 @@ export default function PropertySettings() {
   const [savingPlace, setSavingPlace]   = useState(false);
   const [status, setStatus]             = useState(null);
   const [placeStatus, setPlaceStatus]   = useState(null);
+
+  // Booking link state
+  const [bookingLink, setBookingLink]   = useState(null);
+  const [linkCopied, setLinkCopied]     = useState(false);
+  const qrCanvasRef                     = useRef(null);
 
   // iCal state
   const [feeds, setFeeds]               = useState([]);
@@ -84,6 +90,14 @@ export default function PropertySettings() {
   };
 
   useEffect(() => { loadIcalFeeds(); }, [supabaseId]);
+
+  useEffect(() => {
+    if (!supabaseId) return;
+    apiFetch(`/api/guests?propertyId=${supabaseId}&action=booking-link`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.wa_link) setBookingLink(d); })
+      .catch(() => {});
+  }, [supabaseId]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(outboundUrl).then(() => {
@@ -533,6 +547,120 @@ export default function PropertySettings() {
           <p style={{ fontSize: '12px', color: '#e07070', marginTop: '8px' }}>{addError}</p>
         )}
       </div>
+
+      {/* WhatsApp Booking Link Card */}
+      {bookingLink && (
+        <div style={{
+          background: '#16151f',
+          border: '1px solid rgba(255,255,255,0.07)',
+          borderRadius: '16px',
+          padding: '24px',
+          maxWidth: '680px',
+          marginTop: '20px',
+        }}>
+          <h2 style={{
+            fontFamily: 'Syne, sans-serif',
+            fontWeight: 600,
+            fontSize: '15px',
+            color: '#f0eee8',
+            marginBottom: '6px',
+          }}>
+            WhatsApp Booking Link
+          </h2>
+          <p style={{ fontSize: '12px', color: '#8c8a9e', marginBottom: '20px' }}>
+            Share this link or QR code with guests. They'll land straight in your WhatsApp bot — no property picker needed.
+          </p>
+
+          {/* URL row */}
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+            <input
+              readOnly
+              value={bookingLink.wa_link}
+              style={{
+                flex: 1,
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '8px',
+                padding: '9px 12px',
+                fontSize: '12px',
+                color: '#8c8a9e',
+                fontFamily: 'monospace',
+                outline: 'none',
+              }}
+            />
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(bookingLink.wa_link).then(() => {
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                });
+              }}
+              style={{
+                background: linkCopied ? '#3a7d5c' : 'rgba(37,211,102,0.12)',
+                border: '1px solid rgba(37,211,102,0.3)',
+                color: linkCopied ? '#5cb88a' : '#25d366',
+                borderRadius: '8px',
+                padding: '9px 16px',
+                fontSize: '12px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                fontFamily: 'DM Sans, sans-serif',
+                transition: 'all 0.15s',
+              }}
+            >
+              {linkCopied ? 'Copied ✓' : 'Copy Link'}
+            </button>
+          </div>
+
+          {/* QR Code */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexWrap: 'wrap' }}>
+            <div style={{
+              background: '#fff',
+              borderRadius: '12px',
+              padding: '12px',
+              display: 'inline-block',
+            }}>
+              <QRCodeCanvas
+                ref={qrCanvasRef}
+                value={bookingLink.wa_link}
+                size={160}
+                level="M"
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', justifyContent: 'flex-end', paddingTop: '4px' }}>
+              <p style={{ fontSize: '12px', color: '#8c8a9e', margin: 0 }}>
+                Print this QR code and place it at your check-in desk, in your listing photos, or on your business card.
+              </p>
+              <button
+                onClick={() => {
+                  const canvas = qrCanvasRef.current;
+                  if (!canvas) return;
+                  const url = canvas.toDataURL('image/png');
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `chakrio-booking-qr-${bookingLink.slug}.png`;
+                  a.click();
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  color: '#f0eee8',
+                  borderRadius: '8px',
+                  padding: '9px 16px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif',
+                  alignSelf: 'flex-start',
+                }}
+              >
+                Download QR
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

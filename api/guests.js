@@ -81,6 +81,20 @@ export default async function handler(req, res) {
   const ownedIds = await getOwnerPropertyIds(uid, token, projectId);
   if (!ownedIds.includes(propertyId)) return res.status(403).json({ error: 'Forbidden' });
 
+  // ── GET — booking link ────────────────────────────────────────────
+  if (req.method === 'GET' && req.query.action === 'booking-link') {
+    try {
+      const upstream = await fetch(`${agentUrl}/properties/${propertyId}/booking-link`, {
+        headers: { 'X-Onboard-Secret': secret },
+      });
+      const data = await upstream.json().catch(() => ({}));
+      if (!upstream.ok) return res.status(upstream.status).json({ error: data.detail ?? 'Failed' });
+      return res.status(200).json(data);
+    } catch {
+      return res.status(502).json({ error: 'Could not reach service' });
+    }
+  }
+
   // ── GET — list guests ──────────────────────────────────────────────
   if (req.method === 'GET') {
     try {

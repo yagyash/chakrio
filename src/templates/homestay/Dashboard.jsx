@@ -44,8 +44,9 @@ const LABEL_MAP = {
   total_nights:    'Total Nights',
   total_guests:    'Total Guests',
   net_profit:      'Net Profit',
-  gross_revenue:   'Gross Revenue',
-  total_revenue:   'Total Revenue',
+  gross_revenue:         'Gross Revenue',
+  total_revenue:         'Total Revenue',
+  __revenue_collected:   'Revenue Collected',
   total_expense:   'Total Expenses',
   total_expenses:  'Total Expenses',
 };
@@ -201,10 +202,19 @@ export default function HomestayDashboard() {
   // ── stat card totals ──────────────────────────────────────────────────────
   const bookingTotals = useMemo(() => {
     const cols = numericCols(activeBookings).filter((col) => !isIdCol(col));
-    return cols.map((col) => ({
+    const rows = cols.map((col) => ({
       label: col,
       value: activeBookings.reduce((s, r) => s + Number(r[col] || 0), 0),
     }));
+    const revC = cols.find((c) => c.toLowerCase().replace(/\s+/g, '_').includes('total_amount'));
+    const balC = cols.find((c) => c.toLowerCase().replace(/\s+/g, '_').includes('balance_amount'));
+    if (revC && balC) {
+      rows.push({
+        label: '__revenue_collected',
+        value: activeBookings.reduce((s, r) => s + Number(r[revC] || 0) - Number(r[balC] || 0), 0),
+      });
+    }
+    return rows;
   }, [activeBookings]);
 
   const expenseTotals = useMemo(() => {
@@ -226,8 +236,15 @@ export default function HomestayDashboard() {
       return cols[0] ?? null;
     };
     const revCol = pickCol(activeBookings, ['total_amount', 'booking_amount', 'total', 'revenue', 'amount']);
+    const balCol = pickCol(activeBookings, ['balance_amount', 'balance']);
     const expCol = pickCol(activeExpenses,  ['amount', 'total', 'expense']);
-    const revenue = revCol ? activeBookings.reduce((s, r) => s + Number(r[revCol] || 0), 0) : 0;
+    const revenue = revCol
+      ? activeBookings.reduce((s, r) => {
+          const total   = Number(r[revCol] || 0);
+          const balance = balCol ? Number(r[balCol] || 0) : 0;
+          return s + (total - balance);
+        }, 0)
+      : 0;
     const _NON_OP = new Set(['construction', 'owner drawing']);
     const catCol = Object.keys(activeExpenses[0] || {}).find(k => k.toLowerCase() === 'category') ?? 'Category';
     const opExpenses = activeExpenses.filter(r => !_NON_OP.has(String(r[catCol] || '').toLowerCase().trim()));
