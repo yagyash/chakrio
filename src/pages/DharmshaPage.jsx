@@ -74,10 +74,10 @@ export default function DharmshaPage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+dharmshala" target="_blank" rel="noopener noreferrer" style={{
-            background: '#25D366', color: '#fff', border: 'none', borderRadius: 11,
+            background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
-            boxShadow: '0 14px 34px -14px #25D366',
+            boxShadow: '0 14px 34px -14px #C9A24B',
           }}>
             Chat with us on WhatsApp
           </a>

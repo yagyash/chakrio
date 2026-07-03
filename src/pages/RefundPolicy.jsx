@@ -37,13 +37,13 @@ export default function RefundPolicy() {
 
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">Subscription Cancellations</h2>
-            <p className="mb-3"><strong style={{ color: '#F4F1EA' }}>[YAGYA DECIDES: Cancellation effective date — end of current billing period or immediate?]</strong></p>
+            <p className="mb-3">Cancellation takes effect immediately. Your access continues until the end of the already-paid billing period. No pro-rata refund is issued for unused days.</p>
             <p>To cancel, contact us on WhatsApp at <a href="https://wa.me/919461888529" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A24B', textDecoration: 'underline' }}>+91 94618 88529</a>. We will confirm cancellation and your access end date in writing.</p>
           </section>
 
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">Setup Fee</h2>
-            <p><strong style={{ color: '#F4F1EA' }}>[YAGYA DECIDES: Is the one-time setup fee refundable? Common practice: non-refundable once onboarding begins, since we have already spent time configuring the bot and walking through the setup. Suggest: "The setup fee is non-refundable once onboarding has commenced."]</strong></p>
+            <p>The one-time setup fee is non-refundable once onboarding has commenced. This covers the time spent configuring your bot, setting up the dashboard, and the live walkthrough session with your team.</p>
           </section>
 
           <section>
@@ -54,7 +54,7 @@ export default function RefundPolicy() {
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">Marketing Wallet &amp; Campaign Charges</h2>
             <p className="mb-3">Campaign charges (₹1 per delivered message) are non-refundable once messages have been sent and delivery has been confirmed by Meta's WhatsApp Business API.</p>
-            <p><strong style={{ color: '#F4F1EA' }}>[YAGYA DECIDES: Can unspent wallet balance be refunded? For example: "Unspent balance may be refunded upon written request, subject to a processing fee of ₹100" — or keep it non-refundable and credit it to future campaigns.]</strong></p>
+            <p>Unspent marketing wallet balance is refundable upon written request. Contact us on WhatsApp with your registered phone number and the amount to refund. Refunds are processed within 7 business days to the original payment method.</p>
           </section>
 
           <section>

@@ -43,13 +43,13 @@ export default function Terms() {
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">3. Subscriptions</h2>
             <p className="mb-3">Chakrio is offered as a monthly or annual subscription per the Pricing page. You will be billed at the start of each billing period.</p>
-            <p className="mb-3">You may cancel your subscription at any time via WhatsApp or email. <strong style={{ color: '#F4F1EA' }}>[YAGYA DECIDES: Does cancellation take effect immediately or at the end of the current billing period?]</strong></p>
+            <p className="mb-3">You may cancel your subscription at any time via WhatsApp or email. Cancellation takes effect immediately. Your access continues until the end of the already-paid billing period. No pro-rata refund is issued for unused days.</p>
             <p>A 14-day free trial is included on all plans. No credit card is required during the trial. If you do not cancel before day 14, you will be charged the plan rate for the first billing period.</p>
           </section>
 
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">4. Setup Fee</h2>
-            <p>A one-time setup fee is charged upon onboarding. This fee covers bot configuration, dashboard access, and a live walkthrough with your team. <strong style={{ color: '#F4F1EA' }}>[YAGYA DECIDES: Is the setup fee refundable if the client cancels within X days of onboarding?]</strong></p>
+            <p>A one-time setup fee is charged upon onboarding. This fee covers bot configuration, dashboard access, and a live walkthrough with your team. The setup fee is non-refundable once onboarding has commenced.</p>
           </section>
 
           <section>
@@ -63,7 +63,7 @@ export default function Terms() {
 
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">6. Marketing Wallet</h2>
-            <p>Campaign charges are pre-loaded into a marketing wallet (Razorpay). Wallet credits are consumed per delivered message. <strong style={{ color: '#F4F1EA' }}>[YAGYA DECIDES: Can unspent wallet balance be refunded? Under what conditions?]</strong></p>
+            <p>Campaign charges are pre-loaded into a marketing wallet (Razorpay). Wallet credits are consumed per delivered message. Unspent wallet balance is refundable upon written request. Refunds are processed within 7 business days to the original payment method.</p>
           </section>
 
           <section>

@@ -398,7 +398,7 @@ function DirectBookingsSection() {
             onClick={() => setVideoActive(true)}>
             {videoActive ? (
               <iframe
-                src="https://www.youtube.com/embed/PLACEHOLDER_ID?autoplay=1"
+                src="https://www.youtube.com/embed/rSviz7BZdBE?autoplay=1"
                 allow="autoplay; fullscreen"
                 title="See Chakrio in 60 seconds"
                 style={{ width: '100%', height: '100%', border: 'none' }}
@@ -516,7 +516,7 @@ function PricingSection() {
                     display: 'block', textAlign: 'center', width: '100%',
                     padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
                     fontFamily: "'Hanken Grotesk', sans-serif",
-                    background: '#25D366', color: '#fff', border: 'none',
+                    background: '#C9A24B', color: '#0E0B14', border: 'none',
                     marginBottom: 8,
                   }}>
                     Chat with us on WhatsApp
@@ -670,10 +670,10 @@ export default function LandingPage() {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
           <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
-            background: '#25D366', color: '#fff', border: 'none', borderRadius: 11,
+            background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
-            boxShadow: '0 14px 34px -14px #25D366',
+            boxShadow: '0 14px 34px -14px #C9A24B',
           }}>
             Chat with us on WhatsApp
           </a>
@@ -967,10 +967,10 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
-              background: '#25D366', color: '#fff', border: 'none', borderRadius: 11,
+              background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
               padding: '16px 32px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
               fontFamily: "'Hanken Grotesk', sans-serif",
-              boxShadow: '0 14px 34px -14px #25D366',
+              boxShadow: '0 14px 34px -14px #C9A24B',
             }}>
               Chat with us on WhatsApp
             </a>
@@ -985,7 +985,7 @@ export default function LandingPage() {
           </div>
           <p className="text-text-3 text-sm mt-6">
             Prefer a call?{' '}
-            <a href="GOOGLE_CALENDAR_BOOKING_URL" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
+            <a href="https://calendar.google.com/calendar/u/0?cid=eWFneWEuc2hhcm1hMTRAZ21haWwuY29t" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
               Book a 20-minute slot
             </a>
             {' '}· Already have an account?{' '}

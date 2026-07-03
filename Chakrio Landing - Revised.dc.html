@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:#0E0B14;}
+@keyframes rise{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:none;}}
+@keyframes fadein{from{opacity:0;}to{opacity:1;}}
+@keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+@keyframes glowpulse{0%,100%{opacity:.5;}50%{opacity:.85;}}
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="--gold:{{ accentVar }};font-family:'Hanken Grotesk',sans-serif;background:#0E0B14;color:#F4F1EA;min-height:100vh;overflow-x:hidden;">
+
+<!-- NAV -->
+<nav style="max-width:1200px;margin:0 auto;padding:26px 36px;display:flex;align-items:center;justify-content:space-between;animation:fadein .6s both;">
+  <div style="display:flex;align-items:center;gap:11px;">
+    <div style="width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold,#C9A24B),#7c5e1e);display:flex;align-items:center;justify-content:center;"><div style="width:13px;height:13px;border-radius:50%;border:2.5px solid #0E0B14;"></div></div>
+    <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:21px;letter-spacing:-.02em;">Chakrio</span>
+  </div>
+  <div style="display:flex;gap:28px;align-items:center;font-size:14.5px;font-weight:500;color:#C5C0D2;">
+    <span>Free Tools</span>
+    <button style="background:var(--gold,#C9A24B);color:#0E0B14;border:none;border-radius:9px;padding:10px 20px;font:600 14.5px 'Hanken Grotesk';cursor:pointer;">Login →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header style="max-width:1080px;margin:0 auto;padding:64px 36px 30px;text-align:center;">
+  <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:8px 17px;font-size:13.5px;color:#D4CFE0;animation:fadein .7s both;"><span style="width:7px;height:7px;border-radius:50%;background:#25D366;box-shadow:0 0 9px #25D366;"></span>Automate your property bookings with an AI chatbot</div>
+  <h1 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(46px,7.2vw,94px);line-height:.98;letter-spacing:-.035em;margin:26px auto 0;max-width:15ch;animation:rise .8s both;">WhatsApp booking automation for <span style="color:var(--gold,#C9A24B);">boutique hotels, villas &amp; homestays</span></h1>
+  <p style="font-size:19px;line-height:1.55;color:#CFCAD9;max-width:54ch;margin:26px auto 0;animation:rise .8s .08s both;">Just send a message — <span style="color:#F4F1EA;font-weight:600;">"Alex, 3 nights from 15 June, $200 advance"</span> — and Chakrio logs the booking instantly. No spreadsheets, no missed records.</p>
+  <div style="display:flex;gap:13px;justify-content:center;margin-top:32px;animation:rise .8s .16s both;">
+    <button style="background:var(--gold,#C9A24B);color:#0E0B14;border:none;border-radius:11px;padding:15px 28px;font:600 16px 'Hanken Grotesk';cursor:pointer;box-shadow:0 14px 34px -14px var(--gold,#C9A24B);">Start Free Trial →</button>
+    <button style="background:rgba(255,255,255,.06);color:#F4F1EA;border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:15px 28px;font:600 16px 'Hanken Grotesk';cursor:pointer;">See how it works</button>
+  </div>
+  <div style="margin-top:16px;font-size:13.5px;color:#9D98AC;animation:rise .8s .2s both;">14-day free trial · No credit card required</div>
+</header>
+
+<!-- HERO PRODUCT VISUAL -->
+<section style="max-width:1180px;margin:0 auto;padding:44px 36px 0;animation:rise 1s .24s both;">
+  <div style="position:relative;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.015));padding:16px;box-shadow:0 50px 120px -50px var(--gold,#C9A24B);">
+    <div style="position:absolute;top:-10%;left:50%;transform:translateX(-50%);width:60%;height:120%;background:radial-gradient(ellipse at center,var(--gold,#C9A24B),transparent 70%);opacity:.14;filter:blur(40px);pointer-events:none;animation:glowpulse 6s ease-in-out infinite;"></div>
+    <div style="position:relative;display:grid;grid-template-columns:340px 1fr;gap:16px;">
+      <!-- chat panel -->
+      <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:#0b141a;min-height:340px;display:flex;flex-direction:column;">
+        <div style="background:#1f2c33;padding:12px 14px;display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#25D366;display:flex;align-items:center;justify-content:center;color:#0b141a;font-weight:700;font-size:13px;">C</div><div><div style="font-size:13px;font-weight:600;color:#eaf2ee;">Chakrio Assistant</div><div style="font-size:10.5px;color:#7fa890;">online</div></div></div>
+        <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:9px;background:repeating-linear-gradient(45deg,#0d161c 0 16px,#0b141a 16px 32px);">
+          <div style="align-self:flex-end;max-width:78%;background:#056162;color:#eafff4;font-size:12.5px;line-height:1.4;border-radius:10px 10px 2px 10px;padding:9px 11px;">Alex, 3 nights from 15 June, $200 advance, Sea View room</div>
+          <div style="align-self:flex-start;max-width:82%;background:#1f2c33;color:#dfe9e4;font-size:12px;line-height:1.45;border-radius:10px 10px 10px 2px;padding:10px 11px;">✅ Logged: <b>Alex</b> · Sea View · 15–18 Jun (3 nights) · advance <b>$200</b>. Added to calendar & P&L.</div>
+          <div style="align-self:flex-start;font:500 10px 'JetBrains Mono',monospace;color:#5e7a6b;padding-left:4px;">parsed in 0.8s</div>
+        </div>
+      </div>
+      <!-- dashboard placeholder -->
+      <div style="border-radius:14px;overflow:hidden;border:1px solid rgba(255,255,255,.08);background:repeating-linear-gradient(45deg,#17131f 0 14px,#1b1626 14px 28px);min-height:340px;display:flex;align-items:center;justify-content:center;">
+        <span style="font:500 12px 'JetBrains Mono',monospace;color:#6a6480;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(255,255,255,.1);padding:8px 14px;border-radius:8px;">live dashboard · 1100×680</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<section style="max-width:1180px;margin:0 auto;padding:48px 36px 30px;" data-reveal>
+  <div style="text-align:center;font-size:13px;color:#9D98AC;letter-spacing:.04em;">Used by property managers across Asia, the Middle East &amp; Europe</div>
+  <div style="display:flex;flex-wrap:wrap;gap:48px;justify-content:center;margin-top:24px;">
+    <div style="text-align:center;"><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;color:var(--gold,#C9A24B);">9</div><div style="font-size:13px;color:#B6B1C4;">countries</div></div>
+    <div style="text-align:center;"><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;color:var(--gold,#C9A24B);">50K+</div><div style="font-size:13px;color:#B6B1C4;">bookings logged</div></div>
+    <div style="text-align:center;"><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;color:var(--gold,#C9A24B);">10 hrs</div><div style="font-size:13px;color:#B6B1C4;">saved per week</div></div>
+    <div style="text-align:center;"><div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;color:var(--gold,#C9A24B);">0.8s</div><div style="font-size:13px;color:#B6B1C4;">to log a booking</div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS — LIGHT SECTION (rhythm) -->
+<section style="background:#F4F1EA;color:#16121d;margin-top:50px;" data-reveal>
+  <div style="max-width:1120px;margin:0 auto;padding:90px 36px;">
+    <div style="text-align:center;">
+      <div style="font:500 12px 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:#9a7d2e;">How it works</div>
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,54px);letter-spacing:-.03em;margin:14px 0 0;">From WhatsApp message to recorded booking.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:54px;">
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:32px;box-shadow:0 20px 40px -32px rgba(0,0,0,.5);">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;color:var(--gold,#C9A24B);">01</div>
+        <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:21px;margin:14px 0 8px;letter-spacing:-.01em;">Send a message</h3>
+        <p style="font-size:15px;line-height:1.6;color:#55505f;margin:0;">Forward or type any booking note in WhatsApp — plain language, in any language your guests use.</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:32px;box-shadow:0 20px 40px -32px rgba(0,0,0,.5);">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;color:var(--gold,#C9A24B);">02</div>
+        <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:21px;margin:14px 0 8px;letter-spacing:-.01em;">Chakrio parses it</h3>
+        <p style="font-size:15px;line-height:1.6;color:#55505f;margin:0;">AI pulls out the guest, dates, room, and advance — and logs the booking in under a second.</p>
+      </div>
+      <div style="background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:18px;padding:32px;box-shadow:0 20px 40px -32px rgba(0,0,0,.5);">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:38px;color:var(--gold,#C9A24B);">03</div>
+        <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:21px;margin:14px 0 8px;letter-spacing:-.01em;">Auto-recorded</h3>
+        <p style="font-size:15px;line-height:1.6;color:#55505f;margin:0;">Your dashboard, calendar, and monthly P&amp;L update themselves. No spreadsheets, ever.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES (tightened to 6) -->
+<section style="max-width:1180px;margin:0 auto;padding:96px 36px;" data-reveal>
+  <div style="text-align:center;">
+    <div style="font:500 12px 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--gold,#C9A24B);">Everything you need</div>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,54px);letter-spacing:-.03em;margin:14px 0 0;">One quiet app that runs the back office.</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:54px;">
+    <div style="border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:16px;padding:28px;"><div style="width:40px;height:40px;border-radius:11px;background:rgba(201,162,75,.15);border:1px solid rgba(201,162,75,.35);margin-bottom:18px;"></div><div style="font-weight:700;font-size:17.5px;margin-bottom:8px;">Instant booking records</div><p style="font-size:14.5px;line-height:1.55;color:#B6B1C4;margin:0;">Every booking from chat into a clean, searchable record — instantly.</p></div>
+    <div style="border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:16px;padding:28px;"><div style="width:40px;height:40px;border-radius:11px;background:rgba(201,162,75,.15);border:1px solid rgba(201,162,75,.35);margin-bottom:18px;"></div><div style="font-weight:700;font-size:17.5px;margin-bottom:8px;">Expense logging</div><p style="font-size:14.5px;line-height:1.55;color:#B6B1C4;margin:0;">Text your spends as they happen. Chakrio keeps the ledger tidy.</p></div>
+    <div style="border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:16px;padding:28px;"><div style="width:40px;height:40px;border-radius:11px;background:rgba(201,162,75,.15);border:1px solid rgba(201,162,75,.35);margin-bottom:18px;"></div><div style="font-weight:700;font-size:17.5px;margin-bottom:8px;">OTA calendar sync</div><p style="font-size:14.5px;line-height:1.55;color:#B6B1C4;margin:0;">Two-way sync with Airbnb, Booking.com & more. No double bookings.</p></div>
+    <div style="border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:16px;padding:28px;"><div style="width:40px;height:40px;border-radius:11px;background:rgba(201,162,75,.15);border:1px solid rgba(201,162,75,.35);margin-bottom:18px;"></div><div style="font-weight:700;font-size:17.5px;margin-bottom:8px;">Monthly P&amp;L reports</div><p style="font-size:14.5px;line-height:1.55;color:#B6B1C4;margin:0;">Revenue, expenses, and occupancy — a clear monthly picture, auto-built.</p></div>
+    <div style="border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:16px;padding:28px;"><div style="width:40px;height:40px;border-radius:11px;background:rgba(201,162,75,.15);border:1px solid rgba(201,162,75,.35);margin-bottom:18px;"></div><div style="font-weight:700;font-size:17.5px;margin-bottom:8px;">Guest re-engagement</div><p style="font-size:14.5px;line-height:1.55;color:#B6B1C4;margin:0;">Win-back and review-request messages, sent automatically at the right time.</p></div>
+    <div style="border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025);border-radius:16px;padding:28px;"><div style="width:40px;height:40px;border-radius:11px;background:rgba(201,162,75,.15);border:1px solid rgba(201,162,75,.35);margin-bottom:18px;"></div><div style="font-weight:700;font-size:17.5px;margin-bottom:8px;">WhatsApp &amp; Telegram</div><p style="font-size:14.5px;line-height:1.55;color:#B6B1C4;margin:0;">Works inside the apps you already run your property on — nothing new to learn.</p></div>
+  </div>
+</section>
+
+<!-- PRICING (transparent + toggle) -->
+<section style="max-width:1180px;margin:0 auto;padding:30px 36px 100px;" data-reveal>
+  <div style="text-align:center;">
+    <div style="font:500 12px 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--gold,#C9A24B);">Pricing</div>
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,4.4vw,54px);letter-spacing:-.03em;margin:14px 0 0;">Simple, transparent pricing.</h2>
+    <p style="font-size:16.5px;color:#CFCAD9;margin:14px 0 0;">Real prices, per property. Cancel anytime — onboarding is on us.</p>
+    <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:5px;margin-top:26px;">
+      <button onClick="{{ setMonthly }}" style="{{ monthlyBtnStyle }}">Monthly</button>
+      <button onClick="{{ setAnnual }}" style="{{ annualBtnStyle }}">Annual <span style="font-size:11px;opacity:.8;">−17%</span></button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px;align-items:start;">
+    <!-- Starter -->
+    <div style="border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);border-radius:18px;padding:34px;">
+      <div style="font-weight:600;color:#CFCAD9;">Starter</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin:14px 0 4px;"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;letter-spacing:-.03em;">{{ starterPrice }}</span><span style="font-size:15px;color:#9D98AC;">{{ perMonth }}</span></div>
+      <div style="font-size:13.5px;color:#9D98AC;">1 property · up to 12 rooms</div>
+      <button style="width:100%;margin:24px 0;background:rgba(255,255,255,.06);color:#F4F1EA;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:13px;font:600 15px 'Hanken Grotesk';cursor:pointer;">Start free trial</button>
+      <div style="font-size:14.5px;color:#CFCAD9;line-height:2.05;">Instant booking records<br>Expense logging<br>WhatsApp / Telegram bot<br>Basic dashboard</div>
+    </div>
+    <!-- Growth (popular) -->
+    <div style="border:1.5px solid var(--gold,#C9A24B);background:linear-gradient(180deg,rgba(201,162,75,.1),rgba(255,255,255,.02));border-radius:18px;padding:34px;position:relative;box-shadow:0 30px 70px -34px var(--gold,#C9A24B);">
+      <div style="position:absolute;top:-13px;left:34px;display:flex;gap:8px;">
+        <span style="background:var(--gold,#C9A24B);color:#0E0B14;font:700 11px 'Hanken Grotesk';padding:5px 11px;border-radius:7px;">★ Most popular</span>
+      </div>
+      <div style="font-weight:600;color:var(--gold,#C9A24B);">Growth</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin:14px 0 4px;"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;letter-spacing:-.03em;">{{ growthPrice }}</span><span style="font-size:15px;color:#9D98AC;">{{ perMonth }}</span></div>
+      <div style="font-size:13.5px;color:#9D98AC;">Up to 3 properties · unlimited rooms</div>
+      <button style="width:100%;margin:24px 0;background:var(--gold,#C9A24B);color:#0E0B14;border:none;border-radius:10px;padding:13px;font:600 15px 'Hanken Grotesk';cursor:pointer;">Start free trial</button>
+      <div style="font-size:14.5px;color:#CFCAD9;line-height:2.05;">Everything in Starter, plus:<br>OTA calendar sync<br>Monthly P&amp;L reports<br>Guest re-engagement<br>Priority support</div>
+    </div>
+    <!-- Portfolio -->
+    <div style="border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);border-radius:18px;padding:34px;">
+      <div style="font-weight:600;color:#CFCAD9;">Portfolio</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin:14px 0 4px;"><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:48px;letter-spacing:-.03em;">Custom</span></div>
+      <div style="font-size:13.5px;color:#9D98AC;">4+ properties · multi-team access</div>
+      <button style="width:100%;margin:24px 0;background:rgba(255,255,255,.06);color:#F4F1EA;border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:13px;font:600 15px 'Hanken Grotesk';cursor:pointer;">Contact for quote →</button>
+      <div style="font-size:14.5px;color:#CFCAD9;line-height:2.05;">Everything in Growth, plus:<br>Dedicated onboarding<br>Custom integrations<br>SLA &amp; account manager</div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:22px;font-size:13.5px;color:#9D98AC;">One-time setup &amp; bot configuration included free during onboarding — we set everything up with you.</div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section style="border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);" data-reveal>
+  <div style="max-width:980px;margin:0 auto;padding:80px 36px;text-align:center;">
+    <blockquote style="font-family:'Bricolage Grotesque',sans-serif;font-weight:500;font-size:clamp(24px,3.4vw,40px);line-height:1.3;letter-spacing:-.02em;margin:0 auto;max-width:24ch;">"I run three homestays from one WhatsApp thread now. Chakrio just <span style="color:var(--gold,#C9A24B);">records everything</span> — I stopped touching spreadsheets."</blockquote>
+    <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin-top:30px;"><div style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold,#C9A24B),#7c5e1e);"></div><div style="text-align:left;"><div style="font-weight:600;font-size:15px;">Kaustubh Sharma</div><div style="font-size:13px;color:#9D98AC;">Owner · Riverside Stays, Goa</div></div></div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section style="max-width:1180px;margin:0 auto;padding:96px 36px;" data-reveal>
+  <div style="border:1px solid rgba(201,162,75,.3);border-radius:24px;background:radial-gradient(ellipse at 50% 0%,rgba(201,162,75,.16),transparent 70%),rgba(255,255,255,.02);padding:80px 40px;text-align:center;">
+    <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:clamp(32px,5vw,62px);letter-spacing:-.03em;line-height:1.02;margin:0;">We onboard every property personally.</h2>
+    <p style="font-size:17px;color:#CFCAD9;max-width:50ch;margin:20px auto 0;line-height:1.55;">No setup forms, no waiting room. Book a 20-minute call and we'll have your bookings flowing through WhatsApp the same week.</p>
+    <div style="display:flex;gap:13px;justify-content:center;margin-top:32px;">
+      <button style="background:var(--gold,#C9A24B);color:#0E0B14;border:none;border-radius:11px;padding:16px 32px;font:600 16px 'Hanken Grotesk';cursor:pointer;box-shadow:0 14px 34px -14px var(--gold,#C9A24B);">Start Free Trial →</button>
+      <button style="background:rgba(255,255,255,.06);color:#F4F1EA;border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:16px 32px;font:600 16px 'Hanken Grotesk';cursor:pointer;">Book a call</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="border-top:1px solid rgba(255,255,255,.07);">
+  <div style="max-width:1180px;margin:0 auto;padding:48px 36px;display:flex;flex-wrap:wrap;gap:30px;justify-content:space-between;align-items:center;font-size:14px;color:#9D98AC;">
+    <div style="display:flex;align-items:center;gap:10px;"><div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--gold,#C9A24B),#7c5e1e);"></div><span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:18px;color:#F4F1EA;">Chakrio</span></div>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;"><span>Free Tools</span><span>Pricing</span><span>Privacy</span><span>Terms</span><span>Contact</span></div>
+    <div style="font:500 12px 'JetBrains Mono',monospace;">© 2026 Chakrio</div>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#C9A24B&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;#C9A24B&quot;,&quot;#1F8A5B&quot;,&quot;#C25B3A&quot;,&quot;#5A7DE0&quot;]},&quot;startAnnual&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { annual: false };
+
+  componentDidMount() {
+    if (this.props.startAnnual) this.setState({ annual: true });
+    requestAnimationFrame(() => this.setupReveal());
+  }
+
+  setupReveal() {
+    if (!this.root) return;
+    const els = this.root.querySelectorAll('[data-reveal]');
+    els.forEach((el) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1)';
+    });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'none';
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -6% 0px' });
+    els.forEach((el) => io.observe(el));
+    this._io = io;
+  }
+
+  componentWillUnmount() { if (this._io) this._io.disconnect(); }
+
+  renderVals() {
+    const annual = this.state.annual;
+    const pillOn = {
+      border: 'none', borderRadius: '999px', cursor: 'pointer',
+      padding: '9px 18px', fontFamily: "'Hanken Grotesk',sans-serif",
+      fontWeight: 600, fontSize: '14px',
+      background: 'var(--gold,#C9A24B)', color: '#0E0B14',
+      transition: 'all .2s',
+    };
+    const pillOff = {
+      border: 'none', borderRadius: '999px', cursor: 'pointer',
+      padding: '9px 18px', fontFamily: "'Hanken Grotesk',sans-serif",
+      fontWeight: 600, fontSize: '14px',
+      background: 'transparent', color: '#CFCAD9',
+      transition: 'all .2s',
+    };
+    return {
+      setRoot: (el) => { this.root = el; },
+      accentVar: this.props.accent || '#C9A24B',
+      setMonthly: () => this.setState({ annual: false }),
+      setAnnual: () => this.setState({ annual: true }),
+      monthlyBtnStyle: annual ? pillOff : pillOn,
+      annualBtnStyle: annual ? pillOn : pillOff,
+      starterPrice: annual ? '$24' : '$29',
+      growthPrice: annual ? '$66' : '$79',
+      perMonth: '/mo',
+    };
+  }
+}
+</script>
+</body>
+</html>
