@@ -14,6 +14,9 @@ import CancellationPolicyGenerator from './pages/tools/CancellationPolicyGenerat
 import InvoiceGenerator from './pages/tools/InvoiceGenerator';
 import MenuPage from './pages/MenuPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import DharmshaPage from './pages/DharmshaPage';
+import Terms from './pages/Terms';
+import RefundPolicy from './pages/RefundPolicy';
 
 function MetaPageView() {
   const location = useLocation();
@@ -39,6 +42,9 @@ export default function App() {
           <Route path="/tools/cancellation-policy" element={<CancellationPolicyGenerator />} />
           <Route path="/tools/invoice-generator" element={<InvoiceGenerator />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/dharmshala" element={<DharmshaPage />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/menu/:propertyId" element={<MenuPage />} />
 
           {/* Admin — protected, full-page (outside AppShell) */}

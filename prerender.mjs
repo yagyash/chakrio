@@ -31,9 +31,9 @@ const ORG_SCHEMA = JSON.stringify({
 const ROUTES = [
   {
     outPath: 'index.html',
-    title: 'Chakrio — Manage Property Bookings by Message',
+    title: 'Chakrio — WhatsApp Booking Automation for Dharmshalas, Villas & Homestays',
     description:
-      'Automate property bookings, cancellations & expenses with an AI chatbot. Chakrio records everything in your dashboard automatically. Free tools for property managers.',
+      'Automate property bookings, cancellations & expenses with an AI chatbot. Built for dharmshalas, villas, and boutique hotels. Chakrio records everything automatically. Free 14-day trial.',
     canonical: 'https://chakrio.com/',
     ogUrl: 'https://chakrio.com/',
     schemas: [
@@ -106,6 +106,42 @@ const ROUTES = [
       JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Privacy Policy — Chakrio', url: 'https://chakrio.com/privacy', description: 'Chakrio privacy policy — how we collect, use, and protect your data.', author: { '@type': 'Organization', name: 'Chakrio', url: 'https://chakrio.com' } }),
     ],
   },
+  {
+    outPath: 'dharmshala/index.html',
+    title: 'Dharmshala Booking & Management Software — WhatsApp Based | Chakrio',
+    description:
+      'Manage your dharmshala\'s bookings, rooms, and expenses entirely by WhatsApp. Bulk group bookings, festival campaigns, monthly P&L. Trusted at Raghuleela Dham, Goverdhan.',
+    canonical: 'https://chakrio.com/dharmshala',
+    ogUrl: 'https://chakrio.com/dharmshala',
+    schemas: [
+      ORG_SCHEMA,
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Dharmshala Booking & Management Software — WhatsApp Based | Chakrio', url: 'https://chakrio.com/dharmshala', description: 'Manage your dharmshala\'s bookings, rooms, and expenses entirely by WhatsApp. Bulk group bookings, festival campaigns, monthly P&L reports.', author: { '@type': 'Organization', name: 'Chakrio', url: 'https://chakrio.com' } }),
+    ],
+  },
+  {
+    outPath: 'terms/index.html',
+    title: 'Terms of Service — Chakrio',
+    description:
+      'Chakrio terms of service. Understand your rights and obligations when using our property booking automation platform.',
+    canonical: 'https://chakrio.com/terms',
+    ogUrl: 'https://chakrio.com/terms',
+    schemas: [
+      ORG_SCHEMA,
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Terms of Service — Chakrio', url: 'https://chakrio.com/terms', description: 'Chakrio terms of service.', author: { '@type': 'Organization', name: 'Chakrio', url: 'https://chakrio.com' } }),
+    ],
+  },
+  {
+    outPath: 'refund-policy/index.html',
+    title: 'Refund Policy — Chakrio',
+    description:
+      'Chakrio refund and cancellation policy. Understand how subscription cancellations, setup fees, and marketing wallet credits are handled.',
+    canonical: 'https://chakrio.com/refund-policy',
+    ogUrl: 'https://chakrio.com/refund-policy',
+    schemas: [
+      ORG_SCHEMA,
+      JSON.stringify({ '@context': 'https://schema.org', '@type': 'WebPage', name: 'Refund Policy — Chakrio', url: 'https://chakrio.com/refund-policy', description: 'Chakrio refund and cancellation policy.', author: { '@type': 'Organization', name: 'Chakrio', url: 'https://chakrio.com' } }),
+    ],
+  },
 ];
 
 const baseHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
@@ -140,4 +176,4 @@ for (const route of ROUTES) {
   console.log(`✓ Prerendered: /${route.outPath}`);
 }
 
-console.log('\nPrerender complete — 6 routes with unique meta tags + JSON-LD.');
+console.log('\nPrerender complete — 10 routes with unique meta tags + JSON-LD.');

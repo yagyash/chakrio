@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import {
   CalendarCheck, Undo2, Receipt, BarChart3,
-  Globe, BellRing, MessageSquare, Megaphone,
+  Globe, BellRing, MessageSquare, Megaphone, Users,
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/marketing/Navbar';
@@ -15,7 +15,7 @@ const FEATURES = [
   {
     Icon: CalendarCheck,
     title: 'Instant Booking Records',
-    body: 'Send a message like "Alex, 3 nights from 15 June, $200 advance" — Chakrio parses it and logs the booking automatically.',
+    body: 'Send a message like "Rahul, 3 nights from 15 June, ₹8,000 total, ₹3,000 advance" — Chakrio parses it and logs the booking automatically.',
   },
   {
     Icon: Undo2,
@@ -25,7 +25,7 @@ const FEATURES = [
   {
     Icon: Receipt,
     title: 'Expense Logging',
-    body: 'Type "pool service $85" or "plumber $220" — Chakrio logs the expense instantly. No dropdowns, no category hunting.',
+    body: 'Type "pool service ₹500" or "plumber ₹1,200" — Chakrio logs the expense instantly. No dropdowns, no category hunting.',
   },
   {
     Icon: BarChart3,
@@ -52,6 +52,11 @@ const FEATURES = [
     title: 'Guest Re-engagement Campaigns',
     body: 'Send WhatsApp broadcasts to past guests — seasonal offers, festival availability, or a personalised "we miss you" message. Track delivery in real time.',
   },
+  {
+    Icon: Users,
+    title: 'Direct WhatsApp Bookings',
+    body: 'Guests book you directly on WhatsApp — no OTA, no 15–20% commission. Every enquiry is tracked: dates requested, outcome, and source.',
+  },
 ];
 
 const STEPS = [
@@ -59,19 +64,19 @@ const STEPS = [
     step: '01',
     title: 'Send a message',
     body: 'Type a booking, expense, or cancellation in plain language — exactly how you would say it to someone. No forms, no fields, no formatting.',
-    example: '"Alex, 3 nights from 15 June, $200 advance"',
+    example: '"Rahul, 3 nights from 15 June, ₹8,000 total, ₹3,000 advance"',
   },
   {
     step: '02',
     title: 'Chakrio parses it',
     body: "AI pulls out the guest name, dates, room, and advance — and logs the booking in under a second.",
-    example: 'Extracted: Guest · Alex | Check-in · 15 Jun | Nights · 3 | Advance · $200',
+    example: 'Extracted: Guest · Rahul | Check-in · 15 Jun | Nights · 3 | Advance · ₹3,000',
   },
   {
     step: '03',
     title: 'Auto-recorded',
     body: 'Your dashboard, calendar, and monthly P&L update themselves. No spreadsheets, ever.',
-    example: 'Dashboard updated: 1 new booking · Balance $0 due · Revenue +$200',
+    example: 'Dashboard updated: 1 new booking · Balance ₹5,000 due · Revenue +₹8,000',
   },
 ];
 
@@ -106,6 +111,7 @@ const TOOLS = [
 
 const CAPABILITIES = [
   { Icon: CalendarCheck, label: 'Booking Automation' },
+  { Icon: Users, label: 'Direct Bookings' },
   { Icon: MessageSquare, label: 'WhatsApp & Telegram' },
   { Icon: BarChart3, label: 'Real-time Dashboard' },
   { Icon: Globe, label: 'OTA Calendar Sync' },
@@ -142,9 +148,9 @@ const GUEST_JOURNEY = [
 
 const TRUST_STATS = [
   { value: '1,000+', label: 'Bookings logged' },
-  { value: '5–8 hrs', label: 'Saved per week' },
+  { value: '5–8 hrs', label: 'Saved per week', note: 'client-reported estimate' },
   { value: '5–10 sec', label: 'Bot response time' },
-  { value: '24 hrs', label: 'Avg setup time' },
+  { value: '24 hrs', label: 'Avg setup time', note: 'client-reported estimate' },
 ];
 
 const PRICING_TIERS = [
@@ -176,7 +182,6 @@ const PRICING_TIERS = [
     badge: '★ Most popular',
     features: [
       'Everything in Starter, plus:',
-      'OTA iCal calendar sync',
       'Monthly P&L reports (auto-sent)',
       'Guest experience automation',
       'Priority support',
@@ -212,11 +217,11 @@ const FAQS = [
   },
   {
     q: 'What types of properties can use Chakrio?',
-    a: 'Chakrio is built for owner-operators running boutique hotels, villas, homestays, guesthouses, B&Bs, and vacation rentals. It works for single-property owners as well as those managing multiple properties.',
+    a: 'Chakrio is built for dharmshalas (built for pilgrim-town operations — group arrivals, festival rush, and high-volume bookings), boutique hotels, villas, homestays, guesthouses, B&Bs, and vacation rentals. It works for single-property owners and those managing multiple properties. Our first clients include Raghuleela Dham (60 rooms, Goverdhan) and Niva — The Rooted Heaven (Udaipur).',
   },
   {
     q: 'Does Chakrio work outside India?',
-    a: 'Yes. Chakrio works with any WhatsApp or Telegram account worldwide. Bookings, expenses, and guest messages work in any language your team types in. We onboard properties globally.',
+    a: 'WhatsApp works globally, so the bot can receive messages from any country. However, payments (Razorpay), phone number handling, and our onboarding team are currently India-first. If you\'re based outside India, contact us and we\'ll advise.',
   },
   {
     q: 'Do I need technical knowledge to use Chakrio?',
@@ -275,10 +280,10 @@ function HeroChatPanel() {
       {/* Chat bubbles */}
       <div style={{ flex: 1, padding: 14, display: 'flex', flexDirection: 'column', gap: 9, background: 'repeating-linear-gradient(45deg,#0d161c 0 16px,#0b141a 16px 32px)' }}>
         <div style={{ alignSelf: 'flex-end', maxWidth: '80%', background: '#056162', color: '#eafff4', fontSize: 12.5, lineHeight: 1.45, borderRadius: '10px 10px 2px 10px', padding: '9px 11px' }}>
-          Alex, 3 nights from 15 June, $200 advance, Sea View room
+          Rahul, 3 nights from 15 June, ₹8,000 total, ₹3,000 advance, Sea View room
         </div>
         <div style={{ alignSelf: 'flex-start', maxWidth: '85%', background: '#1f2c33', color: '#dfe9e4', fontSize: 12, lineHeight: 1.5, borderRadius: '10px 10px 10px 2px', padding: '10px 11px' }}>
-          ✅ Logged: <b>Alex</b> · Sea View · 15–18 Jun (3 nights) · advance <b>$200</b>. Added to calendar &amp; P&amp;L.
+          ✅ Logged: <b>Rahul</b> · Sea View · 15–18 Jun (3 nights) · advance <b>₹3,000</b>. Added to calendar &amp; P&amp;L.
         </div>
         <div style={{ alignSelf: 'flex-start', fontSize: 10, fontFamily: "'JetBrains Mono', monospace", color: '#5e7a6b', paddingLeft: 4 }}>
           parsed in 5–10s
@@ -339,6 +344,76 @@ function GuestExperienceSection() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function DirectBookingsSection() {
+  const [videoActive, setVideoActive] = useState(false);
+  const steps = [
+    { n: '1', text: 'Guest scans your QR code or taps your wa.me link' },
+    { n: '2', text: 'Bot asks for dates — guest replies naturally' },
+    { n: '3', text: 'Dates held while you approve with one reply' },
+    { n: '4', text: 'Booking confirmed automatically, guest notified' },
+  ];
+  return (
+    <section style={{ borderTop: '1px solid rgba(255,255,255,.07)', borderBottom: '1px solid rgba(255,255,255,.07)' }}>
+      <div className="max-w-5xl mx-auto px-6 py-20">
+        <div className="reveal text-center mb-12">
+          <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, fontWeight: 500, letterSpacing: '.16em', textTransform: 'uppercase', color: '#C9A24B', marginBottom: 12 }}>Direct bookings</p>
+          <h2 className="font-display font-extrabold tracking-tight text-text-1" style={{ fontSize: 'clamp(26px,4vw,44px)', letterSpacing: '-.03em', marginBottom: 16 }}>
+            Your guests book you directly on WhatsApp —{' '}
+            <span style={{ color: '#25D366' }}>0% commission.</span>
+          </h2>
+          <p className="text-text-2 max-w-2xl mx-auto" style={{ fontSize: 16, lineHeight: 1.6 }}>
+            Every property gets a shareable wa.me link and QR code — print it on your visiting card, add it to your Google Business profile, or put it in your Instagram bio.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-10 items-center mb-12">
+          {/* Step strip */}
+          <div className="reveal reveal-delay-1 space-y-4">
+            {steps.map(s => (
+              <div key={s.n} className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-display font-extrabold text-sm"
+                  style={{ background: 'rgba(37,211,102,.12)', border: '1px solid rgba(37,211,102,.3)', color: '#25D366' }}>
+                  {s.n}
+                </div>
+                <p className="text-text-2 text-sm leading-relaxed pt-1">{s.text}</p>
+              </div>
+            ))}
+            <p className="text-text-3 text-xs pt-2">
+              Every enquiry is tracked: dates requested, outcome, and source — so you know which channel drives direct bookings.
+            </p>
+            <p className="text-text-3 text-xs" style={{ borderTop: '1px solid rgba(255,255,255,.06)', paddingTop: 12 }}>
+              OTA bookings still sync automatically — direct bookings just stop costing you 15–20%.
+            </p>
+          </div>
+
+          {/* Video slot (L7) */}
+          <div className="reveal reveal-delay-2" style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(255,255,255,.08)', aspectRatio: '16/9', position: 'relative', cursor: 'pointer', background: '#0b141a' }}
+            onClick={() => setVideoActive(true)}>
+            {videoActive ? (
+              <iframe
+                src="https://www.youtube.com/embed/PLACEHOLDER_ID?autoplay=1"
+                allow="autoplay; fullscreen"
+                title="See Chakrio in 60 seconds"
+                style={{ width: '100%', height: '100%', border: 'none' }}
+              />
+            ) : (
+              <>
+                <img src="/screenshot.png" alt="See Chakrio in 60 seconds — click to play" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,.35)' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(255,255,255,.9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="#0E0B14"><polygon points="5,3 19,12 5,21" /></svg>
+                  </div>
+                </div>
+                <div style={{ position: 'absolute', bottom: 10, left: 10, background: 'rgba(0,0,0,.6)', color: '#fff', fontSize: 11, padding: '3px 8px', borderRadius: 4 }}>See Chakrio in 60 seconds</div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -436,17 +511,27 @@ function PricingSection() {
                   {tier.cta}
                 </a>
               ) : (
-                <Link to={tier.ctaHref} style={{
-                  display: 'block', textAlign: 'center', width: '100%',
-                  padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
-                  fontFamily: "'Hanken Grotesk', sans-serif",
-                  background: tier.featured ? '#C9A24B' : 'rgba(255,255,255,.06)',
-                  color: tier.featured ? '#0E0B14' : '#F4F1EA',
-                  border: tier.featured ? 'none' : '1px solid rgba(255,255,255,.16)',
-                  marginBottom: 20,
-                }}>
-                  {tier.cta}
-                </Link>
+                <>
+                  <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+                    display: 'block', textAlign: 'center', width: '100%',
+                    padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                    fontFamily: "'Hanken Grotesk', sans-serif",
+                    background: '#25D366', color: '#fff', border: 'none',
+                    marginBottom: 8,
+                  }}>
+                    Chat with us on WhatsApp
+                  </a>
+                  <Link to="/onboard" style={{
+                    display: 'block', textAlign: 'center', width: '100%',
+                    padding: '11px 0', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none',
+                    fontFamily: "'Hanken Grotesk', sans-serif",
+                    background: 'transparent', color: '#9D98AC',
+                    border: '1px solid rgba(255,255,255,.12)',
+                    marginBottom: 20,
+                  }}>
+                    Start Free Trial →
+                  </Link>
+                </>
               )}
 
               {/* Features */}
@@ -472,7 +557,21 @@ function PricingSection() {
           <span className="text-text-3">·</span>
           <span className="text-text-2">26+ rooms: <strong className="text-text-1">Custom</strong></span>
         </div>
-        <p className="text-center text-xs text-text-3 mt-3">Add-ons: Channel manager +₹2,000/mo · Guest campaigns ₹1/message · Room charge +₹100/room/mo</p>
+        <p className="text-center text-xs text-text-3 mt-3">Add-ons: OTA Calendar Sync +₹5,000/mo · Guest campaigns ₹1/message · Room charge +₹100/room/mo</p>
+      </div>
+
+      {/* OTA Calendar Sync add-on callout */}
+      <div className="reveal max-w-6xl mx-auto px-6 mt-6">
+        <div className="rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4" style={{ background: 'rgba(201,162,75,.04)', border: '1px solid rgba(201,162,75,.2)' }}>
+          <Globe size={20} style={{ color: '#C9A24B', flexShrink: 0 }} />
+          <div className="flex-1">
+            <p className="font-semibold text-text-1 text-sm mb-0.5">Add-on: OTA Calendar Sync — <span style={{ color: '#C9A24B' }}>₹5,000/month</span></p>
+            <p className="text-text-3 text-xs">Sync blocked dates with Airbnb, Booking.com, MakeMyTrip &amp; more via iCal. Syncs availability (blocked dates) — not rates or listing content.</p>
+          </div>
+          <a href="https://wa.me/919461888529?text=Hi%2C+I%27m+interested+in+OTA+Calendar+Sync" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold whitespace-nowrap" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
+            Ask us →
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -493,17 +592,17 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen text-text-1 flex flex-col" style={{ background: '#0E0B14' }}>
       <Helmet>
-        <title>Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays</title>
-        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
+        <title>Chakrio — WhatsApp Booking Automation for Dharmshalas, Villas &amp; Homestays</title>
+        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
         <link rel="canonical" href="https://chakrio.com/" />
-        <meta property="og:title" content="Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays" />
-        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
+        <meta property="og:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas, Villas &amp; Homestays" />
+        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels. Setup in 24 hours. Free 14-day trial." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://chakrio.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Chakrio — AI Booking Automation for Boutique Hotels, Villas &amp; Homestays" />
-        <meta name="twitter:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Auto-send guest confirmations, payment reminders, and re-engagement campaigns." />
+        <meta name="twitter:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas, Villas &amp; Homestays" />
+        <meta name="twitter:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels." />
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
@@ -511,7 +610,7 @@ export default function LandingPage() {
           "name": "Chakrio",
           "url": "https://chakrio.com",
           "logo": { "@type": "ImageObject", "url": "https://chakrio.com/og-image.png", "width": 1200, "height": 630 },
-          "description": "Chakrio is an AI-powered property booking automation tool for boutique hotels, villas, homestays, and guesthouses.",
+          "description": "Chakrio is an AI-powered property booking automation tool for dharmshalas, villas, homestays, and boutique hotels.",
           "serviceType": "Property Management Software",
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
@@ -522,6 +621,7 @@ export default function LandingPage() {
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
           "url": "https://chakrio.com",
+          "featureList": "Instant booking records via WhatsApp, Expense logging, Monthly P&L reports, Guest experience automation, OTA Calendar Sync (add-on), Direct WhatsApp guest booking with hold and manager approval, Guest re-engagement campaigns",
           "offers": { "@type": "Offer", "price": "0", "description": "14-day free trial" },
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
@@ -559,34 +659,34 @@ export default function LandingPage() {
 
         <h1 className="font-display font-extrabold tracking-tight text-text-1" style={{ fontSize: 'clamp(40px,7vw,88px)', lineHeight: .97, letterSpacing: '-.035em', maxWidth: '15ch', margin: '0 auto 24px' }}>
           WhatsApp booking automation for{' '}
-          <span style={{ color: '#C9A24B' }}>boutique hotels, villas &amp; homestays</span>
+          <span style={{ color: '#C9A24B' }}>dharmshalas, villas, homestays &amp; boutique hotels</span>
         </h1>
 
         <p className="text-text-2 leading-relaxed mx-auto mb-8" style={{ fontSize: 19, maxWidth: '54ch' }}>
           Just send a message —{' '}
-          <span className="text-text-1 font-semibold">"Alex, 3 nights from 15 June, $200 advance"</span>
+          <span className="text-text-1 font-semibold">"Rahul, 3 nights from 15 June, ₹8,000 total, ₹3,000 advance"</span>
           {' '}— and Chakrio logs the booking instantly. No spreadsheets, no missed records.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-          <Link to="/login" style={{
-            background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
+          <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+            background: '#25D366', color: '#fff', border: 'none', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
-            boxShadow: '0 14px 34px -14px #C9A24B',
+            boxShadow: '0 14px 34px -14px #25D366',
           }}>
-            Start Free Trial →
-          </Link>
-          <a href="#how-it-works" style={{
+            Chat with us on WhatsApp
+          </a>
+          <Link to="/onboard" style={{
             background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
             border: '1px solid rgba(255,255,255,.14)', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
           }}>
-            See how it works
-          </a>
+            Start Free Trial →
+          </Link>
         </div>
-        <p style={{ color: '#9D98AC', fontSize: 13.5 }}>14-day free trial · No credit card required</p>
+        <p style={{ color: '#9D98AC', fontSize: 13.5 }}>14-day free trial · No credit card required · <a href="#how-it-works" style={{ color: '#9D98AC', textDecoration: 'underline' }}>See how it works</a></p>
       </header>
 
       {/* ── Hero Product Visual ───────────────────────────────── */}
@@ -617,16 +717,24 @@ export default function LandingPage() {
 
       {/* ── Trust Strip ───────────────────────────────────────── */}
       <section className="reveal max-w-5xl mx-auto px-6 py-14 w-full">
-        <p className="text-center text-sm text-text-3 mb-8">Used by property managers across Asia, the Middle East &amp; Europe</p>
+        <p className="text-center text-sm text-text-3 mb-8">Running daily operations at a 60-room dharmshala in Goverdhan and a boutique villa in Udaipur.</p>
         <div className="flex flex-wrap justify-center gap-12">
           {TRUST_STATS.map(s => (
             <div key={s.label} className="text-center">
               <div className="font-display font-extrabold" style={{ fontSize: 34, color: '#C9A24B' }}>{s.value}</div>
               <div style={{ fontSize: 13, color: '#B6B1C4', marginTop: 4 }}>{s.label}</div>
+              {s.note && <div style={{ fontSize: 10.5, color: '#6D6880', marginTop: 2 }}>{s.note}</div>}
             </div>
           ))}
         </div>
       </section>
+
+      {/* dharmshala internal link */}
+      <div className="text-center pb-4">
+        <Link to="/dharmshala" style={{ fontSize: 13, color: '#C9A24B', textDecoration: 'underline' }}>
+          Managing a dharmshala? See how Chakrio handles pilgrim-town operations →
+        </Link>
+      </div>
 
       {/* ── How It Works — light section ─────────────────────── */}
       <section id="how-it-works" style={{ background: '#F4F1EA', color: '#16121d' }}>
@@ -655,6 +763,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Direct Bookings Section (L3) ─────────────────────── */}
+      <DirectBookingsSection />
 
       {/* ── Capabilities Strip ───────────────────────────────── */}
       <div style={{ borderBottom: '1px solid rgba(255,255,255,.07)' }}>
@@ -736,7 +847,7 @@ export default function LandingPage() {
               <li>• Every booking, cancellation, and refund logged</li>
               <li>• Monthly P&amp;L report delivered on the 1st — automatically</li>
               <li>• Full refund and advance-retained tracking</li>
-              <li>• Expense logged with one line: "pool service $85"</li>
+              <li>• Expense logged with one line: "pool service ₹500"</li>
             </ul>
           </div>
         </div>
@@ -855,29 +966,32 @@ export default function LandingPage() {
             No setup forms, no waiting room. Book a 20-minute call and we'll have your bookings flowing through WhatsApp the same week.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link to="/login" style={{
-              background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
+            <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+              background: '#25D366', color: '#fff', border: 'none', borderRadius: 11,
               padding: '16px 32px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
               fontFamily: "'Hanken Grotesk', sans-serif",
-              boxShadow: '0 14px 34px -14px #C9A24B',
+              boxShadow: '0 14px 34px -14px #25D366',
             }}>
-              Start Free Trial →
-            </Link>
-            <a href="https://wa.me/919461888529" target="_blank" rel="noopener noreferrer" style={{
+              Chat with us on WhatsApp
+            </a>
+            <Link to="/onboard" style={{
               background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
               border: '1px solid rgba(255,255,255,.14)', borderRadius: 11,
               padding: '16px 32px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
               fontFamily: "'Hanken Grotesk', sans-serif",
             }}>
-              Book a call
-            </a>
+              Start Free Trial →
+            </Link>
           </div>
           <p className="text-text-3 text-sm mt-6">
-            Or{' '}
+            Prefer a call?{' '}
+            <a href="GOOGLE_CALENDAR_BOOKING_URL" target="_blank" rel="noopener noreferrer" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
+              Book a 20-minute slot
+            </a>
+            {' '}· Already have an account?{' '}
             <Link to="/login" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
-              sign in
+              Sign in
             </Link>
-            {' '}if you already have an account.
           </p>
         </div>
       </section>
