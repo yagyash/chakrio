@@ -270,6 +270,9 @@ export default function Guests() {
   const [error,    setError]    = useState('');
   const [selected, setSelected] = useState(null);
   const [search,   setSearch]   = useState('');
+  const [page,     setPage]     = useState(1);
+
+  const PAGE_SIZE = 25;
 
   const loadGuests = useCallback(async () => {
     if (!propertyId) return;
@@ -300,6 +303,9 @@ export default function Guests() {
         return name.includes(q) || String(g.guest_phone).includes(q);
       })
     : guests;
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   if (!propertyId) {
     return (
@@ -336,7 +342,7 @@ export default function Guests() {
             <input
               type="text"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search by name or phone…"
               style={{
                 background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
@@ -385,7 +391,7 @@ export default function Guests() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(g => {
+                {paginated.map(g => {
                   const name     = g.display_name || g.guest_name || '—';
                   const stays    = g.completed_stays ?? g.total_stays ?? 0;
                   const latePmts = g.late_payment_count ?? 0;
@@ -428,6 +434,44 @@ export default function Guests() {
                 })}
               </tbody>
             </table>
+          )}
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)',
+            }}>
+              <span style={{ fontSize: '12px', color: '#8c8a9e' }}>
+                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+              </span>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  style={{
+                    padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600,
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: page === 1 ? '#4a4860' : '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer',
+                  }}
+                >← Prev</button>
+                <span style={{
+                  padding: '6px 12px', fontSize: '12px', color: '#a89dff', fontWeight: 600,
+                  background: 'rgba(108,99,255,0.12)', border: '1px solid rgba(108,99,255,0.25)',
+                  borderRadius: '6px',
+                }}>
+                  {page} / {totalPages}
+                </span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  style={{
+                    padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600,
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                    color: page === totalPages ? '#4a4860' : '#fff', cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                  }}
+                >Next →</button>
+              </div>
+            </div>
           )}
         </div>
       </div>
