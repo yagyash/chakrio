@@ -1,91 +1,57 @@
 /**
- * prerender.mjs — Post-build SSG prerender script
+ * prerender.mjs — Runs on Vercel (and locally) after `vite build`.
  *
- * Runs after `vite build`. Launches the built SPA in a headless browser,
- * navigates to each public route, waits for React to render, then saves
- * the full HTML (body content + Helmet-managed meta) to dist/{route}/index.html.
+ * Reads pre-captured snapshots from prerender-cache/ (committed to git) and
+ * injects each route's Helmet head + React body into the Vite build output.
+ * Asset link/script tags come from the current build's dist/index.html so
+ * hashed filenames are always correct for the deployed build.
  *
- * Requires: npm install puppeteer --save-dev (one-time)
+ * No Puppeteer required here. To regenerate snapshots: node prerender-capture.mjs
  */
 
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { spawn } from 'child_process';
-import puppeteer from 'puppeteer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distDir = path.join(__dirname, 'dist');
-const PORT = 4173;
+const cacheDir = path.join(__dirname, 'prerender-cache');
 
-// [urlPath, outputFile relative to dist/]
-// Homepage MUST be last — other routes use dist/index.html as SPA fallback,
-// so overwriting it before they render would contaminate their <head>.
-const ROUTES = [
-  ['/dharmshala', 'dharmshala/index.html'],
-  ['/privacy', 'privacy/index.html'],
-  ['/terms', 'terms/index.html'],
-  ['/refund-policy', 'refund-policy/index.html'],
-  ['/tools/occupancy-calculator', 'tools/occupancy-calculator/index.html'],
-  ['/tools/rental-income-calculator', 'tools/rental-income-calculator/index.html'],
-  ['/tools/cancellation-policy', 'tools/cancellation-policy/index.html'],
-  ['/tools/invoice-generator', 'tools/invoice-generator/index.html'],
-  ['/', 'index.html'], // last: overwrites the SPA fallback template
-];
-
-async function waitForServer(url, timeoutMs = 20000) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      const res = await fetch(url);
-      if (res.status < 500) return;
-    } catch {}
-    await new Promise(r => setTimeout(r, 400));
-  }
-  throw new Error(`Preview server at ${url} did not start within ${timeoutMs}ms`);
+if (!fs.existsSync(cacheDir) || fs.readdirSync(cacheDir).filter(f => f.endsWith('.json')).length === 0) {
+  console.log('prerender-cache/ is empty — run node prerender-capture.mjs locally to generate snapshots.');
+  process.exit(0);
 }
 
-const viteEntry = path.join(__dirname, 'node_modules', 'vite', 'bin', 'vite.js');
-const serverProcess = spawn(
-  process.execPath,
-  [viteEntry, 'preview', '--port', String(PORT), '--strictPort'],
-  { stdio: 'pipe', cwd: __dirname },
-);
-serverProcess.stderr.on('data', d => process.stderr.write(d));
+// Build's dist/index.html has the correct hashed asset link/script tags.
+// Strip the few page-specific tags that come from snapshots instead.
+const distIndexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
+const headMatch = distIndexHtml.match(/<head>([\s\S]*?)<\/head>/);
+const baseHead = (headMatch ? headMatch[1] : '')
+  .replace(/<title>[^<]*<\/title>/g, '')
+  .replace(/<meta\s[^>]*name="description"[^>]*>/g, '')
+  .replace(/<link\s[^>]*rel="canonical"[^>]*>/g, '')
+  .replace(/<meta\s[^>]*property="og:title"[^>]*>/g, '')
+  .replace(/<meta\s[^>]*property="og:description"[^>]*>/g, '')
+  .replace(/<meta\s[^>]*property="og:url"[^>]*>/g, '')
+  .replace(/<meta\s[^>]*property="og:type"[^>]*>/g, '')
+  .replace(/<meta\s[^>]*name="twitter:title"[^>]*>/g, '')
+  .replace(/<meta\s[^>]*name="twitter:description"[^>]*>/g, '');
 
-try {
-  console.log('Starting preview server...');
-  await waitForServer(`http://localhost:${PORT}/`);
+const cacheFiles = fs.readdirSync(cacheDir).filter(f => f.endsWith('.json'));
+let count = 0;
 
-  const browser = await puppeteer.launch({ headless: true });
+for (const file of cacheFiles) {
+  const { urlPath, outFile, helmetHead, bodyHtml } = JSON.parse(
+    fs.readFileSync(path.join(cacheDir, file), 'utf-8'),
+  );
 
-  for (const [urlPath, outFile] of ROUTES) {
-    // New tab per route: prevents Helmet state from previous pages contaminating <head>
-    const page = await browser.newPage();
-    page.on('pageerror', () => {});
+  const html = `<!doctype html>\n<html lang="en">\n<head>\n${helmetHead}\n${baseHead}\n</head>\n<body>${bodyHtml}</body>\n</html>`;
 
-    await page.goto(`http://localhost:${PORT}${urlPath}`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 30000,
-    });
-
-    // Wait for React to mount (root div gets children populated)
-    await page
-      .waitForFunction(() => document.getElementById('root')?.children?.length > 0, { timeout: 10000 })
-      .catch(() => {});
-
-    const html = await page.content();
-    await page.close();
-
-    const outPath = path.join(distDir, outFile);
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, html, 'utf-8');
-    console.log(`✓ Prerendered: ${urlPath}`);
-  }
-
-  await browser.close();
-} finally {
-  serverProcess.kill();
+  const outPath = path.join(distDir, outFile);
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, html, 'utf-8');
+  console.log(`✓ Prerendered: ${urlPath}`);
+  count++;
 }
 
-console.log(`\nPrerender complete — ${ROUTES.length} routes with full body HTML.`);
+console.log(`\nPrerender complete — ${count} routes injected from prerender-cache/.`);
