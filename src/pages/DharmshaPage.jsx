@@ -17,8 +17,8 @@ const DHARMSHALA_FAQS = [
     a: 'The AI understands natural language — if your team types in Hindi or a mix of Hindi and English, Chakrio parses it correctly. No need to switch to English or fill in fields.',
   },
   {
-    q: 'What about donation tracking or prasad expenses?',
-    a: 'All expenses — maintenance, prasad, donations, repairs — are logged the same way: type it in WhatsApp and Chakrio records it. Monthly P&L includes all expenses by category.',
+    q: 'Can I track prasad and maintenance expenses?',
+    a: 'Yes. Type any expense in WhatsApp — prasad, maintenance, repairs — and Chakrio records it instantly. Your monthly P&L report breaks it down by category.',
   },
 ];
 
@@ -130,7 +130,7 @@ export default function DharmshaPage() {
             { title: 'Festival-season campaigns', body: 'Send a WhatsApp broadcast to previous guests ahead of Holi, Diwali, or Janmashtami. Personalised, tracked, and ₹1/message.' },
             { title: 'Monthly P&L reports', body: 'On the 1st of each month, get a full P&L on WhatsApp — total revenue, expenses by category, and net surplus. Auto-sent.' },
             { title: 'Google review funnel', body: 'After checkout, Chakrio sends a polite message asking guests to leave a review. No manual follow-up required.' },
-            { title: 'Expense tracking for all costs', body: 'Log maintenance, prasad, repairs, or donations in one message. All categorised in your dashboard automatically.' },
+            { title: 'Expense tracking for all costs', body: 'Log maintenance costs, prasad expenses, and repair bills in one WhatsApp message. Categorised automatically in your monthly P&L.' },
           ].map(f => (
             <div key={f.title} className="rounded-2xl border p-6" style={{ background: 'rgba(255,255,255,.025)', borderColor: 'rgba(255,255,255,.09)' }}>
               <h3 className="font-display font-extrabold text-text-1 text-base mb-2">{f.title}</h3>

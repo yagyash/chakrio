@@ -25,6 +25,7 @@ Owner-operators of boutique hotels, villas, homestays, guesthouses, B&Bs, and va
 ## Key Pages
 
 - [Home](https://chakrio.com/)
+- [Dharmshala Booking Software](https://chakrio.com/dharmshala)
 - [Occupancy Rate Calculator](https://chakrio.com/tools/occupancy-calculator)
 - [Rental Income Calculator](https://chakrio.com/tools/rental-income-calculator)
 - [Cancellation Policy Generator](https://chakrio.com/tools/cancellation-policy)
