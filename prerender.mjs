@@ -45,6 +45,14 @@ for (const file of cacheFiles) {
     fs.readFileSync(path.join(cacheDir, file), 'utf-8'),
   );
 
+  // Skip root route: dist/index.html is the SPA fallback served by the Vercel
+  // catch-all rewrite for every path. Prerendering it with landing page content
+  // causes every hard-refreshed dashboard URL to flash the landing page briefly.
+  if (outFile === 'index.html') {
+    console.log(`⏭  Skipped (SPA fallback): ${urlPath}`);
+    continue;
+  }
+
   const html = `<!doctype html>\n<html lang="en">\n<head>\n${helmetHead}\n${baseHead}\n</head>\n<body>${bodyHtml}</body>\n</html>`;
 
   const outPath = path.join(distDir, outFile);
