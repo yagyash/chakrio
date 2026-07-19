@@ -245,7 +245,7 @@ export default function HomestayDashboard() {
           return s + (total - balance);
         }, 0)
       : 0;
-    const _NON_OP = new Set(['construction', 'owner drawing']);
+    const _NON_OP = new Set(['construction', 'equipment', 'owner drawing']);
     const catCol = Object.keys(activeExpenses[0] || {}).find(k => k.toLowerCase() === 'category') ?? 'Category';
     const opExpenses = activeExpenses.filter(r => !_NON_OP.has(String(r[catCol] || '').toLowerCase().trim()));
     const expense = expCol ? opExpenses.reduce((s, r) => s + Number(r[expCol] || 0), 0) : 0;

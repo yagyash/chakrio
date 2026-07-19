@@ -270,7 +270,7 @@ export default function Guests() {
   const [error,    setError]    = useState('');
   const [selected, setSelected] = useState(null);
   const [search,   setSearch]   = useState('');
-  const [page,     setPage]     = useState(1);
+  const [pageNum,  setPageNum]  = useState(1);
 
   const PAGE_SIZE = 25;
 
@@ -305,7 +305,7 @@ export default function Guests() {
     : guests;
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const paginated  = filtered.slice((pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE);
 
   if (!propertyId) {
     return (
@@ -342,7 +342,7 @@ export default function Guests() {
             <input
               type="text"
               value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1); }}
+              onChange={e => { setSearch(e.target.value); setPageNum(1); }}
               placeholder="Search by name or phone…"
               style={{
                 background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
@@ -442,16 +442,16 @@ export default function Guests() {
               padding: '12px 16px', borderTop: '1px solid rgba(255,255,255,0.06)',
             }}>
               <span style={{ fontSize: '12px', color: '#8c8a9e' }}>
-                Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+                Showing {(pageNum - 1) * PAGE_SIZE + 1}–{Math.min(pageNum * PAGE_SIZE, filtered.length)} of {filtered.length}
               </span>
               <div style={{ display: 'flex', gap: '6px' }}>
                 <button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  onClick={() => setPageNum(p => Math.max(1, p - 1))}
+                  disabled={pageNum === 1}
                   style={{
                     padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600,
                     background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: page === 1 ? '#4a4860' : '#fff', cursor: page === 1 ? 'not-allowed' : 'pointer',
+                    color: pageNum === 1 ? '#4a4860' : '#fff', cursor: pageNum === 1 ? 'not-allowed' : 'pointer',
                   }}
                 >← Prev</button>
                 <span style={{
@@ -459,15 +459,15 @@ export default function Guests() {
                   background: 'rgba(108,99,255,0.12)', border: '1px solid rgba(108,99,255,0.25)',
                   borderRadius: '6px',
                 }}>
-                  {page} / {totalPages}
+                  {pageNum} / {totalPages}
                 </span>
                 <button
-                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                  disabled={page === totalPages}
+                  onClick={() => setPageNum(p => Math.min(totalPages, p + 1))}
+                  disabled={pageNum === totalPages}
                   style={{
                     padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 600,
                     background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: page === totalPages ? '#4a4860' : '#fff', cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                    color: pageNum === totalPages ? '#4a4860' : '#fff', cursor: pageNum === totalPages ? 'not-allowed' : 'pointer',
                   }}
                 >Next →</button>
               </div>
