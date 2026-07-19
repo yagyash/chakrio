@@ -24,12 +24,13 @@ function maskPhone(phone) {
 }
 
 const OUTCOME_STYLES = {
-  booked:          { bg: 'rgba(34,197,94,0.15)',  color: '#4ade80', border: 'rgba(34,197,94,0.3)'  },
-  no_availability: { bg: 'rgba(239,68,68,0.12)',  color: '#f87171', border: 'rgba(239,68,68,0.25)' },
-  guest_declined:  { bg: 'rgba(245,158,11,0.12)', color: '#fbbf24', border: 'rgba(245,158,11,0.25)'},
-  rejected:        { bg: 'rgba(239,68,68,0.12)',  color: '#f87171', border: 'rgba(239,68,68,0.25)' },
-  abandoned:       { bg: 'rgba(148,163,184,0.1)', color: '#94a3b8', border: 'rgba(148,163,184,0.2)'},
-  timeout:         { bg: 'rgba(148,163,184,0.1)', color: '#94a3b8', border: 'rgba(148,163,184,0.2)'},
+  booked:           { bg: 'rgba(34,197,94,0.15)',  color: '#4ade80', border: 'rgba(34,197,94,0.3)'  },
+  no_availability:  { bg: 'rgba(239,68,68,0.12)',  color: '#f87171', border: 'rgba(239,68,68,0.25)' },
+  guest_declined:   { bg: 'rgba(245,158,11,0.12)', color: '#fbbf24', border: 'rgba(245,158,11,0.25)'},
+  rejected:         { bg: 'rgba(239,68,68,0.12)',  color: '#f87171', border: 'rgba(239,68,68,0.25)' },
+  abandoned:        { bg: 'rgba(148,163,184,0.1)', color: '#94a3b8', border: 'rgba(148,163,184,0.2)'},
+  timeout:          { bg: 'rgba(148,163,184,0.1)', color: '#94a3b8', border: 'rgba(148,163,184,0.2)'},
+  tour_requested:   { bg: 'rgba(34,211,238,0.12)', color: '#67e8f9', border: 'rgba(34,211,238,0.25)'},
 };
 
 const OUTCOME_LABELS = {
@@ -39,6 +40,7 @@ const OUTCOME_LABELS = {
   rejected:        'Rejected',
   abandoned:       'Abandoned',
   timeout:         'Timeout',
+  tour_requested:  'Tour Requested',
 };
 
 function OutcomePill({ outcome }) {
@@ -160,7 +162,7 @@ export default function Enquiries() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                {['Date', 'Phone', 'Check-in', 'Check-out', 'Guests', 'Outcome', 'Source', 'Nudge'].map(h => (
+                {['Date', 'Phone', 'Check-in', 'Check-out', 'Guests', 'Outcome', 'Source', 'Nudge', 'Media'].map(h => (
                   <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '11px', fontWeight: 600, color: '#8c8a9e', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap', background: 'rgba(255,255,255,0.02)' }}>{h}</th>
                 ))}
               </tr>
@@ -176,6 +178,9 @@ export default function Enquiries() {
                   <td style={{ padding: '13px 16px' }}><OutcomePill outcome={l.outcome} /></td>
                   <td style={{ padding: '13px 16px', fontSize: '12px', color: '#8c8a9e' }}>{l.attribution?.source ?? '—'}</td>
                   <td style={{ padding: '13px 16px', fontSize: '12px', color: '#8c8a9e', whiteSpace: 'nowrap' }}>{l.nudge_sent ? fmtDate(l.nudge_sent) : '—'}</td>
+                  <td style={{ padding: '13px 16px', fontSize: '14px', letterSpacing: '2px' }}>
+                    {[l.photo_sent_at && '📷', l.video_sent_at && '🎬', l.tour_requested_at && '📹'].filter(Boolean).join('') || '—'}
+                  </td>
                 </tr>
               ))}
             </tbody>

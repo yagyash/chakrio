@@ -60,6 +60,11 @@ export default function PropertySettings() {
   const [addError, setAddError]         = useState('');
   const [removingId, setRemovingId]     = useState(null);
 
+  // Photos & Video state
+  const [mediaItems, setMediaItems]     = useState([]);
+  const [mediaError, setMediaError]     = useState('');
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+
   useEffect(() => {
     if (!propertyId) return;
     setLoading(true);
@@ -90,6 +95,69 @@ export default function PropertySettings() {
   };
 
   useEffect(() => { loadIcalFeeds(); }, [supabaseId]);
+
+  const loadMedia = async () => {
+    if (!supabaseId) return;
+    try {
+      const r = await apiFetch(`/api/media?propertyId=${supabaseId}`);
+      if (r.ok) setMediaItems(await r.json());
+    } catch { /* best-effort */ }
+  };
+  useEffect(() => { loadMedia(); }, [supabaseId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleMediaUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (!files.length || !supabaseId) return;
+    if (mediaItems.length + files.length > 10) {
+      setMediaError('Maximum 10 media items allowed. Remove some before uploading.');
+      return;
+    }
+    setMediaError('');
+    setUploadingMedia(true);
+    try {
+      for (const file of files) {
+        const mediaType = file.type.startsWith('video/') ? 'video' : 'image';
+        // Step 1: get signed URL
+        const params = new URLSearchParams({
+          propertyId: supabaseId,
+          action: 'signed-upload',
+          filename: file.name,
+          contentType: file.type,
+        });
+        const signRes = await apiFetch(`/api/media?${params}`);
+        if (!signRes.ok) throw new Error('Could not get upload URL');
+        const { signed_url, storage_path } = await signRes.json();
+        // Step 2: PUT directly to Supabase Storage
+        const putRes = await fetch(signed_url, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type },
+        });
+        if (!putRes.ok) throw new Error('Upload failed');
+        // Step 3: record in DB
+        const recordRes = await apiFetch(`/api/media?propertyId=${supabaseId}`, {
+          method: 'POST',
+          body: JSON.stringify({ storage_path, media_type: mediaType }),
+        });
+        if (!recordRes.ok) throw new Error('Could not save media record');
+      }
+      await loadMedia();
+    } catch (err) {
+      setMediaError(err.message || 'Upload failed. Please try again.');
+    } finally {
+      setUploadingMedia(false);
+    }
+  };
+
+  const handleMediaDelete = async (mediaId) => {
+    try {
+      await apiFetch(`/api/media?propertyId=${supabaseId}&mediaId=${mediaId}`, { method: 'DELETE' });
+      setMediaItems(prev => prev.filter(m => m.id !== mediaId));
+    } catch {
+      setMediaError('Could not delete item. Please try again.');
+    }
+  };
 
   useEffect(() => {
     if (!supabaseId) return;
@@ -613,7 +681,7 @@ export default function PropertySettings() {
             </button>
           </div>
 
-          {/* QR Code */}
+          {/* QR Code — inside booking link card */}
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', flexWrap: 'wrap' }}>
             <div style={{
               background: '#fff',
@@ -659,6 +727,65 @@ export default function PropertySettings() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── Photos & Video ─────────────────────────────────── */}
+      {supabaseId && (
+        <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Photos &amp; Video</h3>
+          <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
+            Upload photos and a video walkthrough. Guests see these in WhatsApp when they enquire.
+            Max 10 items total.
+          </p>
+
+          {mediaError && (
+            <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#ff6b6b' }}>{mediaError}</p>
+          )}
+
+          {/* Thumbnail grid */}
+          {mediaItems.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
+              {mediaItems.map(m => (
+                <div key={m.id} style={{ position: 'relative', width: '96px', height: '96px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  {m.media_type === 'image' ? (
+                    <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>🎬</div>
+                  )}
+                  <button
+                    onClick={() => handleMediaDelete(m.id)}
+                    style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                    title="Remove"
+                  >×</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {mediaItems.length < 10 && (
+            <label style={{ display: 'inline-block', cursor: uploadingMedia ? 'not-allowed' : 'pointer' }}>
+              <input
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleMediaUpload}
+                disabled={uploadingMedia}
+              />
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                background: uploadingMedia ? 'rgba(200,169,110,0.4)' : '#c8a96e',
+                color: '#0d0d14', borderRadius: '8px', padding: '9px 18px',
+                fontSize: '13px', fontWeight: 700, pointerEvents: uploadingMedia ? 'none' : 'auto',
+              }}>
+                {uploadingMedia ? 'Uploading…' : '+ Add photos / video'}
+              </span>
+            </label>
+          )}
+          <p style={{ margin: '10px 0 0', fontSize: '11px', color: '#6c6a7e' }}>
+            Images up to 5 MB · Videos up to 16 MB · Sent inside WhatsApp enquiry session (free)
+          </p>
         </div>
       )}
     </div>
