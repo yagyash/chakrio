@@ -731,63 +731,67 @@ export default function PropertySettings() {
       )}
 
       {/* ── Photos & Video ─────────────────────────────────── */}
-      {supabaseId && (
-        <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Photos &amp; Video</h3>
-          <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
-            Upload photos and a video walkthrough. Guests see these in WhatsApp when they enquire.
-            Max 10 items total.
-          </p>
+      <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Photos &amp; Video</h3>
+        <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
+          Upload photos and a video walkthrough. Guests see these in WhatsApp when they enquire.
+          Max 10 items total.
+        </p>
 
-          {mediaError && (
-            <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#ff6b6b' }}>{mediaError}</p>
-          )}
+        {!supabaseId ? (
+          <p style={{ fontSize: '13px', color: '#8c8a9e' }}>Property not yet linked to Supabase — contact support to enable media uploads.</p>
+        ) : (
+          <>
+            {mediaError && (
+              <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#ff6b6b' }}>{mediaError}</p>
+            )}
 
-          {/* Thumbnail grid */}
-          {mediaItems.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
-              {mediaItems.map(m => (
-                <div key={m.id} style={{ position: 'relative', width: '96px', height: '96px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  {m.media_type === 'image' ? (
-                    <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>🎬</div>
-                  )}
-                  <button
-                    onClick={() => handleMediaDelete(m.id)}
-                    style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
-                    title="Remove"
-                  >×</button>
-                </div>
-              ))}
-            </div>
-          )}
+            {/* Thumbnail grid */}
+            {mediaItems.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px' }}>
+                {mediaItems.map(m => (
+                  <div key={m.id} style={{ position: 'relative', width: '96px', height: '96px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    {m.media_type === 'image' ? (
+                      <img src={m.url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>🎬</div>
+                    )}
+                    <button
+                      onClick={() => handleMediaDelete(m.id)}
+                      style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(0,0,0,0.7)', border: 'none', color: '#fff', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', fontSize: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                      title="Remove"
+                    >×</button>
+                  </div>
+                ))}
+              </div>
+            )}
 
-          {mediaItems.length < 10 && (
-            <label style={{ display: 'inline-block', cursor: uploadingMedia ? 'not-allowed' : 'pointer' }}>
-              <input
-                type="file"
-                accept="image/*,video/*"
-                multiple
-                style={{ display: 'none' }}
-                onChange={handleMediaUpload}
-                disabled={uploadingMedia}
-              />
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: '6px',
-                background: uploadingMedia ? 'rgba(200,169,110,0.4)' : '#c8a96e',
-                color: '#0d0d14', borderRadius: '8px', padding: '9px 18px',
-                fontSize: '13px', fontWeight: 700, pointerEvents: uploadingMedia ? 'none' : 'auto',
-              }}>
-                {uploadingMedia ? 'Uploading…' : '+ Add photos / video'}
-              </span>
-            </label>
-          )}
-          <p style={{ margin: '10px 0 0', fontSize: '11px', color: '#6c6a7e' }}>
-            Images up to 5 MB · Videos up to 16 MB · Sent inside WhatsApp enquiry session (free)
-          </p>
-        </div>
-      )}
+            {mediaItems.length < 10 && (
+              <label style={{ display: 'inline-block', cursor: uploadingMedia ? 'not-allowed' : 'pointer' }}>
+                <input
+                  type="file"
+                  accept="image/*,video/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={handleMediaUpload}
+                  disabled={uploadingMedia}
+                />
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  background: uploadingMedia ? 'rgba(200,169,110,0.4)' : '#c8a96e',
+                  color: '#0d0d14', borderRadius: '8px', padding: '9px 18px',
+                  fontSize: '13px', fontWeight: 700, pointerEvents: uploadingMedia ? 'none' : 'auto',
+                }}>
+                  {uploadingMedia ? 'Uploading…' : '+ Add photos / video'}
+                </span>
+              </label>
+            )}
+            <p style={{ margin: '10px 0 0', fontSize: '11px', color: '#6c6a7e' }}>
+              Images up to 5 MB · Videos up to 16 MB · Sent inside WhatsApp enquiry session (free)
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }
