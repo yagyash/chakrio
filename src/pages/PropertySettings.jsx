@@ -99,7 +99,7 @@ export default function PropertySettings() {
   const loadMedia = async () => {
     if (!supabaseId) return;
     try {
-      const r = await apiFetch(`/api/media?propertyId=${supabaseId}`);
+      const r = await apiFetch(`/api/guests?propertyId=${supabaseId}&resource=media`);
       if (r.ok) setMediaItems(await r.json());
     } catch { /* best-effort */ }
   };
@@ -125,7 +125,7 @@ export default function PropertySettings() {
           filename: file.name,
           contentType: file.type,
         });
-        const signRes = await apiFetch(`/api/media?${params}`);
+        const signRes = await apiFetch(`/api/guests?${params}`);
         if (!signRes.ok) throw new Error('Could not get upload URL');
         const { signed_url, storage_path } = await signRes.json();
         // Step 2: PUT directly to Supabase Storage
@@ -136,7 +136,7 @@ export default function PropertySettings() {
         });
         if (!putRes.ok) throw new Error('Upload failed');
         // Step 3: record in DB
-        const recordRes = await apiFetch(`/api/media?propertyId=${supabaseId}`, {
+        const recordRes = await apiFetch(`/api/guests?propertyId=${supabaseId}&resource=media`, {
           method: 'POST',
           body: JSON.stringify({ storage_path, media_type: mediaType }),
         });
@@ -152,7 +152,7 @@ export default function PropertySettings() {
 
   const handleMediaDelete = async (mediaId) => {
     try {
-      await apiFetch(`/api/media?propertyId=${supabaseId}&mediaId=${mediaId}`, { method: 'DELETE' });
+      await apiFetch(`/api/guests?propertyId=${supabaseId}&resource=media&mediaId=${mediaId}`, { method: 'DELETE' });
       setMediaItems(prev => prev.filter(m => m.id !== mediaId));
     } catch {
       setMediaError('Could not delete item. Please try again.');

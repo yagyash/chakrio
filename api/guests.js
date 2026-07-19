@@ -129,5 +129,59 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Media (photos & video) ────────────────────────────────────────
+  const { mediaId, action, filename, contentType } = req.query;
+
+  if (action === 'signed-upload') {
+    const params = new URLSearchParams({ property_id: propertyId });
+    if (filename) params.set('filename', filename);
+    if (contentType) params.set('content_type', contentType);
+    try {
+      const up = await fetch(`${agentUrl}/media/signed-upload?${params}`, {
+        headers: { 'X-Onboard-Secret': secret },
+      });
+      const data = await up.json().catch(() => ({}));
+      if (!up.ok) return res.status(up.status).json({ error: data.detail ?? 'Failed' });
+      return res.status(200).json(data);
+    } catch {
+      return res.status(502).json({ error: 'Could not reach service' });
+    }
+  }
+
+  if (req.query.resource === 'media') {
+    try {
+      if (req.method === 'GET') {
+        const up = await fetch(`${agentUrl}/media/${propertyId}`, {
+          headers: { 'X-Onboard-Secret': secret },
+        });
+        const data = await up.json().catch(() => ({}));
+        if (!up.ok) return res.status(up.status).json({ error: data.detail ?? 'Failed' });
+        return res.status(200).json(data);
+      }
+      if (req.method === 'POST') {
+        const up = await fetch(`${agentUrl}/media/record?property_id=${propertyId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+          body: JSON.stringify(req.body),
+        });
+        const data = await up.json().catch(() => ({}));
+        if (!up.ok) return res.status(up.status).json({ error: data.detail ?? 'Failed' });
+        return res.status(200).json(data);
+      }
+      if (req.method === 'DELETE') {
+        if (!mediaId) return res.status(400).json({ error: 'mediaId required' });
+        const up = await fetch(`${agentUrl}/media/${mediaId}`, {
+          method: 'DELETE',
+          headers: { 'X-Onboard-Secret': secret },
+        });
+        const data = await up.json().catch(() => ({}));
+        if (!up.ok) return res.status(up.status).json({ error: data.detail ?? 'Failed' });
+        return res.status(200).json(data);
+      }
+    } catch {
+      return res.status(502).json({ error: 'Could not reach service' });
+    }
+  }
+
   return res.status(405).json({ error: 'Method not allowed' });
 }
