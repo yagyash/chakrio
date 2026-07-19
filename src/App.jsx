@@ -3,8 +3,10 @@ import { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import ScrollToTop from './components/shared/ScrollToTop';
 import LoginPage from './components/auth/LoginPage';
 import AppShell from './AppShell';
+import ErrorBoundary from './components/shared/ErrorBoundary';
 import LandingPage from './pages/LandingPage';
 import OnboardPage from './pages/OnboardPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -31,7 +33,9 @@ export default function App() {
     <HelmetProvider>
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <MetaPageView />
+        <ErrorBoundary>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LandingPage />} />
@@ -67,6 +71,7 @@ export default function App() {
             }
           />
         </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </AuthProvider>
     </HelmetProvider>
