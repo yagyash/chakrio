@@ -15,6 +15,7 @@ const CATEGORY_STYLES = {
   food:          { bg: 'rgba(78,205,196,0.1)',  color: '#4ecdc4', border: 'rgba(78,205,196,0.25)'  },
   transport:     { bg: 'rgba(56,189,248,0.1)',  color: '#38bdf8', border: 'rgba(56,189,248,0.25)'  },
   construction:  { bg: 'rgba(251,146,60,0.1)',  color: '#fb923c', border: 'rgba(251,146,60,0.25)'  },
+  equipment:     { bg: 'rgba(236,72,153,0.1)',  color: '#ec4899', border: 'rgba(236,72,153,0.25)'  },
   'owner drawing': { bg: 'rgba(248,113,113,0.1)', color: '#f87171', border: 'rgba(248,113,113,0.25)' },
   rent:          { bg: 'rgba(92,184,138,0.1)',  color: '#5cb88a', border: 'rgba(92,184,138,0.25)'  },
 };

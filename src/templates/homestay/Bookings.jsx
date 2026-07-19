@@ -13,6 +13,7 @@ const HEADER_MAP = {
   total_amount:   'Total Amount',
   advance_amount: 'Advance Paid',
   balance_amount: 'Balance Due',
+  is_mgmt:        'Type',
 };
 
 function formatHeader(col) {
@@ -21,8 +22,17 @@ function formatHeader(col) {
 }
 
 function formatCell(col, val) {
-  if (!val && val !== 0) return val;
   const c = col.toLowerCase().replace(/[\s_-]/g, '');
+
+  // Management/owner block — boolean flag, not a paying guest (checked before the
+  // generic falsy guard below, since `false` would otherwise render as blank)
+  if (c === 'ismgmt') {
+    return val
+      ? <span style={{ color: '#a896f8', fontWeight: 600, fontSize: '11px' }}>MGMT</span>
+      : <span style={{ color: '#56546a' }}>—</span>;
+  }
+
+  if (!val && val !== 0) return val;
 
   if (c.includes('status')) return <StatusBadge value={val} />;
   if (isDateCol(col)) return formatDate(val);
