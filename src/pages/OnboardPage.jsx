@@ -305,6 +305,12 @@ function Step2({ data, onChange, errors }) {
           <input style={S.input} value={data.google_review_link} onChange={e => onChange('google_review_link', e.target.value)} placeholder="https://g.page/r/..." />
         </div>
       </div>
+
+      <div style={S.row}>
+        <label style={S.label}>UPI ID for advance payments (optional)</label>
+        <input style={S.input} value={data.upi_id} onChange={e => onChange('upi_id', e.target.value)} placeholder="e.g. yourname@upi or yourname@ybl" />
+        <div style={S.hint}>Sent to guests when an advance is required after booking via WhatsApp</div>
+      </div>
     </>
   );
 }
@@ -501,6 +507,7 @@ function Step4({ client, property, rooms, otaFeeds }) {
     property.address ? ['Address', property.address] : null,
     property.manager_phone ? ['Manager Phone', property.manager_phone] : null,
     property.google_review_link ? ['Google Review', property.google_review_link] : null,
+    property.upi_id ? ['UPI ID', property.upi_id] : null,
     property.owner_names_raw ? ['Owner Name(s)', property.owner_names_raw] : null,
     property.owner_phone ? ['Owner WhatsApp', property.owner_phone] : null,
     property.owner_telegram_chat_id ? ['Owner Telegram ID', property.owner_telegram_chat_id] : null,
@@ -573,7 +580,7 @@ export default function OnboardPage() {
   const [property, setProperty] = useState({
     property_name: '', property_id: '', short_name: '', property_type: 'homestay',
     notification_channel: 'telegram', telegram_chat_id: '', manager_whatsapp: '',
-    address: '', manager_phone: '', google_review_link: '',
+    address: '', manager_phone: '', google_review_link: '', upi_id: '',
     owner_names_raw: '', owner_phone: '', owner_telegram_chat_id: '',
     subscription_notify: 'manager', monthly_report_notify: 'manager',
     _slugEdited: false, _shortEdited: false,
@@ -640,6 +647,7 @@ export default function OnboardPage() {
           address:                property.address,
           manager_phone:          property.manager_phone,
           google_review_link:     property.google_review_link,
+          upi_id:                 property.upi_id,
           has_rooms:              HOTEL_TYPES.has(property.property_type) || hasRoomsOverride,
           is_hotel_type:          HOTEL_TYPES.has(property.property_type) || hasRoomsOverride,
           owner_names:            property.owner_names_raw
