@@ -1,19 +1,12 @@
 /**
  * Vercel Serverless Function — GET /api/admin-clients
  *
- * Returns all clients + their properties for the admin dashboard.
- * Only accessible to the admin email (ADMIN_EMAIL env var).
- *
- * Flow:
- *   1. Verify Firebase ID token
- *   2. Check decoded email === ADMIN_EMAIL
- *   3. Fetch clients JOIN properties from Supabase
- *
- * Env vars required (Vercel Dashboard):
- *   FIREBASE_PROJECT_ID
- *   SUPABASE_URL
- *   SUPABASE_SERVICE_ROLE_KEY
- *   ADMIN_EMAIL
+ * Default (no action):  returns all clients + properties + usage counts
+ * ?action=token-history&propertyId=UUID  → monthly token breakdown (last 6 months)
+ * ?action=activity                        → global activity log (last 20 events)
+ * ?action=payment-history&propertyId=UUID → payment history for a property
+ * ?action=checklist&propertyId=UUID       → onboard status checklist for a property
+ * ?action=stats                           → collected-this-month from payment_history
  */
 
 import { createRemoteJWKSet, jwtVerify } from 'jose';
@@ -22,20 +15,13 @@ const FIREBASE_JWKS = createRemoteJWKSet(
   new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com')
 );
 
-export default async function handler(req, res) {
-  res.setHeader('Content-Type', 'application/json');
-
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  // ── 1. Verify Firebase ID token ──────────────────────────────────
+async function verifyAdmin(req) {
   const authHeader = req.headers['authorization'] ?? '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : null;
-  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  if (!token) return false;
 
   const projectId = process.env.FIREBASE_PROJECT_ID;
-  if (!projectId) return res.status(500).json({ error: 'Server configuration error' });
+  if (!projectId) return false;
 
   let payload;
   try {
@@ -45,70 +31,122 @@ export default async function handler(req, res) {
     });
     payload = result.payload;
   } catch {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return false;
   }
 
-  // ── 2. Admin-only gate (Supabase admins table) ──────────────────
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !supabaseKey) return res.status(500).json({ error: 'Server configuration error' });
+  if (!supabaseUrl || !supabaseKey) return false;
 
-  const adminCheck = await fetch(
+  const adminRes = await fetch(
     `${supabaseUrl}/rest/v1/admins?email=eq.${encodeURIComponent(payload.email)}&select=email&limit=1`,
-    {
-      headers: {
-        apikey:        supabaseKey,
-        Authorization: `Bearer ${supabaseKey}`,
-        Accept:        'application/json',
-      },
-    }
+    { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Accept: 'application/json' } }
   ).catch(() => null);
-  const adminRows = adminCheck?.ok ? await adminCheck.json().catch(() => []) : [];
-  if (!Array.isArray(adminRows) || adminRows.length === 0) {
-    return res.status(403).json({ error: 'Forbidden' });
+
+  const rows = adminRes?.ok ? await adminRes.json().catch(() => []) : [];
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+export default async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const isAdmin = await verifyAdmin(req);
+  if (!isAdmin) return res.status(403).json({ error: 'Forbidden' });
+
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supaHeaders = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Accept: 'application/json' };
+
+  const { action, propertyId } = req.query;
+
+  // ── token-history ──────────────────────────────────────────────────
+  if (action === 'token-history') {
+    if (!propertyId) return res.status(400).json({ error: 'propertyId required' });
+    const r = await fetch(`${supabaseUrl}/rest/v1/rpc/get_token_monthly`, {
+      method: 'POST',
+      headers: { ...supaHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_property_id: propertyId }),
+    });
+    if (!r.ok) return res.status(502).json({ error: 'RPC failed' });
+    return res.status(200).json(await r.json());
   }
 
-  // ── 3. Fetch from Supabase ───────────────────────────────────────
+  // ── activity ───────────────────────────────────────────────────────
+  if (action === 'activity') {
+    const r = await fetch(`${supabaseUrl}/rest/v1/rpc/get_activity_log`, {
+      method: 'POST',
+      headers: { ...supaHeaders, 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    if (!r.ok) return res.status(502).json({ error: 'RPC failed' });
+    return res.status(200).json(await r.json());
+  }
+
+  // ── payment-history ────────────────────────────────────────────────
+  if (action === 'payment-history') {
+    if (!propertyId) return res.status(400).json({ error: 'propertyId required' });
+    const r = await fetch(
+      `${supabaseUrl}/rest/v1/payment_history?property_id=eq.${propertyId}&order=created_at.desc&limit=20`,
+      { headers: supaHeaders }
+    );
+    if (!r.ok) return res.status(502).json({ error: 'Query failed' });
+    return res.status(200).json(await r.json());
+  }
+
+  // ── checklist ──────────────────────────────────────────────────────
+  if (action === 'checklist') {
+    if (!propertyId) return res.status(400).json({ error: 'propertyId required' });
+    const r = await fetch(`${supabaseUrl}/rest/v1/rpc/get_onboard_status`, {
+      method: 'POST',
+      headers: { ...supaHeaders, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_property_id: propertyId }),
+    });
+    if (!r.ok) return res.status(502).json({ error: 'RPC failed' });
+    const rows = await r.json();
+    return res.status(200).json(rows[0] ?? { has_message: false, has_booking: false });
+  }
+
+  // ── stats (collected this month) ───────────────────────────────────
+  if (action === 'stats') {
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    const r = await fetch(
+      `${supabaseUrl}/rest/v1/payment_history?created_at=gte.${startOfMonth.toISOString()}&select=amount`,
+      { headers: supaHeaders }
+    );
+    const rows = r.ok ? await r.json().catch(() => []) : [];
+    const collected = rows.reduce((s, row) => s + (Number(row.amount) || 0), 0);
+    return res.status(200).json({ collected_this_month: collected });
+  }
+
+  // ── default: all clients ───────────────────────────────────────────
   let supaRes;
   try {
     supaRes = await fetch(
       `${supabaseUrl}/rest/v1/clients?select=id,name,plan,email,phone,is_active,created_at,properties(id,property_id,property_name,property_type,notification_channel,is_active,created_at,subscription_due_date,subscription_amount,subscription_status)&order=created_at.desc&limit=500`,
-      {
-        headers: {
-          apikey:        supabaseKey,
-          Authorization: `Bearer ${supabaseKey}`,
-          Accept:        'application/json',
-        },
-      }
+      { headers: supaHeaders }
     );
   } catch {
     return res.status(502).json({ error: 'Database unreachable' });
   }
 
-  if (!supaRes.ok) {
-    return res.status(502).json({ error: 'Failed to fetch client data' });
-  }
-
+  if (!supaRes.ok) return res.status(502).json({ error: 'Failed to fetch client data' });
   const clients = await supaRes.json();
 
-  // ── 4. Fetch usage counts per property ──────────────────────────
   let usageCounts = {};
   try {
     const usageRes = await fetch(`${supabaseUrl}/rest/v1/rpc/get_usage_counts`, {
-      method:  'POST',
-      headers: {
-        apikey:          supabaseKey,
-        Authorization:   `Bearer ${supabaseKey}`,
-        'Content-Type':  'application/json',
-        Accept:          'application/json',
-      },
+      method: 'POST',
+      headers: { ...supaHeaders, 'Content-Type': 'application/json' },
       body: '{}',
     });
     if (usageRes.ok) {
       const rows = await usageRes.json();
       rows.forEach(r => { usageCounts[r.property_id] = r; });
     }
-  } catch { /* non-fatal — usage counts are optional */ }
+  } catch { /* non-fatal */ }
 
   clients.forEach(c => c.properties?.forEach(p => {
     p.usage = usageCounts[p.id] ?? null;
