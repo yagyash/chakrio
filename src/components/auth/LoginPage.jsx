@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   signInWithEmailAndPassword,
-  signInWithRedirect,
+  signInWithPopup,
   signInWithEmailLink,
   isSignInWithEmailLink,
-  getRedirectResult,
   sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth, googleProvider } from '../../services/firebase';
@@ -44,13 +43,6 @@ export default function LoginPage() {
     }
   }, []);
 
-  // Google redirect result
-  useEffect(() => {
-    getRedirectResult(auth)
-      .then((result) => { if (result) setLoading(true); })
-      .catch((err)   => { setError(friendlyError(err.code)); });
-  }, []);
-
   const handleMagicLinkSignIn = async (e) => {
     e.preventDefault();
     setError('');
@@ -81,7 +73,8 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await signInWithRedirect(auth, googleProvider);
+      await signInWithPopup(auth, googleProvider);
+      // AuthContext.profileStatus will change → useEffect above navigates
     } catch (err) {
       setError(friendlyError(err.code));
       setLoading(false);
@@ -248,6 +241,8 @@ function friendlyError(code) {
     'auth/too-many-requests':         'Too many attempts. Please try again later.',
     'auth/network-request-failed':    'Network error. Check your connection.',
     'auth/popup-closed-by-user':      'Google sign-in was cancelled.',
+    'auth/popup-blocked':             'Pop-up was blocked by your browser. Please allow pop-ups for chakrio.com and try again.',
+    'auth/unauthorized-domain':       'This domain is not authorised for Google sign-in. Contact support.',
     'auth/invalid-action-code':       'This sign-in link has expired or already been used. Please request a new one.',
     'auth/invalid-email':             'Email address does not match the sign-in link.',
   };
