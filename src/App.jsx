@@ -1,11 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuthContext } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import ScrollToTop from './components/shared/ScrollToTop';
 import LoginPage from './components/auth/LoginPage';
 import AppShell from './AppShell';
+
+// Lighter guard for /admin — only requires Firebase auth, not a Firestore profile.
+// AdminDashboard handles its own is-admin check against the Supabase admins table.
+function AdminRoute({ children }) {
+  const { firebaseUser, profileStatus } = useAuthContext();
+  if (profileStatus === 'loading') return null;
+  if (!firebaseUser) return <Navigate to="/login" replace />;
+  return children;
+}
 import ErrorBoundary from './components/shared/ErrorBoundary';
 import LandingPage from './pages/LandingPage';
 import OnboardPage from './pages/OnboardPage';
@@ -51,13 +60,13 @@ export default function App() {
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/menu/:propertyId" element={<MenuPage />} />
 
-          {/* Admin — protected, full-page (outside AppShell) */}
+          {/* Admin — only requires Firebase auth, not Firestore profile */}
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <AdminRoute>
                 <AdminDashboard />
-              </ProtectedRoute>
+              </AdminRoute>
             }
           />
 
