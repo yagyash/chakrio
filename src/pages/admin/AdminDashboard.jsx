@@ -25,7 +25,10 @@ function downloadCSV(clients) {
   a.click();
 }
 
-const EVENT_ICONS = { booking: '📅', onboarded: '✅', payment: '💳' };
+const EVENT_ICONS = {
+  activate: '✅', deactivate: '🔴', payment: '💳', change_plan: '🔄',
+  send_message: '📨', delete: '🗑️', onboarded: '🏠', booking: '📅',
+};
 
 export default function AdminDashboard() {
   const { firebaseUser } = useAuthContext();
@@ -236,23 +239,27 @@ export default function AdminDashboard() {
         <ClientTable clients={clients} onPropertyAction={handlePropertyAction} fetchPropertyData={fetchPropertyData} />
 
         {/* Activity Log (item 9) */}
-        {activity.length > 0 && (
-          <div style={{ marginTop: 28, background: '#16151f', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px' }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#f0eee8', marginBottom: 14 }}>Recent Activity</div>
+        <div style={{ marginTop: 28, background: '#16151f', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '16px 18px' }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#f0eee8', marginBottom: 14 }}>Admin Activity Log</div>
+          {activity.length === 0 ? (
+            <div style={{ fontSize: 13, color: '#56546a' }}>No recent activity — actions you take (activate, payment, plan change, etc.) will appear here.</div>
+          ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {activity.map((ev, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: i < activity.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none', fontSize: 13 }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '9px 0', borderBottom: i < activity.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none', fontSize: 13 }}>
                   <span style={{ fontSize: 16, flexShrink: 0 }}>{EVENT_ICONS[ev.event_type] ?? '📌'}</span>
                   <span style={{ color: '#f0eee8', flex: 1 }}>{ev.description}</span>
-                  <span style={{ color: '#56546a', fontSize: 11, flexShrink: 0 }}>{ev.property_name}</span>
+                  {ev.performed_by && (
+                    <span style={{ color: '#56546a', fontSize: 11, flexShrink: 0 }}>{ev.performed_by.split('@')[0]}</span>
+                  )}
                   <span style={{ color: '#56546a', fontSize: 11, flexShrink: 0 }}>
                     {new Date(ev.occurred_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                   </span>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
