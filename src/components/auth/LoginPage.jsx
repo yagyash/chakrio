@@ -30,9 +30,10 @@ export default function LoginPage() {
     return () => document.head.removeChild(meta);
   }, []);
 
-  // Navigate after auth
+  // Navigate after auth — regular users go to dashboard, admins (no Firestore profile) go to /admin
   useEffect(() => {
     if (profileStatus === 'ready') navigate('/dashboard', { replace: true });
+    if (profileStatus === 'pending') navigate('/admin', { replace: true });
   }, [profileStatus, navigate]);
 
   // Detect Firebase magic link in URL (sent during onboarding)
