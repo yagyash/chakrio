@@ -337,13 +337,13 @@ export default function RentalIncomeCalculator() {
               <p className="font-medium text-text-1 mb-1">Occupancy Rate Calculator</p>
               <p className="text-text-2 text-sm">Calculate your property's occupancy rate for any period.</p>
             </Link>
-            <Link to="/tools/cancellation-policy"
+            <Link to="/tools/gst-calculator-hotel"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
-              <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
+              <p className="font-medium text-text-1 mb-1">Hotel GST Calculator</p>
+              <p className="text-text-2 text-sm">Calculate the correct GST on your room tariff under India's 2025 rules.</p>
             </Link>
             <Link to="/tools/invoice-generator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"

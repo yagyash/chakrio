@@ -272,21 +272,21 @@ export default function CancellationPolicyGenerator() {
       <div className="max-w-3xl mx-auto px-4 pb-10">
         <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
         <div className="grid sm:grid-cols-3 gap-4">
-          <Link to="/tools/occupancy-calculator"
+          <Link to="/tools/whatsapp-booking-confirmation"
             className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
             style={{ textDecoration: 'none' }}
             onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
             onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-            <p className="font-medium text-text-1 mb-1">Occupancy Rate Calculator</p>
-            <p className="text-text-2 text-sm">Calculate your property's occupancy rate and compare to industry benchmarks.</p>
+            <p className="font-medium text-text-1 mb-1">WhatsApp Booking Confirmation Generator</p>
+            <p className="text-text-2 text-sm">Generate a professional booking confirmation message for WhatsApp.</p>
           </Link>
-          <Link to="/tools/rental-income-calculator"
+          <Link to="/tools/gst-calculator-hotel"
             className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
             style={{ textDecoration: 'none' }}
             onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
             onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-            <p className="font-medium text-text-1 mb-1">Rental Income Calculator</p>
-            <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
+            <p className="font-medium text-text-1 mb-1">Hotel GST Calculator</p>
+            <p className="text-text-2 text-sm">Calculate the correct GST on your room tariff under India's 2025 rules.</p>
           </Link>
           <Link to="/tools/invoice-generator"
             className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"

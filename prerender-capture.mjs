@@ -32,6 +32,8 @@ const ROUTES = [
   ['/tools/rental-income-calculator', 'tools/rental-income-calculator/index.html'],
   ['/tools/cancellation-policy', 'tools/cancellation-policy/index.html'],
   ['/tools/invoice-generator', 'tools/invoice-generator/index.html'],
+  ['/tools/whatsapp-booking-confirmation', 'tools/whatsapp-booking-confirmation/index.html'],
+  ['/tools/gst-calculator-hotel', 'tools/gst-calculator-hotel/index.html'],
   ['/', 'index.html'],
 ];
 

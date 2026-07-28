@@ -23,6 +23,8 @@ import OccupancyCalculator from './pages/tools/OccupancyCalculator';
 import RentalIncomeCalculator from './pages/tools/RentalIncomeCalculator';
 import CancellationPolicyGenerator from './pages/tools/CancellationPolicyGenerator';
 import InvoiceGenerator from './pages/tools/InvoiceGenerator';
+import WhatsappBookingConfirmation from './pages/tools/WhatsappBookingConfirmation';
+import GSTCalculator from './pages/tools/GSTCalculator';
 import MenuPage from './pages/MenuPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import DharmshaPage from './pages/DharmshaPage';
@@ -54,6 +56,8 @@ export default function App() {
           <Route path="/tools/rental-income-calculator" element={<RentalIncomeCalculator />} />
           <Route path="/tools/cancellation-policy" element={<CancellationPolicyGenerator />} />
           <Route path="/tools/invoice-generator" element={<InvoiceGenerator />} />
+          <Route path="/tools/whatsapp-booking-confirmation" element={<WhatsappBookingConfirmation />} />
+          <Route path="/tools/gst-calculator-hotel" element={<GSTCalculator />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/dharmshala" element={<DharmshaPage />} />
           <Route path="/terms" element={<Terms />} />

@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
 
-export default function CTABox({ headline, body, buttonText = 'Try Chakrio Free →', buttonHref = '/login' }) {
+export default function CTABox({ headline, body, buttonText = 'Try Chakrio Free →', buttonHref = '/login', toolName = '' }) {
+  function handleClick() {
+    if (toolName && typeof window.gtag === 'function') {
+      window.gtag('event', 'cta_click', { tool_name: toolName });
+    }
+  }
   return (
     <div className="rounded-2xl p-8 text-center border" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(201,162,75,0.1) 0%, transparent 70%), #16151f', borderColor: 'rgba(201,162,75,0.25)' }}>
       <h3 className="font-display font-extrabold text-xl text-text-1 mb-2">
@@ -11,6 +16,7 @@ export default function CTABox({ headline, body, buttonText = 'Try Chakrio Free 
       </p>
       <Link
         to={buttonHref}
+        onClick={handleClick}
         style={{ background: 'linear-gradient(135deg, #C9A24B, #b8934a)', color: '#0E0B14', fontWeight: 600, padding: '12px 24px', borderRadius: '12px', fontSize: '14px', textDecoration: 'none', display: 'inline-block' }}
       >
         {buttonText}

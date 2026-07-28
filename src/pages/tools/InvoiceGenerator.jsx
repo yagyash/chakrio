@@ -7,6 +7,7 @@ import Navbar from '../../components/marketing/Navbar';
 import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
 import ToolConversionHook from '../../components/tools/ToolConversionHook';
+import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 import { db } from '../../services/firebase';
 
 // ---------------------------------------------------------------------------
@@ -564,6 +565,22 @@ export default function InvoiceGenerator() {
         <div className="mt-10">
           <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
           <div className="grid sm:grid-cols-3 gap-4">
+            <Link to="/tools/gst-calculator-hotel"
+              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+              <p className="font-medium text-text-1 mb-1">Hotel GST Calculator</p>
+              <p className="text-text-2 text-sm">Calculate the correct GST on your room tariff under India's 2025 rules.</p>
+            </Link>
+            <Link to="/tools/whatsapp-booking-confirmation"
+              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+              style={{ textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+              <p className="font-medium text-text-1 mb-1">WhatsApp Booking Confirmation Generator</p>
+              <p className="text-text-2 text-sm">Generate a professional booking confirmation message for WhatsApp.</p>
+            </Link>
             <Link to="/tools/occupancy-calculator"
               className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
               style={{ textDecoration: 'none' }}
@@ -571,22 +588,6 @@ export default function InvoiceGenerator() {
               onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
               <p className="font-medium text-text-1 mb-1">Hotel Occupancy Rate Calculator</p>
               <p className="text-text-2 text-sm">Calculate your property's occupancy rate for any period.</p>
-            </Link>
-            <Link to="/tools/rental-income-calculator"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Rental Income Calculator</p>
-              <p className="text-text-2 text-sm">Estimate gross and net income from your property.</p>
-            </Link>
-            <Link to="/tools/cancellation-policy"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Cancellation Policy Generator</p>
-              <p className="text-text-2 text-sm">Generate a professional cancellation policy for your property.</p>
             </Link>
           </div>
         </div>
@@ -597,6 +598,7 @@ export default function InvoiceGenerator() {
           heading="Generating invoices one by one?"
           body="Chakrio logs every booking and expense automatically. Your monthly report is always ready — no manual invoice writing."
         />
+        <LeadCaptureBox sourcePage="invoice-generator" />
       </div>
 
       <Footer />

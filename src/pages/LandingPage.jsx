@@ -107,6 +107,8 @@ const TOOLS = [
   { title: 'Rental Income Calculator', desc: 'Estimate gross and net income from your rooms.', href: '/tools/rental-income-calculator' },
   { title: 'Cancellation Policy Generator', desc: 'Generate a professional cancellation policy in seconds.', href: '/tools/cancellation-policy' },
   { title: 'Villa & Homestay Invoice Generator', desc: 'Generate a clean PDF invoice for your guests in seconds. No sign-up required.', href: '/tools/invoice-generator' },
+  { title: 'WhatsApp Booking Confirmation Generator', desc: 'Generate a professional booking confirmation message for WhatsApp instantly.', href: '/tools/whatsapp-booking-confirmation' },
+  { title: 'Hotel GST Calculator', desc: "Calculate the correct GST on your room tariff under India's updated 2025 rules.", href: '/tools/gst-calculator-hotel' },
 ];
 
 const CAPABILITIES = [
@@ -863,7 +865,7 @@ export default function LandingPage() {
             </div>
             <p className="text-text-3 text-sm">No sign-up required.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {TOOLS.map(t => (
               <Link key={t.href} to={t.href} className="reveal group" style={{
                 background: 'rgba(255,255,255,.025)', borderRadius: 16,
