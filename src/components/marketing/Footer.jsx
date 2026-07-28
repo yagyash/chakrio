@@ -14,6 +14,9 @@ export default function Footer() {
               <Link to="/tools/occupancy-calculator" className="text-sm text-text-2 hover:text-text-1 transition-colors">Occupancy Calculator</Link>
               <Link to="/tools/rental-income-calculator" className="text-sm text-text-2 hover:text-text-1 transition-colors">Rental Income Calculator</Link>
               <Link to="/tools/cancellation-policy" className="text-sm text-text-2 hover:text-text-1 transition-colors">Cancellation Policy</Link>
+              <Link to="/tools/invoice-generator" className="text-sm text-text-2 hover:text-text-1 transition-colors">Invoice Generator</Link>
+              <Link to="/tools/whatsapp-booking-confirmation" className="text-sm text-text-2 hover:text-text-1 transition-colors">WA Booking Confirmation</Link>
+              <Link to="/tools/gst-calculator-hotel" className="text-sm text-text-2 hover:text-text-1 transition-colors">Hotel GST Calculator</Link>
             </div>
             <div className="flex flex-wrap gap-5">
               <Link to="/privacy" className="text-sm text-text-2 hover:text-text-1 transition-colors">Privacy</Link>
