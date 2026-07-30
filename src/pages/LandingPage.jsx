@@ -459,7 +459,7 @@ function PricingSection() {
         <p className="text-text-2 mt-2 max-w-xl mx-auto">14-day free trial on all plans. Real prices, per property. Cancel anytime.</p>
       </div>
 
-      <div className="reveal grid sm:grid-cols-2 xl:grid-cols-5 gap-4 items-start">
+      <div className="reveal grid sm:grid-cols-2 xl:grid-cols-5 gap-4 items-stretch">
         {PRICING_TIERS.map((tier) => {
           return (
             <div key={tier.key} style={{
@@ -469,6 +469,7 @@ function PricingSection() {
                 : 'rgba(255,255,255,.025)',
               borderRadius: 18, padding: 24, position: 'relative',
               boxShadow: tier.featured ? '0 30px 70px -34px #C9A24B' : 'none',
+              display: 'flex', flexDirection: 'column',
             }}>
               {tier.badge && (
                 <div style={{
@@ -491,44 +492,47 @@ function PricingSection() {
               </div>
               <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 22 }}>{tier.sub}</div>
 
-              {/* CTA */}
-              {tier.ctaExternal ? (
-                <a href={tier.ctaHref} target="_blank" rel="noopener noreferrer" style={{
-                  display: 'block', textAlign: 'center', width: '100%',
-                  padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
-                  fontFamily: "'Hanken Grotesk', sans-serif",
-                  background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
-                  border: '1px solid rgba(255,255,255,.16)',
-                  marginBottom: 20,
-                }}>
-                  {tier.cta}
-                </a>
-              ) : (
-                <>
-                  <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
-                    display: 'block', textAlign: 'center', width: '100%',
-                    padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
-                    fontFamily: "'Hanken Grotesk', sans-serif",
-                    background: '#C9A24B', color: '#0E0B14', border: 'none',
-                    marginBottom: 8,
-                  }}>
-                    Chat with us on WhatsApp
-                  </a>
-                  <Link to="/onboard" style={{
-                    display: 'block', textAlign: 'center', width: '100%',
-                    padding: '11px 0', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none',
-                    fontFamily: "'Hanken Grotesk', sans-serif",
-                    background: 'transparent', color: '#9D98AC',
-                    border: '1px solid rgba(255,255,255,.12)',
-                    marginBottom: 20,
-                  }}>
-                    Start 14-day Free Trial →
-                  </Link>
-                </>
-              )}
+              {/* CTA — fixed-height zone so features start at same vertical position across all cards */}
+              <div style={{ marginBottom: 20 }}>
+                {tier.ctaExternal ? (
+                  <>
+                    <a href={tier.ctaHref} target="_blank" rel="noopener noreferrer" style={{
+                      display: 'block', textAlign: 'center', width: '100%',
+                      padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                      fontFamily: "'Hanken Grotesk', sans-serif",
+                      background: '#C9A24B', color: '#0E0B14', border: 'none',
+                      marginBottom: 8, boxSizing: 'border-box',
+                    }}>
+                      {tier.cta}
+                    </a>
+                    <div style={{ height: 46 }} />
+                  </>
+                ) : (
+                  <>
+                    <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+                      display: 'block', textAlign: 'center', width: '100%',
+                      padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                      fontFamily: "'Hanken Grotesk', sans-serif",
+                      background: '#C9A24B', color: '#0E0B14', border: 'none',
+                      marginBottom: 8,
+                    }}>
+                      Chat with us on WhatsApp
+                    </a>
+                    <Link to="/onboard" style={{
+                      display: 'block', textAlign: 'center', width: '100%',
+                      padding: '11px 0', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none',
+                      fontFamily: "'Hanken Grotesk', sans-serif",
+                      background: 'transparent', color: '#9D98AC',
+                      border: '1px solid rgba(255,255,255,.12)',
+                    }}>
+                      Start 14-day Free Trial →
+                    </Link>
+                  </>
+                )}
+              </div>
 
               {/* Features */}
-              <div style={{ fontSize: 14, color: '#CFCAD9', lineHeight: 2.1 }}>
+              <div style={{ fontSize: 14, color: '#CFCAD9', lineHeight: 2.1, flex: 1 }}>
                 {tier.features.map((f, i) => (
                   <div key={i} style={{ color: i === 0 && f.endsWith(':') ? '#9D98AC' : '#CFCAD9' }}>{f}</div>
                 ))}
