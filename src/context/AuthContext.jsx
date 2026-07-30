@@ -124,6 +124,7 @@ export function AuthProvider({ children }) {
         profileStatus,
         loading,
         logout,
+        plan: userProfile?.plan ?? 'starter',
       }}
     >
       {children}

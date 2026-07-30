@@ -4,12 +4,15 @@ import { useAuthContext } from '../../context/AuthContext';
 import businessTemplates from '../../config/businessTemplates';
 
 export default function Sidebar() {
-  const { userProfile, logout, selectedProperty, selectProperty, properties } = useAuthContext();
+  const { userProfile, logout, selectedProperty, selectProperty, properties, plan } = useAuthContext();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const businessType = userProfile?.business_type ?? 'homestay';
   const template = businessTemplates[businessType] ?? businessTemplates.homestay;
-  const nav = template.nav;
+  const PLAN_RANK = { starter: 0, lite: 1, growth: 2, pro: 3, advance: 4 };
+  const nav = template.nav.filter(
+    item => !item.minPlan || (PLAN_RANK[plan] ?? 0) >= (PLAN_RANK[item.minPlan] ?? 0)
+  );
 
   const propertyName = selectedProperty?.property_name ?? 'My Property';
   const ownerName = userProfile?.owner_name ?? '';

@@ -18,6 +18,7 @@ import PropertySettings from './pages/PropertySettings';
 import Campaigns from './pages/Campaigns';
 import Guests from './pages/Guests';
 import Enquiries from './pages/Enquiries';
+import UpgradePrompt from './components/shared/UpgradePrompt';
 
 // Bakery placeholder
 import BakeryComingSoon from './templates/bakery/index';
@@ -28,11 +29,14 @@ import BakeryComingSoon from './templates/bakery/index';
  * - Otherwise → render sidebar + topbar + dashboard routes
  */
 export default function AppShell() {
-  const { userProfile, selectedProperty, properties } = useAuthContext();
+  const { userProfile, selectedProperty, properties, plan } = useAuthContext();
   const { pathname } = useLocation();
   const businessType = userProfile?.business_type ?? 'homestay';
   const PROPERTY_TYPES = ['homestay', 'hotel', 'villa', 'dharmshala'];
   const resolvedType = PROPERTY_TYPES.includes(businessType) ? 'homestay' : businessType;
+
+  const PLAN_RANK = { starter: 0, lite: 1, growth: 2, pro: 3, advance: 4 };
+  const canAccess = (minPlan) => (PLAN_RANK[plan] ?? 0) >= (PLAN_RANK[minPlan] ?? 0);
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -65,10 +69,10 @@ export default function AppShell() {
               <Route path="/calendar" element={<OccupancyCalendar />} />
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/reports" element={<Reports />} />
-              <Route path="/menu" element={<DigitalMenu />} />
-              <Route path="/campaigns" element={<Campaigns />} />
-              <Route path="/guests" element={<Guests />} />
-              <Route path="/enquiries" element={<Enquiries />} />
+              <Route path="/menu" element={canAccess('pro') ? <DigitalMenu /> : <UpgradePrompt minPlan="Pro" />} />
+              <Route path="/campaigns" element={canAccess('lite') ? <Campaigns /> : <UpgradePrompt minPlan="Lite" />} />
+              <Route path="/guests" element={canAccess('lite') ? <Guests /> : <UpgradePrompt minPlan="Lite" />} />
+              <Route path="/enquiries" element={canAccess('lite') ? <Enquiries /> : <UpgradePrompt minPlan="Lite" />} />
               <Route path="/settings" element={<PropertySettings />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

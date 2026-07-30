@@ -41,7 +41,7 @@ function genInvoiceNo() {
 const inputCls = 'w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors text-sm';
 const labelCls = 'block text-xs font-medium text-text-2 mb-1';
 const GOLD = '#C9A24B';
-const GST_RATES = [0, 12, 18];
+const GST_RATES = [0, 5, 18];
 
 // ---------------------------------------------------------------------------
 // PDF generator
@@ -327,7 +327,7 @@ export default function InvoiceGenerator() {
             {
               "@type": "Question",
               "name": "Is GST applicable on villa and homestay stays in India?",
-              "acceptedAnswer": { "@type": "Answer", "text": "GST on hotel and homestay stays in India depends on the room tariff: (1) Rooms priced below ₹1,000/night — exempt from GST. (2) Rooms between ₹1,001 and ₹7,500/night — 12% GST. (3) Rooms above ₹7,500/night — 18% GST. GST registration is required if your annual turnover exceeds ₹20 lakhs. Small homestays and villas below this threshold are not required to charge GST. Consult a tax professional for your specific situation." }
+              "acceptedAnswer": { "@type": "Answer", "text": "GST on hotel and homestay stays in India depends on the room tariff: (1) Rooms priced below ₹1,000/night — exempt from GST. (2) Rooms between ₹1,001 and ₹7,500/night — 5% GST (no input tax credit). (3) Rooms above ₹7,500/night — 18% GST. GST registration is required if your annual turnover exceeds ₹20 lakhs. Small homestays and villas below this threshold are not required to charge GST. Consult a tax professional for your specific situation." }
             },
             {
               "@type": "Question",

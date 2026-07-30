@@ -159,51 +159,77 @@ const PRICING_TIERS = [
   {
     key: 'starter',
     name: 'Starter',
-    inr: { monthly: '₹2,000', annual: '₹1,660' },
-    usd: { monthly: '~$24', annual: '~$20' },
-    sub: '1 property · up to 12 rooms',
-    cta: 'Start Free Trial →',
-    ctaHref: '/login',
+    price: '₹499',
+    sub: 'Up to 4 rooms · small villas & homestays',
     featured: false,
     features: [
-      'Instant booking & expense records',
-      'WhatsApp / Telegram bot',
-      'Real-time dashboard',
-      'Basic monthly P&L',
+      'WhatsApp or Telegram bot',
+      'Bookings — add / update / cancel / settle',
+      'Expenses — 10 auto-categories',
+      'Monthly P&L report (auto + on-demand)',
+      'GST invoice PDF via bot',
+      'Web dashboard',
+    ],
+  },
+  {
+    key: 'lite',
+    name: 'Lite',
+    price: '₹999',
+    sub: 'Up to 8 rooms · growing homestays',
+    featured: false,
+    features: [
+      'Everything in Starter, plus:',
+      'Guest experience layer (pre / mid / post-stay)',
+      'Direct booking link + QR code',
+      'UPI advance payment link to guest',
+      'Guest CRM — VIP / DND flags',
+      'OTA iCal sync (Airbnb, Booking.com)',
+      'Marketing campaigns — 60/mo',
     ],
   },
   {
     key: 'growth',
     name: 'Growth',
-    inr: { monthly: '₹5,000', annual: '₹4,150' },
-    usd: { monthly: '~$60', annual: '~$50' },
-    sub: 'Up to 3 properties · unlimited rooms',
-    cta: 'Start Free Trial →',
-    ctaHref: '/login',
-    featured: true,
+    price: '₹2,199',
+    sub: 'Up to 15 rooms · boutique hotels & homestays',
     badge: '★ Most popular',
+    featured: true,
     features: [
-      'Everything in Starter, plus:',
-      'Monthly P&L reports (auto-sent)',
-      'Guest experience automation',
-      'Priority support',
+      'Everything in Lite, plus:',
+      'Enquiry tracking + auto follow-up nudge',
+      'Marketing campaigns — 125/mo',
+      'Channel Manager add-on available',
     ],
   },
   {
-    key: 'portfolio',
-    name: 'Portfolio',
-    inr: { monthly: 'Custom', annual: 'Custom' },
-    usd: { monthly: '', annual: '' },
-    sub: '4+ properties · multi-team access',
+    key: 'pro',
+    name: 'Pro',
+    price: '₹3,999',
+    sub: 'Up to 30 rooms · hotels & dharamshalas',
+    featured: false,
+    features: [
+      'Everything in Growth, plus:',
+      'Room-level hotel management',
+      'Multi-room + bulk booking',
+      'Food orders + table management',
+      'Digital menu — AI extraction + guest QR',
+      'Marketing campaigns — 250/mo',
+    ],
+  },
+  {
+    key: 'advance',
+    name: 'Advance',
+    price: 'From ₹4,999',
+    sub: '30+ rooms · large hotels & multi-property groups',
     cta: 'Contact for quote →',
     ctaHref: 'https://wa.me/919461888529',
     ctaExternal: true,
     featured: false,
     features: [
-      'Everything in Growth, plus:',
+      'Everything in Pro, plus:',
       'Dedicated onboarding manager',
-      'Custom integrations',
-      'SLA & account manager',
+      'Custom integrations & SLA',
+      'Multi-property group management',
     ],
   },
 ];
@@ -424,53 +450,24 @@ function DirectBookingsSection() {
 }
 
 function PricingSection() {
-  const [annual, setAnnual] = useState(false);
-
-  const pillActive = {
-    background: '#C9A24B', color: '#0E0B14', border: 'none',
-    borderRadius: 999, padding: '9px 18px',
-    fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 14,
-    cursor: 'pointer', transition: 'all .2s',
-  };
-  const pillInactive = {
-    background: 'transparent', color: '#CFCAD9', border: 'none',
-    borderRadius: 999, padding: '9px 18px',
-    fontFamily: "'Hanken Grotesk', sans-serif", fontWeight: 600, fontSize: 14,
-    cursor: 'pointer', transition: 'all .2s',
-  };
 
   return (
     <section id="pricing" className="max-w-6xl mx-auto px-6 py-20">
       <div className="reveal text-center mb-10">
         <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Pricing</p>
         <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight">Simple, transparent pricing.</h2>
-        <p className="text-text-2 mt-2 max-w-xl mx-auto">Real prices, per property. Cancel anytime — onboarding is on us.</p>
-        {/* Toggle */}
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 4,
-          background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.1)',
-          borderRadius: 999, padding: 5, marginTop: 24,
-        }}>
-          <button onClick={() => setAnnual(false)} style={!annual ? pillActive : pillInactive}>Monthly</button>
-          <button onClick={() => setAnnual(true)} style={annual ? pillActive : pillInactive}>
-            Annual <span style={{ fontSize: 11, opacity: 0.8 }}>−17%</span>
-          </button>
-        </div>
+        <p className="text-text-2 mt-2 max-w-xl mx-auto">14-day free trial on all plans. Real prices, per property. Cancel anytime.</p>
       </div>
 
-      <div className="reveal grid lg:grid-cols-3 gap-5 items-start">
+      <div className="reveal grid sm:grid-cols-2 xl:grid-cols-5 gap-4 items-start">
         {PRICING_TIERS.map((tier) => {
-          const isCustom = tier.inr.monthly === 'Custom';
-          const displayInr = isCustom ? 'Custom' : (annual ? tier.inr.annual : tier.inr.monthly);
-          const displayUsd = isCustom ? '' : (annual ? tier.usd.annual : tier.usd.monthly);
-
           return (
             <div key={tier.key} style={{
               border: tier.featured ? '1.5px solid #C9A24B' : '1px solid rgba(255,255,255,.1)',
               background: tier.featured
                 ? 'linear-gradient(180deg,rgba(201,162,75,.1),rgba(255,255,255,.02))'
                 : 'rgba(255,255,255,.025)',
-              borderRadius: 18, padding: 34, position: 'relative',
+              borderRadius: 18, padding: 24, position: 'relative',
               boxShadow: tier.featured ? '0 30px 70px -34px #C9A24B' : 'none',
             }}>
               {tier.badge && (
@@ -486,18 +483,12 @@ function PricingSection() {
               <div style={{ fontWeight: 600, color: tier.featured ? '#C9A24B' : '#CFCAD9', fontSize: 15, marginBottom: 14 }}>{tier.name}</div>
 
               {/* Price */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
-                <span className="font-display font-extrabold" style={{ fontSize: 44, letterSpacing: '-.03em', color: '#F4F1EA', lineHeight: 1 }}>
-                  {displayInr}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 2 }}>
+                <span className="font-display font-extrabold" style={{ fontSize: 36, letterSpacing: '-.03em', color: '#F4F1EA', lineHeight: 1 }}>
+                  {tier.price}
                 </span>
-                {!isCustom && <span style={{ fontSize: 15, color: '#9D98AC' }}>/mo</span>}
+                <span style={{ fontSize: 14, color: '#9D98AC' }}>/mo</span>
               </div>
-              {!isCustom && (
-                <div style={{ fontSize: 14, color: '#C9A24B', marginBottom: 4, fontWeight: 600 }}>
-                  {displayUsd}<span style={{ color: '#9D98AC', fontWeight: 400 }}>/mo</span>
-                  {annual && <span style={{ fontSize: 11, color: '#9D98AC', marginLeft: 6 }}>billed annually</span>}
-                </div>
-              )}
               <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 22 }}>{tier.sub}</div>
 
               {/* CTA */}
@@ -531,7 +522,7 @@ function PricingSection() {
                     border: '1px solid rgba(255,255,255,.12)',
                     marginBottom: 20,
                   }}>
-                    Start Free Trial →
+                    Start 14-day Free Trial →
                   </Link>
                 </>
               )}
@@ -549,31 +540,10 @@ function PricingSection() {
 
       {/* Setup fee note */}
       <div className="reveal mt-8 rounded-xl p-5" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.08)' }}>
-        <p className="text-center text-sm text-text-2 mb-2">
-          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee</span> — included free during onboarding when you book a call
+        <p className="text-center text-sm text-text-2 mb-1">
+          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee: ₹999–₹2,999</span> — waived for launch &amp; reference properties
         </p>
-        <div className="flex flex-wrap justify-center gap-4 text-sm">
-          <span className="text-text-2">1–10 rooms: <strong className="text-text-1">₹9,000 (~$108)</strong></span>
-          <span className="text-text-3">·</span>
-          <span className="text-text-2">11–25 rooms: <strong className="text-text-1">₹17,000 (~$200)</strong></span>
-          <span className="text-text-3">·</span>
-          <span className="text-text-2">26+ rooms: <strong className="text-text-1">Custom</strong></span>
-        </div>
-        <p className="text-center text-xs text-text-3 mt-3">Add-ons: OTA Calendar Sync +₹5,000/mo · Guest campaigns ₹1/message · Room charge +₹100/room/mo</p>
-      </div>
-
-      {/* OTA Calendar Sync add-on callout */}
-      <div className="reveal max-w-6xl mx-auto px-6 mt-6">
-        <div className="rounded-xl p-5 flex flex-col sm:flex-row sm:items-center gap-4" style={{ background: 'rgba(201,162,75,.04)', border: '1px solid rgba(201,162,75,.2)' }}>
-          <Globe size={20} style={{ color: '#C9A24B', flexShrink: 0 }} />
-          <div className="flex-1">
-            <p className="font-semibold text-text-1 text-sm mb-0.5">Add-on: OTA Calendar Sync — <span style={{ color: '#C9A24B' }}>₹5,000/month</span></p>
-            <p className="text-text-3 text-xs">Sync blocked dates with Airbnb, Booking.com, MakeMyTrip &amp; more via iCal. Syncs availability (blocked dates) — not rates or listing content.</p>
-          </div>
-          <a href="https://wa.me/919461888529?text=Hi%2C+I%27m+interested+in+OTA+Calendar+Sync" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold whitespace-nowrap" style={{ color: '#C9A24B', textDecoration: 'underline' }}>
-            Ask us →
-          </a>
-        </div>
+        <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Marketing overage ₹0.90/delivered msg</p>
       </div>
     </section>
   );

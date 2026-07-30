@@ -5,7 +5,14 @@ import { CheckCircle, ChevronRight, ChevronLeft, Upload, X, Download } from 'luc
 const STEPS = ['Business', 'Property', 'Rooms', 'Review'];
 
 const PROPERTY_TYPES = ['homestay', 'villa', 'hotel', 'resort', 'dharamshala'];
-const PLANS          = ['free', 'starter', 'pro'];
+const PLANS          = ['starter', 'lite', 'growth', 'pro', 'advance'];
+const PLAN_LABELS    = {
+  starter: 'Starter — ≤4 rooms · ₹499/mo',
+  lite:    'Lite — ≤8 rooms · ₹999/mo',
+  growth:  'Growth — ≤15 rooms · ₹2,199/mo',
+  pro:     'Pro — ≤30 rooms · ₹3,999/mo',
+  advance: 'Advance — 30+ rooms · from ₹4,999/mo',
+};
 const ROOM_TYPES     = ['standard', 'vip', 'family', 'group', 'dorm'];
 const HOTEL_TYPES    = new Set(['hotel', 'resort', 'dharamshala']);
 const OTA_NAMES      = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 'other'];
@@ -111,7 +118,7 @@ function Step1({ data, onChange, errors }) {
         <div style={S.row}>
           <label style={S.label}>Plan</label>
           <select style={S.select} value={data.plan} onChange={e => onChange('plan', e.target.value)}>
-            {PLANS.map(p => <option key={p} value={p}>{p.charAt(0).toUpperCase() + p.slice(1)}</option>)}
+            {PLANS.map(p => <option key={p} value={p}>{PLAN_LABELS[p]}</option>)}
           </select>
         </div>
         <div style={S.row}>
