@@ -94,6 +94,22 @@ export default async function handler(req, res) {
     Prefer:         'return=minimal',
   };
 
+  // ── POST run_auto_complete ─────────────────────────────────────────
+  if (req.method === 'POST' && (req.body?.action === 'run_auto_complete')) {
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (!agentUrl || !secret) return res.status(500).json({ error: 'Agent not configured' });
+    const r = await fetch(`${agentUrl}/admin/run-auto-complete`, {
+      method: 'POST',
+      headers: { 'X-Onboard-Secret': secret },
+    }).catch(() => null);
+    if (!r || !r.ok) return res.status(502).json({ error: 'Auto-complete trigger failed' });
+    await logAction(supabaseUrl, supabaseKey, {
+      actionType: 'auto_complete', description: 'Manual auto-complete triggered', performedBy: adminEmail,
+    });
+    return res.status(200).json({ ok: true });
+  }
+
   // ── POST send_message ──────────────────────────────────────────────
   if (req.method === 'POST') {
     const { action, propertyId, message } = req.body ?? {};

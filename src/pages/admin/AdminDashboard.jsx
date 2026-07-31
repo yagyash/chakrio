@@ -34,13 +34,14 @@ export default function AdminDashboard() {
   const { firebaseUser } = useAuthContext();
   const navigate = useNavigate();
 
-  const [isAdmin, setIsAdmin]     = useState(null);
-  const [clients, setClients]     = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState('');
-  const [actionMsg, setActionMsg] = useState('');
-  const [activity, setActivity]   = useState([]);
+  const [isAdmin, setIsAdmin]               = useState(null);
+  const [clients, setClients]               = useState([]);
+  const [loading, setLoading]               = useState(true);
+  const [error, setError]                   = useState('');
+  const [actionMsg, setActionMsg]           = useState('');
+  const [activity, setActivity]             = useState([]);
   const [collectedThisMonth, setCollectedThisMonth] = useState(null);
+  const [autoCompleting, setAutoCompleting] = useState(false);
 
   useEffect(() => {
     if (!firebaseUser) return;
@@ -110,6 +111,26 @@ export default function AdminDashboard() {
     return r.ok ? r.json() : null;
   }, [firebaseUser]);
 
+  const handleRunAutoComplete = useCallback(async () => {
+    if (!firebaseUser || autoCompleting) return;
+    setAutoCompleting(true); setActionMsg('');
+    try {
+      const token = await getIdToken(firebaseUser);
+      const r = await fetch('/api/admin-property', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'run_auto_complete' }),
+      });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Failed'); }
+      setActionMsg('Auto-complete triggered — past confirmed bookings marked completed.');
+      await loadClients();
+    } catch (err) {
+      setActionMsg(`Error: ${err.message}`);
+    } finally {
+      setAutoCompleting(false);
+    }
+  }, [firebaseUser, autoCompleting, loadClients]);
+
   // ── States ──────────────────────────────────────────────────────────
   if (!firebaseUser || isAdmin === null) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '40vh', color: '#56546a', fontSize: 14 }}>Checking access...</div>;
@@ -160,6 +181,10 @@ export default function AdminDashboard() {
         <span style={{ fontSize: 16, fontWeight: 700, color: '#6C63FF', letterSpacing: '-0.02em' }}>chakrio</span>
         <span style={{ fontSize: 13, color: '#56546a' }}>/ Admin</span>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={handleRunAutoComplete} disabled={autoCompleting}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(108,99,255,0.08)', border: '1px solid rgba(108,99,255,0.25)', borderRadius: 7, padding: '6px 12px', color: autoCompleting ? '#56546a' : '#6C63FF', cursor: autoCompleting ? 'default' : 'pointer', fontSize: 12, opacity: autoCompleting ? 0.6 : 1 }}>
+            ⚡ {autoCompleting ? 'Running...' : 'Run Auto-Complete'}
+          </button>
           <button onClick={() => downloadCSV(clients)}
             style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 7, padding: '6px 12px', color: '#8c8a9e', cursor: 'pointer', fontSize: 12 }}>
             <Download size={13} /> Export CSV
