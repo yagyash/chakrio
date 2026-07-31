@@ -16,23 +16,30 @@ async function request(path, options) {
   return data;
 }
 
-/** {property_name, has_rooms, rates: [{room_type, price_per_night, capacity}], photos: [url]} */
+/**
+ * {property_name, has_rooms, max_capacity, photos: [url], rates}
+ * has-rooms: rates = [{room_type, price_per_night, capacity}]
+ * villa:     rates = [{guest_count, price_per_night}] — tiered by party size
+ */
 export function getPropertyInfo(propertySlug) {
   return request(`/book/${propertySlug}`);
 }
 
 /** {available, available_count, nights, price_per_night, total_price} */
-export function getAvailability(propertySlug, { roomType, checkIn, checkOut }) {
-  const params = new URLSearchParams({ room_type: roomType, check_in: checkIn, check_out: checkOut });
+export function getAvailability(propertySlug, { roomType, partySize, checkIn, checkOut }) {
+  const params = new URLSearchParams({ check_in: checkIn, check_out: checkOut });
+  if (roomType) params.set('room_type', roomType);
+  if (partySize) params.set('party_size', partySize);
   return request(`/book/${propertySlug}/availability?${params}`);
 }
 
 /** {group_id, payment_method: 'upi'|'razorpay', upi_uri?, payment_url?, amount, expires_at} */
-export function reserve(propertySlug, { rooms, checkIn, checkOut, guestName, guestPhone }) {
+export function reserve(propertySlug, { rooms, partySize, checkIn, checkOut, guestName, guestPhone }) {
   return request(`/book/${propertySlug}/reserve`, {
     method: 'POST',
     body: JSON.stringify({
-      rooms, check_in: checkIn, check_out: checkOut, guest_name: guestName, guest_phone: guestPhone,
+      rooms, party_size: partySize, check_in: checkIn, check_out: checkOut,
+      guest_name: guestName, guest_phone: guestPhone,
     }),
   });
 }

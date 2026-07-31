@@ -49,7 +49,8 @@ export default function PropertyBookingPage() {
   const [infoError, setInfoError] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [quantities, setQuantities] = useState({}); // room_type -> quantity
+  const [quantities, setQuantities] = useState({}); // room_type -> quantity (has-rooms properties)
+  const [partySize, setPartySize] = useState(null); // guest count (villas)
   const [quote, setQuote] = useState(null); // combined availability/price across lines
   const [checking, setChecking] = useState(false);
   const [guestName, setGuestName] = useState('');
@@ -65,7 +66,7 @@ export default function PropertyBookingPage() {
       .then((data) => {
         setInfo(data);
         if (!data.has_rooms && data.rates[0]) {
-          setQuantities({ [data.rates[0].room_type]: 1 });
+          setPartySize(data.rates[0].guest_count);
         }
       })
       .catch(() => setInfoError('Could not load this property right now. Please try again shortly.'));
@@ -77,17 +78,23 @@ export default function PropertyBookingPage() {
   );
 
   async function handleCheckAvailability() {
-    if (!checkIn || !checkOut || activeLines.length === 0) return;
+    if (!checkIn || !checkOut) return;
+    if (info.has_rooms ? activeLines.length === 0 : !partySize) return;
     setChecking(true);
     setError('');
     setQuote(null);
     try {
-      const results = await Promise.all(
-        activeLines.map(([roomType]) => getAvailability(content.backendSlug, { roomType, checkIn, checkOut })),
-      );
-      const allAvailable = results.every((r, i) => r.available_count >= activeLines[i][1]);
-      const total = results.reduce((sum, r, i) => sum + r.price_per_night * r.nights * activeLines[i][1], 0);
-      setQuote({ allAvailable, total, nights: results[0]?.nights || 0 });
+      if (info.has_rooms) {
+        const results = await Promise.all(
+          activeLines.map(([roomType]) => getAvailability(content.backendSlug, { roomType, checkIn, checkOut })),
+        );
+        const allAvailable = results.every((r, i) => r.available_count >= activeLines[i][1]);
+        const total = results.reduce((sum, r, i) => sum + r.price_per_night * r.nights * activeLines[i][1], 0);
+        setQuote({ allAvailable, total, nights: results[0]?.nights || 0 });
+      } else {
+        const r = await getAvailability(content.backendSlug, { partySize, checkIn, checkOut });
+        setQuote({ allAvailable: r.available, total: r.total_price, nights: r.nights });
+      }
     } catch {
       setError('Could not check availability. Please try again.');
     } finally {
@@ -104,7 +111,8 @@ export default function PropertyBookingPage() {
     setError('');
     try {
       const result = await reserve(content.backendSlug, {
-        rooms: activeLines.map(([roomType, quantity]) => ({ room_type: roomType, quantity })),
+        rooms: info.has_rooms ? activeLines.map(([roomType, quantity]) => ({ room_type: roomType, quantity })) : undefined,
+        partySize: info.has_rooms ? undefined : partySize,
         checkIn, checkOut, guestName, guestPhone,
       });
       setReservation(result);
@@ -154,7 +162,7 @@ export default function PropertyBookingPage() {
     ...(info?.rates?.length && {
       makesOffer: info.rates.map((r) => ({
         '@type': 'Offer',
-        name: r.room_type,
+        name: r.room_type || `${r.guest_count} guests`,
         priceCurrency: 'INR',
         price: r.price_per_night,
       })),
@@ -260,9 +268,9 @@ export default function PropertyBookingPage() {
             {info && !confirmed && !reservation && (
               <>
                 <h2 className="font-display text-lg font-bold m-0">Book Direct</h2>
-                {!info.has_rooms && info.rates[0]?.capacity && (
+                {!info.has_rooms && info.max_capacity && (
                   <p className="flex items-center gap-1.5 text-sm text-text-3 mt-1 mb-5">
-                    <Users size={14} /> Whole property, sleeps up to {info.rates[0].capacity} guests
+                    <Users size={14} /> Whole property, sleeps up to {info.max_capacity} guests
                   </p>
                 )}
 
@@ -279,7 +287,7 @@ export default function PropertyBookingPage() {
                   </label>
                 </div>
 
-                {info.has_rooms && (
+                {info.has_rooms ? (
                   <div className="mb-5 divide-y divide-white/6">
                     {info.rates.map((r) => (
                       <div key={r.room_type} className="flex items-center justify-between py-2.5">
@@ -292,9 +300,25 @@ export default function PropertyBookingPage() {
                       </div>
                     ))}
                   </div>
+                ) : (
+                  <label className="block text-xs font-medium text-text-3 mb-5">
+                    Guests
+                    <select value={partySize || ''} onChange={(e) => setPartySize(Number(e.target.value))}
+                      className={`block mt-1.5 ${inputClass}`}>
+                      {info.rates.map((r) => (
+                        <option key={r.guest_count} value={r.guest_count}>
+                          {r.guest_count} guests — ₹{r.price_per_night.toLocaleString('en-IN')}/night
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 )}
 
-                <button onClick={handleCheckAvailability} disabled={checking || !checkIn || !checkOut} className={primaryButtonClass}>
+                <button
+                  onClick={handleCheckAvailability}
+                  disabled={checking || !checkIn || !checkOut || (info.has_rooms ? activeLines.length === 0 : !partySize)}
+                  className={primaryButtonClass}
+                >
                   {checking && <Loader2 size={15} className="animate-spin" />}
                   {checking ? 'Checking…' : 'Check Availability'}
                 </button>
