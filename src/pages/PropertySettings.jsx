@@ -31,8 +31,27 @@ const inputStyle = {
 
 const OTA_OPTIONS = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 'other'];
 
+const PLAN_RANK = { starter: 0, lite: 1, growth: 2, pro: 3, advance: 4 };
+const atLeast = (plan, required) => (PLAN_RANK[plan] ?? 0) >= (PLAN_RANK[required] ?? 1);
+
+function UpgradePrompt({ required }) {
+  return (
+    <div style={{ background: 'rgba(108,99,255,0.06)', border: '1px solid rgba(108,99,255,0.2)', borderRadius: '12px', padding: '16px 20px', marginTop: '20px', maxWidth: '680px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+      <span style={{ fontSize: '20px' }}>🔒</span>
+      <div>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: '#a09bff' }}>
+          Available from {required.charAt(0).toUpperCase() + required.slice(1)} plan
+        </div>
+        <div style={{ fontSize: '12px', color: '#56546a', marginTop: '2px' }}>
+          Upgrade your plan to unlock this feature. Contact us on WhatsApp to upgrade.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PropertySettings() {
-  const { selectedProperty } = useAuthContext();
+  const { selectedProperty, plan } = useAuthContext();
   const propertyId   = selectedProperty?.id || 'default';
   const supabaseId   = selectedProperty?.supabase_property_id || null;
 
@@ -362,8 +381,11 @@ export default function PropertySettings() {
           </>
         )}
       </div>
+      {/* Upgrade prompt for Starter plan */}
+      {!atLeast(plan, 'lite') && <UpgradePrompt required="lite" />}
+
       {/* Google Place ID Card */}
-      <div style={{
+      {atLeast(plan, 'lite') && <div style={{
         background: '#16151f',
         border: '1px solid rgba(255,255,255,0.07)',
         borderRadius: '16px',
@@ -444,9 +466,9 @@ export default function PropertySettings() {
             </div>
           </>
         )}
-      </div>
+      </div>}
       {/* OTA Channel Sync Card */}
-      <div style={{
+      {atLeast(plan, 'lite') && <div style={{
         background: '#16151f',
         border: '1px solid rgba(255,255,255,0.07)',
         borderRadius: '16px',
@@ -640,10 +662,10 @@ export default function PropertySettings() {
         {addError && (
           <p style={{ fontSize: '12px', color: '#e07070', marginTop: '8px' }}>{addError}</p>
         )}
-      </div>
+      </div>}
 
       {/* WhatsApp Booking Link Card */}
-      {bookingLink && (
+      {atLeast(plan, 'lite') && bookingLink && (
         <div style={{
           background: '#16151f',
           border: '1px solid rgba(255,255,255,0.07)',
@@ -757,7 +779,7 @@ export default function PropertySettings() {
       )}
 
       {/* ── UPI Payment ID ───────────────────────────────────── */}
-      {supabaseId && (
+      {atLeast(plan, 'lite') && supabaseId && (
         <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)', marginTop: '20px' }}>
           <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Advance Payment</h3>
           <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
@@ -805,7 +827,7 @@ export default function PropertySettings() {
       )}
 
       {/* ── Photos & Video ─────────────────────────────────── */}
-      <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)' }}>
+      {atLeast(plan, 'lite') && <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)', marginTop: '20px' }}>
         <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Photos &amp; Video</h3>
         <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
           Upload photos and a video walkthrough. Guests see these in WhatsApp when they enquire.
@@ -865,7 +887,7 @@ export default function PropertySettings() {
             </p>
           </>
         )}
-      </div>
+      </div>}
     </div>
   );
 }
