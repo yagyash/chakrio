@@ -26,6 +26,7 @@ import InvoiceGenerator from './pages/tools/InvoiceGenerator';
 import WhatsappBookingConfirmation from './pages/tools/WhatsappBookingConfirmation';
 import GSTCalculator from './pages/tools/GSTCalculator';
 import MenuPage from './pages/MenuPage';
+import PropertyBookingPage from './pages/PropertyBookingPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import DharmshaPage from './pages/DharmshaPage';
 import Terms from './pages/Terms';
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/menu/:propertyId" element={<MenuPage />} />
+          <Route path="/book/:propertySlug" element={<PropertyBookingPage />} />
 
           {/* Admin — only requires Firebase auth, not Firestore profile */}
           <Route

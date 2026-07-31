@@ -34,6 +34,7 @@ const ROUTES = [
   ['/tools/invoice-generator', 'tools/invoice-generator/index.html'],
   ['/tools/whatsapp-booking-confirmation', 'tools/whatsapp-booking-confirmation/index.html'],
   ['/tools/gst-calculator-hotel', 'tools/gst-calculator-hotel/index.html'],
+  ['/book/niva-the-rooted-heaven-udaipur', 'book/niva-the-rooted-heaven-udaipur/index.html'],
   ['/', 'index.html'],
 ];
 
