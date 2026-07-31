@@ -89,6 +89,11 @@ try {
       .waitForFunction(() => document.getElementById('root')?.children?.length > 0, { timeout: 10000 })
       .catch(() => {});
 
+    // react-helmet-async commits to <head> in a later effect tick than the
+    // root's first paint — heavier pages (extra async data fetches) can lose
+    // that race, leaving an empty <title> and JSON-LD stuck in <body>.
+    await page.waitForFunction(() => !!document.title, { timeout: 8000 }).catch(() => {});
+
     // Extract Helmet-managed head tags and body content.
     // react-helmet-async PREPENDS its tags, so querySelector returns Helmet's version first
     // — this correctly deduplicates even when dist/index.html has stale tags below.

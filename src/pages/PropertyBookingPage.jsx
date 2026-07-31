@@ -181,14 +181,14 @@ export default function PropertyBookingPage() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 font-sans">
       <Helmet>
-        <title>{content.displayName} — Book Direct | Chakrio</title>
+        <title>{`${content.displayName} — Book Direct | Chakrio`}</title>
         <meta name="description" content={content.metaDescription} />
         <link rel="canonical" href={canonical} />
         <meta property="og:title" content={`${content.displayName} — Book Direct`} />
         <meta property="og:description" content={content.metaDescription} />
         <meta property="og:url" content={canonical} />
         <meta property="og:type" content="website" />
-        {info?.photos?.[0] && <meta property="og:image" content={info.photos[0]} />}
+        <meta property="og:image" content={info?.photos?.[0] || 'https://chakrio.com/og-image.png'} />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbLd)}</script>
       </Helmet>
