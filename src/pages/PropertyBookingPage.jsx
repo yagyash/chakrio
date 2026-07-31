@@ -14,17 +14,20 @@ import { QRCodeSVG } from 'qrcode.react';
 import { MapPin, Phone, Mail, Users, Check, AlertCircle, CircleCheck, Loader2 } from 'lucide-react';
 import { getPropertyContent } from '../data/propertyContent';
 import { getPropertyInfo, getAvailability, reserve, confirmUpiPayment } from '../services/directBooking';
+import DateRangePicker from '../components/booking/DateRangePicker';
+import Stepper from '../components/booking/Stepper';
+import GuestCountPicker from '../components/booking/GuestCountPicker';
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
 }
 
 const inputClass =
-  'w-full bg-bg-app text-text-1 placeholder:text-text-3 border border-white/15 rounded-lg px-3 py-2.5 text-sm ' +
+  'w-full min-h-11 bg-bg-app text-text-1 placeholder:text-text-3 border border-white/15 rounded-lg px-3 py-2.5 text-sm ' +
   'transition-colors duration-200 focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30';
 
 const primaryButtonClass =
-  'inline-flex items-center justify-center gap-2 bg-gold text-bg-app font-semibold rounded-lg px-5 py-2.5 text-sm ' +
+  'inline-flex items-center justify-center gap-2 min-h-11 bg-gold text-bg-app font-semibold rounded-lg px-5 py-2.5 text-sm ' +
   'transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
 
 function Alert({ tone = 'error', children }) {
@@ -274,44 +277,37 @@ export default function PropertyBookingPage() {
                   </p>
                 )}
 
-                <div className="flex gap-3 flex-wrap mb-5">
-                  <label className="text-xs font-medium text-text-3">
-                    Check-in
-                    <input type="date" min={todayStr()} value={checkIn} onChange={(e) => setCheckIn(e.target.value)}
-                      className={`block mt-1.5 ${inputClass}`} />
-                  </label>
-                  <label className="text-xs font-medium text-text-3">
-                    Check-out
-                    <input type="date" min={checkIn || todayStr()} value={checkOut} onChange={(e) => setCheckOut(e.target.value)}
-                      className={`block mt-1.5 ${inputClass}`} />
-                  </label>
+                <div className="mb-5">
+                  <p className="text-xs font-medium text-text-3 mb-1.5">Dates</p>
+                  <DateRangePicker
+                    checkIn={checkIn}
+                    checkOut={checkOut}
+                    onChange={(next) => { setCheckIn(next.checkIn); setCheckOut(next.checkOut); }}
+                    minDate={todayStr()}
+                  />
                 </div>
 
                 {info.has_rooms ? (
                   <div className="mb-5 divide-y divide-white/6">
                     {info.rates.map((r) => (
-                      <div key={r.room_type} className="flex items-center justify-between py-2.5">
+                      <div key={r.room_type} className="flex items-center justify-between gap-3 py-3">
                         <span className="text-sm text-text-2">
                           {r.room_type}{r.capacity ? ` · sleeps ${r.capacity}` : ''} — <span className="tabular-nums">₹{r.price_per_night.toLocaleString('en-IN')}</span>/night
                         </span>
-                        <input type="number" min={0} max={20} value={quantities[r.room_type] || 0}
-                          onChange={(e) => setQuantities((q) => ({ ...q, [r.room_type]: Number(e.target.value) }))}
-                          className={`w-16 text-center tabular-nums ${inputClass}`} />
+                        <Stepper
+                          value={quantities[r.room_type] || 0}
+                          onChange={(v) => setQuantities((q) => ({ ...q, [r.room_type]: v }))}
+                          max={20}
+                          label={r.room_type}
+                        />
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <label className="block text-xs font-medium text-text-3 mb-5">
-                    Guests
-                    <select value={partySize || ''} onChange={(e) => setPartySize(Number(e.target.value))}
-                      className={`block mt-1.5 ${inputClass}`}>
-                      {info.rates.map((r) => (
-                        <option key={r.guest_count} value={r.guest_count}>
-                          {r.guest_count} guests — ₹{r.price_per_night.toLocaleString('en-IN')}/night
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <div className="mb-5">
+                    <p className="text-xs font-medium text-text-3 mb-2">Guests</p>
+                    <GuestCountPicker options={info.rates} value={partySize} onChange={setPartySize} />
+                  </div>
                 )}
 
                 <button
