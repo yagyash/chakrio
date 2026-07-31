@@ -178,6 +178,7 @@ function Step2({ data, onChange, errors }) {
             onChange={e => { onChange('short_name', e.target.value); onChange('_shortEdited', true); }}
             placeholder="Niva" />
           <div style={S.hint}>Used in bot replies</div>
+          {errors.short_name && <div style={S.err}>{errors.short_name}</div>}
         </div>
       </div>
 
@@ -303,10 +304,13 @@ function Step2({ data, onChange, errors }) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-        <div style={S.row}>
-          <label style={S.label}>Manager Phone (optional)</label>
-          <input style={S.input} value={data.manager_phone} onChange={e => onChange('manager_phone', e.target.value)} placeholder="+91 98765 43210" />
-        </div>
+        {data.notification_channel === 'whatsapp' && (
+          <div style={S.row}>
+            <label style={S.label}>Manager Phone (optional)</label>
+            <input style={S.input} value={data.manager_phone} onChange={e => onChange('manager_phone', e.target.value)} placeholder="+91 98765 43210" />
+            <div style={S.hint}>Contact number shown to guests (if different from WhatsApp above)</div>
+          </div>
+        )}
         <div style={S.row}>
           <label style={S.label}>Google Review Link (optional)</label>
           <input style={S.input} value={data.google_review_link} onChange={e => onChange('google_review_link', e.target.value)} placeholder="https://g.page/r/..." />
@@ -314,9 +318,10 @@ function Step2({ data, onChange, errors }) {
       </div>
 
       <div style={S.row}>
-        <label style={S.label}>UPI ID for advance payments (optional)</label>
+        <label style={S.label}>UPI ID *</label>
         <input style={S.input} value={data.upi_id} onChange={e => onChange('upi_id', e.target.value)} placeholder="e.g. yourname@upi or yourname@ybl" />
-        <div style={S.hint}>Sent to guests when an advance is required after booking via WhatsApp</div>
+        <div style={S.hint}>Sent to guests for direct advance payments after booking via WhatsApp</div>
+        {errors.upi_id && <div style={S.err}>{errors.upi_id}</div>}
       </div>
     </>
   );
@@ -514,7 +519,7 @@ function Step4({ client, property, rooms, otaFeeds }) {
     property.address ? ['Address', property.address] : null,
     property.manager_phone ? ['Manager Phone', property.manager_phone] : null,
     property.google_review_link ? ['Google Review', property.google_review_link] : null,
-    property.upi_id ? ['UPI ID', property.upi_id] : null,
+    ['UPI ID', property.upi_id],
     property.owner_names_raw ? ['Owner Name(s)', property.owner_names_raw] : null,
     property.owner_phone ? ['Owner WhatsApp', property.owner_phone] : null,
     property.owner_telegram_chat_id ? ['Owner Telegram ID', property.owner_telegram_chat_id] : null,
@@ -624,6 +629,8 @@ export default function OnboardPage() {
       if ((property.subscription_notify !== 'manager' || property.monthly_report_notify !== 'manager')
           && !property.owner_phone.trim() && !property.owner_telegram_chat_id.trim())
         errs.owner_contact = 'Owner phone or Telegram ID required when routing to owner';
+      if (!property.upi_id.trim())
+        errs.upi_id = 'Required — guests cannot pay advances without a UPI ID';
     }
     return errs;
   }
