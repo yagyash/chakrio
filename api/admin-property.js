@@ -222,12 +222,26 @@ export default async function handler(req, res) {
 
   } else if (action === 'change_plan') {
     if (!clientId || !plan) return res.status(400).json({ error: 'clientId and plan are required' });
-    const allowed = ['free', 'starter', 'pro'];
+    const allowed = ['starter', 'lite', 'growth', 'pro', 'advance'];
     if (!allowed.includes(plan)) return res.status(400).json({ error: 'Invalid plan' });
+
+    // 1. Update Supabase clients.plan
     const r = await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${clientId}`, {
       method: 'PATCH', headers, body: JSON.stringify({ plan }),
     });
     if (!r.ok) return res.status(502).json({ error: 'Update failed' });
+
+    // 2. Sync plan to Firestore via agent (so dashboard gating reflects the new plan)
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (agentUrl && secret) {
+      await fetch(`${agentUrl}/admin/plan`, {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+        body:    JSON.stringify({ client_id: clientId, plan }),
+      }).catch(() => null); // non-fatal — Supabase is source of truth
+    }
+
     await logAction(supabaseUrl, supabaseKey, {
       actionType:  'change_plan',
       description: `Plan changed to ${plan}`,
