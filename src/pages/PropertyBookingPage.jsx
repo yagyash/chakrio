@@ -60,6 +60,7 @@ export default function PropertyBookingPage() {
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [reservation, setReservation] = useState(null);
+  const [utr, setUtr] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -133,10 +134,14 @@ export default function PropertyBookingPage() {
   }
 
   async function handleConfirmPaid() {
+    if (utr.trim().length < 6) {
+      setError('Please enter the UPI transaction reference (UTR) from your payment.');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
-      await confirmUpiPayment(content.backendSlug, reservation.group_id);
+      await confirmUpiPayment(content.backendSlug, reservation.group_id, utr.trim());
       setConfirmed(true);
     } catch (e) {
       setError(e.message || 'Could not confirm payment. Please try again.');
@@ -374,9 +379,21 @@ export default function PropertyBookingPage() {
                       Scan with any UPI app, or on mobile{' '}
                       <a href={reservation.upi_uri} className="text-brand hover:underline">tap here to pay</a>.
                     </p>
-                    <button onClick={handleConfirmPaid} disabled={busy} className={primaryButtonClass}>
+                    <div className="mb-4">
+                      <p className="text-xs font-medium text-text-3 mb-1.5">UPI transaction ref (UTR)</p>
+                      <input
+                        placeholder="e.g. 234567891234"
+                        value={utr}
+                        onChange={(e) => setUtr(e.target.value)}
+                        className={inputClass}
+                      />
+                      <p className="text-xs text-text-3 mt-1.5">
+                        Find this in your UPI app's payment history — we use it to verify your payment.
+                      </p>
+                    </div>
+                    <button onClick={handleConfirmPaid} disabled={busy || utr.trim().length < 6} className={primaryButtonClass}>
                       {busy && <Loader2 size={15} className="animate-spin" />}
-                      {busy ? 'Confirming…' : "I've paid"}
+                      {busy ? 'Submitting…' : "I've paid"}
                     </button>
                   </>
                 ) : (
@@ -388,7 +405,10 @@ export default function PropertyBookingPage() {
             )}
 
             {confirmed && (
-              <Alert tone="success">Payment received. Your confirmation is on its way via WhatsApp.</Alert>
+              <Alert tone="success">
+                Thanks — we're verifying your payment. You'll get a WhatsApp confirmation once it's checked
+                (usually within a few hours).
+              </Alert>
             )}
 
             {error && <div className="mt-4"><Alert>{error}</Alert></div>}

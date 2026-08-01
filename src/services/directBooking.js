@@ -44,10 +44,15 @@ export function reserve(propertySlug, { rooms, partySize, checkIn, checkOut, gue
   });
 }
 
-/** UPI-method properties only — guest self-report after paying. {status: 'confirmed'} */
-export function confirmUpiPayment(propertySlug, groupId) {
+/**
+ * UPI-method properties only — guest self-report after paying, with a UTR
+ * as evidence. {status: 'pending_verification'} — the booking is created
+ * immediately but the property manager must verify the UTR and reply
+ * CONFIRM/DECLINE before it's real (see routers/direct_booking.py).
+ */
+export function confirmUpiPayment(propertySlug, groupId, utr) {
   return request(`/book/${propertySlug}/confirm-payment`, {
     method: 'POST',
-    body: JSON.stringify({ group_id: groupId }),
+    body: JSON.stringify({ group_id: groupId, utr }),
   });
 }

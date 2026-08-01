@@ -25,7 +25,11 @@ const STATUS_COLORS = {
 };
 
 function statusColor(status) {
-  return STATUS_COLORS[(status || '').toLowerCase()] ?? { bg: 'rgba(140,138,158,0.5)', text: '#fff' };
+  const s = (status || '').toLowerCase();
+  // pending_verification (UPI direct-booking payments awaiting manager
+  // approval) shares the 'pending' swatch rather than getting its own
+  // legend entry — same visual meaning to a manager scanning the calendar.
+  return STATUS_COLORS[s] ?? (s.startsWith('pending') ? STATUS_COLORS.pending : { bg: 'rgba(140,138,158,0.5)', text: '#fff' });
 }
 
 function normalise(s) {
