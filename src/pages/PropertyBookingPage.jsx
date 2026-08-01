@@ -17,6 +17,7 @@ import { getPropertyInfo, getAvailability, reserve, confirmUpiPayment } from '..
 import DateRangePicker from '../components/booking/DateRangePicker';
 import Stepper from '../components/booking/Stepper';
 import GuestCountPicker from '../components/booking/GuestCountPicker';
+import PhotoGallery from '../components/booking/PhotoGallery';
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10);
@@ -79,6 +80,11 @@ export default function PropertyBookingPage() {
     () => Object.entries(quantities).filter(([, qty]) => qty > 0),
     [quantities],
   );
+
+  const startingPrice = useMemo(() => {
+    if (!info?.rates?.length) return null;
+    return Math.min(...info.rates.map((r) => r.price_per_night));
+  }, [info]);
 
   async function handleCheckAvailability() {
     if (!checkIn || !checkOut) return;
@@ -202,61 +208,71 @@ export default function PropertyBookingPage() {
           className="pointer-events-none absolute -top-32 left-1/2 h-96 w-[42rem] -translate-x-1/2 rounded-full opacity-20 blur-3xl"
           style={{ background: 'radial-gradient(closest-side, #6C63FF, transparent)' }}
         />
+        <div
+          className="pointer-events-none absolute -top-16 right-0 h-72 w-72 rounded-full opacity-[0.12] blur-3xl"
+          style={{ background: 'radial-gradient(closest-side, #C9A24B, transparent)' }}
+        />
 
         <main className="relative max-w-3xl mx-auto px-5 py-12 md:py-16">
           {/* Eyebrow + heading */}
-          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-gold m-0">
-            <MapPin size={14} /> {content.locality}
-          </p>
-          <h1 className="font-display text-4xl md:text-[2.75rem] font-extrabold tracking-tight mt-2 mb-5 text-balance">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gold">
+            <MapPin size={13} /> {content.locality}
+          </div>
+          <h1 className="font-display text-4xl md:text-[2.75rem] font-extrabold tracking-tight mt-3 mb-2 text-balance">
             {content.displayName}
           </h1>
+          <div className="h-[3px] w-10 rounded-full bg-gold mb-5" />
 
-          {/* Photos */}
-          {info?.photos?.length > 0 && (
-            <div className={`grid gap-2 mb-8 ${info.photos.length > 1 ? 'grid-cols-3' : 'grid-cols-1'}`}>
-              <img
-                src={info.photos[0]}
-                alt={`${content.displayName} — exterior view`}
-                className={`w-full object-cover rounded-xl shadow-lg shadow-black/30 ${info.photos.length > 1 ? 'col-span-2 h-80' : 'h-80'}`}
-              />
-              {info.photos.length > 1 && (
-                <div className="grid grid-rows-2 gap-2">
-                  {info.photos.slice(1, 3).map((url, i) => (
-                    <img
-                      key={url}
-                      src={url}
-                      alt={`${content.displayName} — view ${i + 2}`}
-                      className="w-full h-full object-cover rounded-xl shadow-lg shadow-black/30"
-                    />
-                  ))}
-                </div>
+          {(startingPrice || (info && !info.has_rooms && info.max_capacity)) && (
+            <div className="flex flex-wrap items-center gap-2.5 mb-7">
+              {!info.has_rooms && info.max_capacity && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-surface2 px-3 py-1.5 text-xs font-medium text-text-2">
+                  <Users size={13} className="text-text-3" /> Sleeps up to {info.max_capacity}
+                </span>
+              )}
+              {startingPrice && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/30 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold tabular-nums">
+                  From ₹{startingPrice.toLocaleString('en-IN')}/night
+                </span>
               )}
             </div>
           )}
 
+          {/* Photos */}
+          <PhotoGallery photos={info?.photos} alt={content.displayName} />
+
           <p className="text-[15px] leading-relaxed text-text-2 max-w-[65ch]">{content.about}</p>
 
           {/* Amenities */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 my-8">
-            {content.amenities.map((a) => (
-              <div key={a} className="flex items-center gap-2.5 text-sm text-text-2">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand">
-                  <Check size={12} strokeWidth={3} />
-                </span>
-                {a}
-              </div>
-            ))}
-          </div>
+          <section className="mt-10 mb-10">
+            <h2 className="font-display text-xl font-bold text-text-1 mb-4">What this place offers</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 rounded-2xl border border-white/8 bg-surface/60 p-5 md:p-6">
+              {content.amenities.map((a) => (
+                <div key={a} className="flex items-center gap-3 text-sm text-text-2">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
+                    <Check size={13} strokeWidth={3} />
+                  </span>
+                  {a}
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* Nearby */}
-          <div className="flex flex-wrap gap-2 mb-10">
-            {content.nearby.map((n) => (
-              <span key={n.name} className="text-xs text-text-3 bg-surface2 border border-white/8 rounded-full px-3 py-1">
-                {n.name} · {n.distance}
-              </span>
-            ))}
-          </div>
+          <section className="mb-10">
+            <h2 className="font-display text-xl font-bold text-text-1 mb-4">Nearby</h2>
+            <div className="flex gap-2.5 overflow-x-auto -mx-5 px-5 pb-1 sm:mx-0 sm:px-0 sm:flex-wrap">
+              {content.nearby.map((n) => (
+                <span
+                  key={n.name}
+                  className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-white/8 bg-surface2 px-3.5 py-2 text-xs text-text-2"
+                >
+                  <MapPin size={12} className="text-gold" /> {n.name}
+                  <span className="text-text-3">· {n.distance}</span>
+                </span>
+              ))}
+            </div>
+          </section>
 
           {/* Booking widget */}
           <section className="bg-surface border border-white/8 rounded-2xl p-6 md:p-8 shadow-xl shadow-black/20">
@@ -379,17 +395,26 @@ export default function PropertyBookingPage() {
           </section>
 
           {/* Contact / NAP */}
-          <address className="not-italic mt-10 text-sm text-text-3 space-y-1.5">
-            <p className="m-0">{content.fullAddress}</p>
-            <p className="m-0 flex flex-wrap items-center gap-x-4 gap-y-1">
-              <a href={`tel:${content.phone}`} className="flex items-center gap-1.5 hover:text-text-2 transition-colors">
-                <Phone size={13} /> {content.phone}
+          <footer className="mt-14 pt-7 border-t border-white/8 flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+            <address className="not-italic text-sm text-text-3 space-y-1.5">
+              <p className="font-display text-base font-semibold text-text-1 m-0">{content.displayName}</p>
+              <p className="m-0">{content.fullAddress}</p>
+            </address>
+            <div className="flex flex-wrap gap-2.5">
+              <a
+                href={`tel:${content.phone}`}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/12 px-4 py-2 text-sm text-text-2 hover:border-white/25 hover:text-text-1 transition-colors"
+              >
+                <Phone size={14} /> {content.phone}
               </a>
-              <a href={`mailto:${content.email}`} className="flex items-center gap-1.5 hover:text-text-2 transition-colors">
-                <Mail size={13} /> {content.email}
+              <a
+                href={`mailto:${content.email}`}
+                className="inline-flex items-center gap-2 rounded-lg border border-white/12 px-4 py-2 text-sm text-text-2 hover:border-white/25 hover:text-text-1 transition-colors"
+              >
+                <Mail size={14} /> {content.email}
               </a>
-            </p>
-          </address>
+            </div>
+          </footer>
         </main>
       </div>
     </div>
