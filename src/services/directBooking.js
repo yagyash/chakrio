@@ -12,7 +12,17 @@ async function request(path, options) {
     headers: { 'Content-Type': 'application/json', ...(options?.headers || {}) },
   });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.detail || 'Request failed');
+  if (!res.ok) {
+    // FastAPI's own request-validation errors (422, e.g. a missing/too-short
+    // field) return detail as an ARRAY of {msg, loc, ...} objects, not a
+    // string — new Error(array) silently stringifies to "[object Object]".
+    // HTTPException(...) calls elsewhere in the API already send a plain
+    // string, so handle both shapes.
+    const detail = Array.isArray(data.detail)
+      ? data.detail.map((d) => d.msg || JSON.stringify(d)).join('; ')
+      : data.detail;
+    throw new Error(detail || 'Request failed');
+  }
   return data;
 }
 
