@@ -173,6 +173,52 @@ function PaymentHistory({ rows }) {
   );
 }
 
+const CAMPAIGN_TEMPLATE_LABELS = {
+  festival_availability: 'Festival Availability',
+  welcome_back_guest:    'Welcome Back',
+  seasonal_offer:        'Seasonal Offer',
+  we_miss_you:           'We Miss You',
+};
+
+const CAMPAIGN_STATUS_COLOR = {
+  queued:                     '#00D4FF',
+  sending:                    '#a89ef5',
+  completed:                  '#4CAF50',
+  failed:                     '#ff6b6b',
+  paused_by_user:             '#8c8a9e',
+  paused_insufficient_funds:  '#ff6b6b',
+};
+
+function CampaignSummary({ rows }) {
+  if (!rows || rows.length === 0) return <div style={{ fontSize: 12, color: '#56546a' }}>No campaigns yet.</div>;
+
+  const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+  const autoSentThisMonth = rows
+    .filter(r => r.source === 'auto' && new Date(r.created_at) >= monthStart)
+    .reduce((s, r) => s + (r.sent_count || 0), 0);
+
+  return (
+    <div>
+      <div style={{ fontSize: 12, color: '#8c8a9e', marginBottom: 8 }}>
+        <span style={{ color: '#a89ef5', fontWeight: 600 }}>{autoSentThisMonth}</span> auto-marketing message{autoSentThisMonth === 1 ? '' : 's'} sent this month
+      </div>
+      {rows.map(r => (
+        <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#8c8a9e', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', gap: 8, flexWrap: 'wrap' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {r.source === 'auto' && (
+              <span style={{ fontSize: 10, fontWeight: 600, color: '#a89ef5', background: 'rgba(108,99,255,0.12)', borderRadius: 3, padding: '1px 5px' }}>AUTO</span>
+            )}
+            {CAMPAIGN_TEMPLATE_LABELS[r.template_name] ?? r.template_name}
+          </span>
+          <span style={{ color: CAMPAIGN_STATUS_COLOR[r.status] ?? '#8c8a9e', fontWeight: 600 }}>{r.status}</span>
+          <span>{r.sent_count || 0}/{r.total_recipients || 0} sent{r.failed_count > 0 ? ` · ${r.failed_count} failed` : ''}</span>
+          <span>{fmtDate(r.created_at)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function OnboardChecklist({ status }) {
   if (!status) return null;
   const items = [
@@ -208,12 +254,13 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
   const loadPropertyData = useCallback(async (propertyId) => {
     if (!fetchPropertyData || propData[propertyId]) return;
     setPropData(prev => ({ ...prev, [propertyId]: { loading: true } }));
-    const [tokenHistory, paymentHistory, checklist] = await Promise.all([
+    const [tokenHistory, paymentHistory, checklist, campaigns] = await Promise.all([
       fetchPropertyData(propertyId, 'token-history'),
       fetchPropertyData(propertyId, 'payment-history'),
       fetchPropertyData(propertyId, 'checklist'),
+      fetchPropertyData(propertyId, 'campaigns'),
     ]);
-    setPropData(prev => ({ ...prev, [propertyId]: { tokenHistory, paymentHistory, checklist, loading: false } }));
+    setPropData(prev => ({ ...prev, [propertyId]: { tokenHistory, paymentHistory, checklist, campaigns, loading: false } }));
   }, [fetchPropertyData, propData]);
 
   function toggleSort(key) {
@@ -434,6 +481,14 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
                                   <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
                                     <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Payment History</div>
                                     <PaymentHistory rows={pd.paymentHistory} />
+                                  </div>
+                                )}
+
+                                {/* Campaigns — manual + auto-marketing send counts */}
+                                {!pd?.loading && pd?.campaigns !== undefined && (
+                                  <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
+                                    <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Campaigns</div>
+                                    <CampaignSummary rows={pd.campaigns} />
                                   </div>
                                 )}
                               </div>

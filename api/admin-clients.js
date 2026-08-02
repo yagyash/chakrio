@@ -6,6 +6,7 @@
  * ?action=activity                        → global activity log (last 20 events)
  * ?action=payment-history&propertyId=UUID → payment history for a property
  * ?action=checklist&propertyId=UUID       → onboard status checklist for a property
+ * ?action=campaigns&propertyId=UUID       → broadcast campaigns (manual + auto) for a property
  * ?action=stats                           → collected-this-month from payment_history
  */
 
@@ -105,6 +106,17 @@ export default async function handler(req, res) {
     if (!r.ok) return res.status(502).json({ error: 'RPC failed' });
     const rows = await r.json();
     return res.status(200).json(rows[0] ?? { has_message: false, has_booking: false });
+  }
+
+  // ── campaigns (manual + auto broadcast history) ──────────────────────
+  if (action === 'campaigns') {
+    if (!propertyId) return res.status(400).json({ error: 'propertyId required' });
+    const r = await fetch(
+      `${supabaseUrl}/rest/v1/broadcast_campaigns?property_id=eq.${propertyId}&select=id,template_name,source,status,sent_count,failed_count,total_recipients,budget_amount,spent_amount,created_at&order=created_at.desc&limit=20`,
+      { headers: supaHeaders }
+    );
+    if (!r.ok) return res.status(502).json({ error: 'Query failed' });
+    return res.status(200).json(await r.json());
   }
 
   // ── stats (collected this month) ───────────────────────────────────
