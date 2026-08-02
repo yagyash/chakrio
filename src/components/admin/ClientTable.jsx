@@ -189,7 +189,7 @@ const CAMPAIGN_STATUS_COLOR = {
   paused_insufficient_funds:  '#ff6b6b',
 };
 
-function CampaignSummary({ rows }) {
+function CampaignSummary({ rows, onPauseResume }) {
   if (!rows || rows.length === 0) return <div style={{ fontSize: 12, color: '#56546a' }}>No campaigns yet.</div>;
 
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
@@ -202,19 +202,29 @@ function CampaignSummary({ rows }) {
       <div style={{ fontSize: 12, color: '#8c8a9e', marginBottom: 8 }}>
         <span style={{ color: '#a89ef5', fontWeight: 600 }}>{autoSentThisMonth}</span> auto-marketing message{autoSentThisMonth === 1 ? '' : 's'} sent this month
       </div>
-      {rows.map(r => (
-        <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#8c8a9e', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {r.source === 'auto' && (
-              <span style={{ fontSize: 10, fontWeight: 600, color: '#a89ef5', background: 'rgba(108,99,255,0.12)', borderRadius: 3, padding: '1px 5px' }}>AUTO</span>
+      {rows.map(r => {
+        const isActive = ['queued', 'sending'].includes(r.status);
+        const isPaused = ['paused_by_user', 'paused_insufficient_funds'].includes(r.status);
+        return (
+          <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, color: '#8c8a9e', padding: '4px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {r.source === 'auto' && (
+                <span style={{ fontSize: 10, fontWeight: 600, color: '#a89ef5', background: 'rgba(108,99,255,0.12)', borderRadius: 3, padding: '1px 5px' }}>AUTO</span>
+              )}
+              {CAMPAIGN_TEMPLATE_LABELS[r.template_name] ?? r.template_name}
+            </span>
+            <span style={{ color: CAMPAIGN_STATUS_COLOR[r.status] ?? '#8c8a9e', fontWeight: 600 }}>{r.status}</span>
+            <span>{r.sent_count || 0}/{r.total_recipients || 0} sent{r.failed_count > 0 ? ` · ${r.failed_count} failed` : ''}</span>
+            <span>{fmtDate(r.created_at)}</span>
+            {isActive && (
+              <ActionBtn small onClick={() => onPauseResume(r.id, 'pause_campaign')}>⏸ Pause</ActionBtn>
             )}
-            {CAMPAIGN_TEMPLATE_LABELS[r.template_name] ?? r.template_name}
-          </span>
-          <span style={{ color: CAMPAIGN_STATUS_COLOR[r.status] ?? '#8c8a9e', fontWeight: 600 }}>{r.status}</span>
-          <span>{r.sent_count || 0}/{r.total_recipients || 0} sent{r.failed_count > 0 ? ` · ${r.failed_count} failed` : ''}</span>
-          <span>{fmtDate(r.created_at)}</span>
-        </div>
-      ))}
+            {isPaused && (
+              <ActionBtn small primary onClick={() => onPauseResume(r.id, 'resume_campaign')}>▶ Resume</ActionBtn>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -262,6 +272,26 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
     ]);
     setPropData(prev => ({ ...prev, [propertyId]: { tokenHistory, paymentHistory, checklist, campaigns, loading: false } }));
   }, [fetchPropertyData, propData]);
+
+  const handleCampaignAction = useCallback(async (propertyId, campaignId, action) => {
+    await onPropertyAction(propertyId, action, { campaignId });
+    // Optimistic local patch (same pattern as the property-facing /campaigns
+    // page) — onPropertyAction swallows errors into the actionMsg banner
+    // rather than throwing, same as every other admin action here, so this
+    // matches existing behavior rather than introducing a new inconsistency.
+    const newStatus = action === 'pause_campaign' ? 'paused_by_user' : 'sending';
+    setPropData(prev => {
+      const pd = prev[propertyId];
+      if (!pd?.campaigns) return prev;
+      return {
+        ...prev,
+        [propertyId]: {
+          ...pd,
+          campaigns: pd.campaigns.map(c => c.id === campaignId ? { ...c, status: newStatus } : c),
+        },
+      };
+    });
+  }, [onPropertyAction]);
 
   function toggleSort(key) {
     if (sortKey === key) setSortAsc(a => !a);
@@ -488,7 +518,10 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
                                 {!pd?.loading && pd?.campaigns !== undefined && (
                                   <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
                                     <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Campaigns</div>
-                                    <CampaignSummary rows={pd.campaigns} />
+                                    <CampaignSummary
+                                      rows={pd.campaigns}
+                                      onPauseResume={(campaignId, campAction) => handleCampaignAction(p.id, campaignId, campAction)}
+                                    />
                                   </div>
                                 )}
                               </div>

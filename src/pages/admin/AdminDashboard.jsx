@@ -94,6 +94,7 @@ export default function AdminDashboard() {
         delete: 'Property deleted.', activate: 'Property activated.', deactivate: 'Property deactivated.',
         payment: 'Payment recorded. Property activated.', change_plan: 'Plan updated.',
         send_message: 'Message sent to manager.',
+        pause_campaign: 'Campaign paused.', resume_campaign: 'Campaign resumed.',
       };
       setActionMsg(labels[action] ?? 'Done.');
       if (action !== 'send_message') await loadClients();

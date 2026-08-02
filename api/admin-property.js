@@ -143,8 +143,9 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   }
 
-  const { propertyId, action, dueDate, amount, clientId, plan } = req.body ?? {};
-  if (!propertyId && action !== 'change_plan') return res.status(400).json({ error: 'propertyId is required' });
+  const { propertyId, action, dueDate, amount, clientId, plan, campaignId } = req.body ?? {};
+  const propertyIdOptional = ['change_plan', 'pause_campaign', 'resume_campaign'].includes(action);
+  if (!propertyId && !propertyIdOptional) return res.status(400).json({ error: 'propertyId is required' });
 
   // ── DELETE ─────────────────────────────────────────────────────────
   if (req.method === 'DELETE') {
@@ -264,6 +265,41 @@ export default async function handler(req, res) {
       performedBy: adminEmail,
     });
     return res.status(200).json({ ok: true });
+
+  } else if (action === 'pause_campaign' || action === 'resume_campaign') {
+    if (!campaignId) return res.status(400).json({ error: 'campaignId is required' });
+    const campaignAction = action === 'pause_campaign' ? 'pause' : 'resume';
+
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (!agentUrl || !secret) return res.status(500).json({ error: 'Agent not configured' });
+
+    // Existing backend endpoint (routers/campaigns.py PATCH) is shared-secret
+    // gated only, no per-property ownership check — same one the property
+    // dashboard's /campaigns page already uses, just reached via admin auth
+    // instead of Firestore ownership (which an admin won't have for every
+    // client's property).
+    let upstream;
+    try {
+      upstream = await fetch(`${agentUrl}/campaigns/${campaignId}`, {
+        method:  'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+        body:    JSON.stringify({ action: campaignAction }),
+      });
+    } catch {
+      return res.status(502).json({ error: 'Could not reach campaign server' });
+    }
+    const data = await upstream.json().catch(() => ({}));
+    if (!upstream.ok) return res.status(upstream.status).json({ error: data.detail ?? `Failed to ${campaignAction} campaign` });
+
+    const propName = propertyId ? await getPropertyName(supabaseUrl, supabaseKey, propertyId) : null;
+    await logAction(supabaseUrl, supabaseKey, {
+      actionType:   action,
+      description:  `Campaign ${campaignAction}d${propName ? ` — ${propName}` : ''}`,
+      propertyName: propName,
+      performedBy:  adminEmail,
+    });
+    return res.status(200).json(data);
 
   } else {
     return res.status(400).json({ error: `Unknown action: ${action}` });
