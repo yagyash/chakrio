@@ -308,31 +308,23 @@ export default function WhatsappBookingConfirmation() {
 
         <div className="mt-10">
           <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
-          <div className="grid sm:grid-cols-3 gap-4">
-            <Link to="/tools/invoice-generator"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Villa &amp; Homestay Invoice Generator</p>
-              <p className="text-text-2 text-sm">Generate a PDF invoice for your guests. No sign-up required.</p>
-            </Link>
-            <Link to="/tools/gst-calculator-hotel"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Hotel GST Calculator</p>
-              <p className="text-text-2 text-sm">Calculate the correct GST on your room tariff under India's 2025 rules.</p>
-            </Link>
-            <Link to="/tools/occupancy-calculator"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Hotel Occupancy Rate Calculator</p>
-              <p className="text-text-2 text-sm">Calculate your property's occupancy % for any period.</p>
-            </Link>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { to: '/tools/invoice-generator', title: 'Villa & Homestay Invoice Generator', desc: 'Generate a PDF invoice for your guests. No sign-up required.' },
+              { to: '/tools/gst-calculator-hotel', title: 'Hotel GST Calculator', desc: "Calculate the correct GST on your room tariff under India's 2025 rules." },
+              { to: '/tools/occupancy-calculator', title: 'Hotel Occupancy Rate Calculator', desc: "Calculate your property's occupancy % for any period." },
+              { to: '/tools/rental-income-calculator', title: 'Rental Income Calculator', desc: 'Estimate gross and net revenue from your rooms across any period.' },
+              { to: '/tools/cancellation-policy', title: 'Cancellation Policy Generator', desc: 'Generate a professional cancellation policy for your property in seconds.' },
+            ].map(({ to, title, desc }) => (
+              <Link key={to} to={to}
+                className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+                style={{ textDecoration: 'none' }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+                <p className="font-medium text-text-1 mb-1">{title}</p>
+                <p className="text-text-2 text-sm">{desc}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </main>

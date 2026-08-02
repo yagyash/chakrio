@@ -292,9 +292,10 @@ export default function GSTCalculator() {
         </div>
 
         <CTABox
-          headline="Chakrio generates GST-ready invoices automatically"
-          body="Every booking confirmed through Chakrio can produce a proper invoice — with guest details, tariff breakdown, and GST amount — without you opening a spreadsheet."
-          buttonText="See Chakrio in Action →"
+          headline="Need a GST-ready invoice for this booking?"
+          body="Use our free Invoice Generator — add room charges, pick the GST rate, and download a professional PDF invoice in seconds. No sign-up required."
+          buttonText="Generate Invoice Free →"
+          buttonHref="/tools/invoice-generator"
           toolName="gst-calculator-hotel"
         />
 
@@ -302,39 +303,31 @@ export default function GSTCalculator() {
 
         <div className="mt-10">
           <h2 className="font-display font-extrabold text-lg text-text-1 mb-4">More Free Tools</h2>
-          <div className="grid sm:grid-cols-3 gap-4">
-            <Link to="/tools/invoice-generator"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Villa &amp; Homestay Invoice Generator</p>
-              <p className="text-text-2 text-sm">Generate a PDF invoice with GST for your guests. No sign-up required.</p>
-            </Link>
-            <Link to="/tools/whatsapp-booking-confirmation"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">WhatsApp Booking Confirmation Generator</p>
-              <p className="text-text-2 text-sm">Generate a professional booking confirmation message for WhatsApp.</p>
-            </Link>
-            <Link to="/tools/rental-income-calculator"
-              className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
-              style={{ textDecoration: 'none' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
-              onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
-              <p className="font-medium text-text-1 mb-1">Rental Income Calculator</p>
-              <p className="text-text-2 text-sm">Estimate gross and net revenue from your rooms across any period.</p>
-            </Link>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { to: '/tools/invoice-generator', title: 'Villa & Homestay Invoice Generator', desc: 'Generate a PDF invoice with GST for your guests. No sign-up required.' },
+              { to: '/tools/whatsapp-booking-confirmation', title: 'WhatsApp Booking Confirmation Generator', desc: 'Generate a professional booking confirmation message for WhatsApp.' },
+              { to: '/tools/occupancy-calculator', title: 'Hotel Occupancy Rate Calculator', desc: "Calculate your property's occupancy % for any period." },
+              { to: '/tools/rental-income-calculator', title: 'Rental Income Calculator', desc: 'Estimate gross and net revenue from your rooms across any period.' },
+              { to: '/tools/cancellation-policy', title: 'Cancellation Policy Generator', desc: 'Generate a professional cancellation policy for your property in seconds.' },
+            ].map(({ to, title, desc }) => (
+              <Link key={to} to={to}
+                className="bg-surface rounded-xl border border-surface3 p-5 transition-colors"
+                style={{ textDecoration: 'none' }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,162,75,0.4)'}
+                onMouseLeave={e => e.currentTarget.style.borderColor = ''}>
+                <p className="font-medium text-text-1 mb-1">{title}</p>
+                <p className="text-text-2 text-sm">{desc}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </main>
 
       <div className="max-w-2xl mx-auto px-6 pb-8">
         <ToolConversionHook
-          heading="Tired of calculating GST manually for every booking?"
-          body="Chakrio generates GST-ready invoices automatically for every confirmed booking — no spreadsheet, no manual calculation."
+          heading="Manage all your bookings from WhatsApp"
+          body="Chakrio records every booking, payment, and expense automatically — so your numbers are always up to date without a spreadsheet."
         />
       </div>
 
