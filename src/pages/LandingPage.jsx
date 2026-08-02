@@ -547,7 +547,7 @@ function PricingSection() {
         <p className="text-center text-sm text-text-2 mb-1">
           <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee: ₹999–₹2,999</span> — waived for launch &amp; reference properties
         </p>
-        <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Marketing overage ₹0.90/delivered msg</p>
+        <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Marketing overage ₹1/delivered msg</p>
       </div>
     </section>
   );
