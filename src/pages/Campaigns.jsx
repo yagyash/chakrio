@@ -119,7 +119,6 @@ export default function Campaigns() {
   const [error,        setError]        = useState('');
   const [showModal,    setShowModal]    = useState(false);
   const [showTopup,    setShowTopup]    = useState(false);
-  const [activeCampaign, setActiveCampaign] = useState(null);
   const pollRef = useRef(null);
 
   // ── Load campaigns + wallet ────────────────────────────────────
@@ -141,25 +140,19 @@ export default function Campaigns() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // ── Poll active campaign ───────────────────────────────────────
+  // ── Poll while any campaign is actively sending — covers both a
+  // manually-just-launched campaign AND an auto-marketing campaign the
+  // scheduler created server-side (which the page has no other way to
+  // learn is progressing, since nothing in this browser session "launched" it).
   useEffect(() => {
-    if (!activeCampaign) { clearInterval(pollRef.current); return; }
-    pollRef.current = setInterval(async () => {
-      try {
-        const c = await apiFetch(`/api/campaigns?campaignId=${activeCampaign}`);
-        setCampaigns(prev => prev.map(x => x.id === c.id ? c : x));
-        if (['completed', 'failed', 'paused_by_user', 'paused_insufficient_funds'].includes(c.status)) {
-          setActiveCampaign(null);
-          loadData(); // refresh wallet balance after campaign activity
-        }
-      } catch { /* silent */ }
-    }, 5000);
+    const hasActive = campaigns.some(c => ['queued', 'sending'].includes(c.status));
+    if (!hasActive) { clearInterval(pollRef.current); return; }
+    pollRef.current = setInterval(() => { loadData(); }, 8000);
     return () => clearInterval(pollRef.current);
-  }, [activeCampaign, loadData]);
+  }, [campaigns, loadData]);
 
   const handleLaunched = (campaign) => {
     setCampaigns(prev => [campaign, ...prev]);
-    setActiveCampaign(campaign.campaign_id ?? campaign.id);
     setShowModal(false);
     loadData();
   };
@@ -183,7 +176,6 @@ export default function Campaigns() {
         body: JSON.stringify({ action: 'resume' }),
       });
       setCampaigns(prev => prev.map(c => c.id === campaignId ? { ...c, status: 'sending' } : c));
-      setActiveCampaign(campaignId);
     } catch (e) {
       setError(e.message);
     }
