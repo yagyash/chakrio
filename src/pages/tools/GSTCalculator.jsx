@@ -151,6 +151,7 @@ export default function GSTCalculator() {
             style={{ background: 'rgba(201,162,75,0.12)', color: '#C9A24B', border: '1px solid rgba(201,162,75,0.25)' }}>
             Updated for September 2025 GST revision — 12% slab abolished
           </div>
+          <p className="text-text-3 text-xs mt-2">Page last updated: 28 July 2026</p>
         </div>
 
         {/* Calculator Card */}

@@ -151,6 +151,7 @@ export default function RentalIncomeCalculator() {
             Estimate your gross and net rental income. Enter your room count, nightly rate, occupancy,
             and period — and optionally deduct operating expenses to see net profit.
           </p>
+          <p className="text-text-3 text-xs mt-3">Page last updated: 23 March 2026</p>
         </div>
 
         {/* Calculator Card */}

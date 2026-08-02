@@ -376,6 +376,7 @@ export default function InvoiceGenerator() {
           <p className="text-text-2 text-sm max-w-xl mx-auto">
             Fill in the stay details, preview the totals, and download a clean PDF invoice to share with your guest. No sign-up. No watermarks.
           </p>
+          <p className="text-text-3 text-xs mt-3">Page last updated: 5 April 2026</p>
         </div>
 
         <div className="rounded-2xl border p-6 sm:p-8 space-y-8" style={{ background: '#16151f', borderColor: 'rgba(255,255,255,0.07)' }}>

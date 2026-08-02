@@ -6,6 +6,12 @@
  * Asset link/script tags come from the current build's dist/index.html so
  * hashed filenames are always correct for the deployed build.
  *
+ * dist/app-shell.html is written first, as a copy of the pristine (empty)
+ * vite build output — this is the file vercel.json's catch-all rewrite
+ * points unmatched deep links (e.g. /dashboard, /bookings) at. index.html
+ * itself is then prerendered like every other route, so `/` gets real
+ * content instead of doubling as the SPA fallback.
+ *
  * No Puppeteer required here. To regenerate snapshots: node prerender-capture.mjs
  */
 
@@ -25,6 +31,12 @@ if (!fs.existsSync(cacheDir) || fs.readdirSync(cacheDir).filter(f => f.endsWith(
 // Build's dist/index.html has the correct hashed asset link/script tags.
 // Strip the few page-specific tags that come from snapshots instead.
 const distIndexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
+
+// Preserve the pristine empty shell as the SPA-fallback target before
+// index.html itself gets overwritten with real homepage content below.
+fs.writeFileSync(path.join(distDir, 'app-shell.html'), distIndexHtml, 'utf-8');
+console.log('✓ Wrote SPA fallback: app-shell.html');
+
 const headMatch = distIndexHtml.match(/<head>([\s\S]*?)<\/head>/);
 const baseHead = (headMatch ? headMatch[1] : '')
   .replace(/<title>[^<]*<\/title>/g, '')
@@ -44,14 +56,6 @@ for (const file of cacheFiles) {
   const { urlPath, outFile, helmetHead, bodyHtml } = JSON.parse(
     fs.readFileSync(path.join(cacheDir, file), 'utf-8'),
   );
-
-  // Skip root route: dist/index.html is the SPA fallback served by the Vercel
-  // catch-all rewrite for every path. Prerendering it with landing page content
-  // causes every hard-refreshed dashboard URL to flash the landing page briefly.
-  if (outFile === 'index.html') {
-    console.log(`⏭  Skipped (SPA fallback): ${urlPath}`);
-    continue;
-  }
 
   const html = `<!doctype html>\n<html lang="en">\n<head>\n${helmetHead}\n${baseHead}\n</head>\n<body>${bodyHtml}</body>\n</html>`;
 

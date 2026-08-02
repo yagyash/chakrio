@@ -602,17 +602,6 @@ export default function LandingPage() {
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "HowTo",
-          "name": "How Chakrio automates property booking records",
-          "description": "Three steps to automate your property booking records using Chakrio's AI chatbot.",
-          "step": [
-            { "@type": "HowToStep", "position": 1, "name": "Send a message", "text": "Type a booking or expense in plain language to the Chakrio chatbot — exactly how you would say it out loud." },
-            { "@type": "HowToStep", "position": 2, "name": "AI parses it", "text": "Chakrio's AI extracts guest name, dates, amounts, and booking type — no structured input needed." },
-            { "@type": "HowToStep", "position": 3, "name": "Auto-recorded", "text": "The data is recorded automatically and your dashboard updates in real time." },
-          ],
-        })}</script>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
           "@type": "FAQPage",
           "mainEntity": FAQS.map(({ q, a }) => ({
             "@type": "Question",

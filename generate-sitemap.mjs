@@ -10,6 +10,12 @@
  *
  * <priority>/<changefreq> are dropped — Google ignores both.
  *
+ * <lastmod> is each route's own dateModified/datePublished, read straight out
+ * of the page-specific JSON-LD already captured in prerender-cache/ (the
+ * WebPage block each page's own Helmet renders) — not the build run's date.
+ * Routes with no page-specific date yet (e.g. the homepage) fall back to
+ * today so lastmod is never left blank.
+ *
  * fetchActiveProperties() below is ready but NOT yet wired in: there is no
  * /book/:propertySlug page live yet (separate, larger build). Once that
  * page ships, call it and merge the results into `routes` before writing —
@@ -42,9 +48,28 @@ async function fetchActiveProperties() {
   return res.json();
 }
 
-function buildSitemap(urlPaths) {
-  const urls = urlPaths
-    .map((p) => `  <url>\n    <loc>${BASE_URL}${p}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`)
+// Pull dateModified (falling back to datePublished) out of the page's own
+// WebPage JSON-LD block — there can be several ld+json scripts per page
+// (WebSite, SoftwareApplication, WebPage, BreadcrumbList, FAQPage...), only
+// the WebPage one describes this specific route.
+function pageLastmod(helmetHead) {
+  const blocks = helmetHead.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g);
+  for (const [, json] of blocks) {
+    try {
+      const data = JSON.parse(json);
+      if (data['@type'] === 'WebPage' && (data.dateModified || data.datePublished)) {
+        return data.dateModified || data.datePublished;
+      }
+    } catch {
+      // Malformed block — skip it rather than guess.
+    }
+  }
+  return null;
+}
+
+function buildSitemap(entries) {
+  const urls = entries
+    .map(({ path: p, lastmod }) => `  <url>\n    <loc>${BASE_URL}${p}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`)
     .join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
@@ -54,12 +79,16 @@ if (!fs.existsSync(cacheDir)) {
   process.exit(0);
 }
 
-const routePaths = fs
+const routes = fs
   .readdirSync(cacheDir)
   .filter((f) => f.endsWith('.json'))
-  .map((f) => JSON.parse(fs.readFileSync(path.join(cacheDir, f), 'utf-8')).urlPath)
+  .map((f) => {
+    const { urlPath, helmetHead } = JSON.parse(fs.readFileSync(path.join(cacheDir, f), 'utf-8'));
+    return urlPath ? { path: urlPath, lastmod: pageLastmod(helmetHead) || today } : null;
+  })
   .filter(Boolean);
 
-const allPaths = ['/', ...routePaths.filter((p) => p !== '/')].sort();
-fs.writeFileSync(path.join(distDir, 'sitemap.xml'), buildSitemap(allPaths), 'utf-8');
-console.log(`✓ sitemap.xml generated from prerender-cache/ — ${allPaths.length} URLs.`);
+const homepage = routes.find((r) => r.path === '/') || { path: '/', lastmod: today };
+const allRoutes = [homepage, ...routes.filter((r) => r.path !== '/')].sort((a, b) => a.path.localeCompare(b.path));
+fs.writeFileSync(path.join(distDir, 'sitemap.xml'), buildSitemap(allRoutes), 'utf-8');
+console.log(`✓ sitemap.xml generated from prerender-cache/ — ${allRoutes.length} URLs.`);

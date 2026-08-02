@@ -162,6 +162,7 @@ export default function WhatsappBookingConfirmation() {
             Generate a professional booking confirmation message to send your guests on WhatsApp.
             Fill in the details — the message is ready to copy and paste instantly.
           </p>
+          <p className="text-text-3 text-xs mt-3">Page last updated: 28 July 2026</p>
         </div>
 
         {/* Generator Card */}

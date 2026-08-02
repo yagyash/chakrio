@@ -137,6 +137,7 @@ export default function OccupancyCalculator() {
             Calculate your property's occupancy rate instantly. Enter your total rooms, the period length,
             and how many room-nights were booked — get your occupancy % in seconds.
           </p>
+          <p className="text-text-3 text-xs mt-3">Page last updated: 23 March 2026</p>
         </div>
 
         {/* Calculator Card */}

@@ -169,6 +169,7 @@ export default function CancellationPolicyGenerator() {
             Generate a professional cancellation policy in seconds. Customise your refund windows,
             advance deposit terms, and no-show conditions — then copy and paste directly into your listing.
           </p>
+          <p className="text-text-3 text-xs mt-3">Page last updated: 23 March 2026</p>
         </div>
 
         {/* Form Card */}
@@ -262,11 +263,22 @@ export default function CancellationPolicyGenerator() {
         <CTABox />
         <LeadCaptureBox sourcePage="cancellation-policy" />
         <div className='trust-signals text-center py-8 text-text-3 text-sm'><p>Free to Use — No Sign-Up Required. Generate as many policies as you need.</p></div>
-      </main>
 
-      <div className='intro hidden'><h2>About Chakrio</h2><p>Chakrio optimizes property management with AI-powered automation tools tailored for homestays, villas, and guesthouses. Our platform streamlines booking management, ensuring operational efficiency and ease for property managers.</p></div>
-      <div className='entity-clarity hidden'><p>As a Software as a Service (SaaS) platform, Chakrio specifically targets property managers looking to simplify and enhance their booking and management processes for homestays, villas, and guesthouses.</p></div>
-      <div className='use-cases hidden'><h3>Use Case Examples</h3><p>Utilize this tool to effortlessly generate customized cancellation policies for both peak season and off-season bookings, adjusting refund terms to optimize bookings and customer satisfaction.</p></div>
+        <div className="bg-surface rounded-2xl border border-surface3 p-8 mb-8">
+          <h2 className="font-display font-extrabold text-lg text-text-1 mb-2">About Chakrio</h2>
+          <p className="text-text-2 text-sm leading-relaxed">
+            Chakrio is a WhatsApp and Telegram booking platform for homestays, villas, and guesthouses.
+            Property managers send a plain-language message — a booking, a cancellation, an expense — and
+            it's recorded automatically. No spreadsheets, no forms.
+          </p>
+          <h3 className="font-display font-extrabold text-base text-text-1 mt-6 mb-2">Different policies for different seasons</h3>
+          <p className="text-text-2 text-sm leading-relaxed">
+            Peak weekends and off-season stays often need different refund terms. Generate a stricter policy
+            for festival dates and a more flexible one for the off-season — each takes seconds, and you can
+            paste the result straight into your OTA listing or send it to guests directly.
+          </p>
+        </div>
+      </main>
 
       {/* Related tools */}
       <div className="max-w-3xl mx-auto px-4 pb-10">
