@@ -89,14 +89,15 @@ export default function AdminDashboard() {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ propertyId, action, ...extra }),
       });
-      if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Action failed'); }
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'Action failed');
       const labels = {
         delete: 'Property deleted.', activate: 'Property activated.', deactivate: 'Property deactivated.',
         payment: 'Payment recorded. Property activated.', change_plan: 'Plan updated.',
         send_message: 'Message sent to manager.',
         pause_campaign: 'Campaign paused.', resume_campaign: 'Campaign resumed.',
       };
-      setActionMsg(labels[action] ?? 'Done.');
+      setActionMsg(d.warning ? `${labels[action] ?? 'Done.'} ⚠️ ${d.warning}` : (labels[action] ?? 'Done.'));
       if (action !== 'send_message') await loadClients();
     } catch (err) {
       setActionMsg(`Error: ${err.message}`);

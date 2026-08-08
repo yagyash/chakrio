@@ -251,20 +251,31 @@ export default async function handler(req, res) {
     // 2. Sync plan to Firestore via agent (so dashboard gating reflects the new plan)
     const agentUrl = process.env.CHAKRIO_AGENT_URL;
     const secret   = process.env.ONBOARD_SECRET;
+    let syncWarning = null;
     if (agentUrl && secret) {
-      await fetch(`${agentUrl}/admin/plan`, {
-        method:  'PATCH',
-        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
-        body:    JSON.stringify({ client_id: clientId, plan }),
-      }).catch(() => null); // non-fatal — Supabase is source of truth
+      try {
+        const syncRes = await fetch(`${agentUrl}/admin/plan`, {
+          method:  'PATCH',
+          headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+          body:    JSON.stringify({ client_id: clientId, plan }),
+        });
+        if (!syncRes.ok) {
+          const d = await syncRes.json().catch(() => ({}));
+          syncWarning = d.detail || `Firestore sync failed (${syncRes.status})`;
+        }
+      } catch (e) {
+        syncWarning = `Firestore sync unreachable: ${e.message}`;
+      }
+    } else {
+      syncWarning = 'CHAKRIO_AGENT_URL/ONBOARD_SECRET not configured — dashboard plan not synced';
     }
 
     await logAction(supabaseUrl, supabaseKey, {
       actionType:  'change_plan',
-      description: `Plan changed to ${plan}`,
+      description: `Plan changed to ${plan}${syncWarning ? ` (sync warning: ${syncWarning})` : ''}`,
       performedBy: adminEmail,
     });
-    return res.status(200).json({ ok: true });
+    return res.status(200).json({ ok: true, ...(syncWarning && { warning: syncWarning }) });
 
   } else if (action === 'pause_campaign' || action === 'resume_campaign') {
     if (!campaignId) return res.status(400).json({ error: 'campaignId is required' });
