@@ -105,6 +105,32 @@ export default function PropertySettings() {
     setTimeout(() => setUpiStatus(null), 2500);
   };
 
+  // Guest ID upload form URL state
+  const [idUploadFormUrl, setIdUploadFormUrl] = useState('');
+  const [idUploadStatus, setIdUploadStatus]   = useState(null);
+
+  useEffect(() => {
+    if (!supabaseId) return;
+    apiFetch(`/api/guests?propertyId=${supabaseId}&action=id-upload-form-url`)
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d?.id_upload_form_url != null) setIdUploadFormUrl(d.id_upload_form_url); })
+      .catch(() => {});
+  }, [supabaseId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSaveIdForm = async () => {
+    setIdUploadStatus('saving');
+    try {
+      const r = await apiFetch(`/api/guests?propertyId=${supabaseId}&action=id-upload-form-url`, {
+        method: 'PATCH',
+        body: JSON.stringify({ idUploadFormUrl }),
+      });
+      setIdUploadStatus(r.ok ? 'saved' : 'error');
+    } catch {
+      setIdUploadStatus('error');
+    }
+    setTimeout(() => setIdUploadStatus(null), 2500);
+  };
+
   // Photos & Video state
   const [mediaItems, setMediaItems]     = useState([]);
   const [mediaError, setMediaError]     = useState('');
@@ -821,6 +847,55 @@ export default function PropertySettings() {
               }}
             >
               {upiStatus === 'saving' ? 'Saving…' : upiStatus === 'saved' ? 'Saved ✓' : upiStatus === 'error' ? 'Error' : 'Save'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Guest ID Upload ──────────────────────────────────── */}
+      {atLeast(plan, 'lite') && supabaseId && (
+        <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)', marginTop: '20px' }}>
+          <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Guest ID Upload</h3>
+          <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
+            Paste the link to a Google Form with a file-upload question — guests booking direct can
+            optionally upload their ID before arrival, straight into your own Drive. Create one free at
+            forms.google.com. Leave blank to skip.
+          </p>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <input
+              type="text"
+              placeholder="e.g. https://forms.gle/…"
+              value={idUploadFormUrl}
+              onChange={e => setIdUploadFormUrl(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                fontSize: '14px',
+                color: '#f0eee8',
+                fontFamily: 'DM Sans, sans-serif',
+                outline: 'none',
+              }}
+            />
+            <button
+              onClick={handleSaveIdForm}
+              disabled={idUploadStatus === 'saving'}
+              style={{
+                background: idUploadStatus === 'saved' ? 'rgba(37,211,102,0.15)' : idUploadStatus === 'error' ? 'rgba(255,80,80,0.15)' : 'rgba(108,99,255,0.2)',
+                border: `1px solid ${idUploadStatus === 'saved' ? 'rgba(37,211,102,0.4)' : idUploadStatus === 'error' ? 'rgba(255,80,80,0.4)' : 'rgba(108,99,255,0.4)'}`,
+                color: idUploadStatus === 'saved' ? '#25d366' : idUploadStatus === 'error' ? '#ff5050' : '#a09bff',
+                borderRadius: '8px',
+                padding: '10px 20px',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: idUploadStatus === 'saving' ? 'not-allowed' : 'pointer',
+                fontFamily: 'DM Sans, sans-serif',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {idUploadStatus === 'saving' ? 'Saving…' : idUploadStatus === 'saved' ? 'Saved ✓' : idUploadStatus === 'error' ? 'Error' : 'Save'}
             </button>
           </div>
         </div>

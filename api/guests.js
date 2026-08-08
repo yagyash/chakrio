@@ -100,6 +100,23 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── GET — Guest ID upload form URL ─────────────────────────────────
+  if (req.method === 'GET' && action === 'id-upload-form-url') {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) return res.status(503).json({ error: 'Service not configured' });
+    try {
+      const r = await fetch(
+        `${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}&select=id_upload_form_url`,
+        { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Accept: 'application/json' } }
+      );
+      const rows = await r.json().catch(() => []);
+      return res.status(200).json({ id_upload_form_url: rows[0]?.id_upload_form_url ?? '' });
+    } catch {
+      return res.status(502).json({ error: 'Could not reach service' });
+    }
+  }
+
   // ── GET — booking link ────────────────────────────────────────────
   if (req.method === 'GET' && action === 'booking-link') {
     try {
@@ -198,6 +215,31 @@ export default async function handler(req, res) {
           Prefer: 'return=minimal',
         },
         body: JSON.stringify({ upi_id: upiId.trim() || null }),
+      });
+      if (!r.ok) return res.status(502).json({ error: 'Update failed' });
+      return res.status(200).json({ ok: true });
+    } catch {
+      return res.status(502).json({ error: 'Could not reach service' });
+    }
+  }
+
+  // ── PATCH — update Guest ID upload form URL ────────────────────────
+  if (req.method === 'PATCH' && action === 'id-upload-form-url') {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !supabaseKey) return res.status(503).json({ error: 'Service not configured' });
+    const { idUploadFormUrl } = req.body ?? {};
+    if (idUploadFormUrl === undefined) return res.status(400).json({ error: 'idUploadFormUrl required' });
+    try {
+      const r = await fetch(`${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}`, {
+        method: 'PATCH',
+        headers: {
+          apikey: supabaseKey,
+          Authorization: `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify({ id_upload_form_url: idUploadFormUrl.trim() || null }),
       });
       if (!r.ok) return res.status(502).json({ error: 'Update failed' });
       return res.status(200).json({ ok: true });

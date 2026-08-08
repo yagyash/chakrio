@@ -27,9 +27,10 @@ async function request(path, options) {
 }
 
 /**
- * {property_name, has_rooms, max_capacity, photos: [url], rates}
- * has-rooms: rates = [{room_type, price_per_night, capacity}]
- * villa:     rates = [{guest_count, price_per_night}] — tiered by party size
+ * {property_name, has_rooms, max_capacity, photos: [url], rates,
+ * id_upload_form_url?} — id_upload_form_url is the property's own Google
+ * Form for optional guest ID upload; absent/empty if the property hasn't
+ * set one up.
  */
 export function getPropertyInfo(propertySlug) {
   return request(`/book/${propertySlug}`);
@@ -44,12 +45,12 @@ export function getAvailability(propertySlug, { roomType, partySize, checkIn, ch
 }
 
 /** {group_id, payment_method: 'upi'|'razorpay', upi_uri?, payment_url?, amount, expires_at} */
-export function reserve(propertySlug, { rooms, partySize, checkIn, checkOut, guestName, guestPhone }) {
+export function reserve(propertySlug, { rooms, partySize, checkIn, checkOut, guestName, guestPhone, idUploaded }) {
   return request(`/book/${propertySlug}/reserve`, {
     method: 'POST',
     body: JSON.stringify({
       rooms, party_size: partySize, check_in: checkIn, check_out: checkOut,
-      guest_name: guestName, guest_phone: guestPhone,
+      guest_name: guestName, guest_phone: guestPhone, id_uploaded: idUploaded,
     }),
   });
 }

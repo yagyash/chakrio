@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { QRCodeSVG } from 'qrcode.react';
-import { MapPin, Phone, Mail, Users, Check, AlertCircle, CircleCheck, Loader2 } from 'lucide-react';
+import { MapPin, Phone, Mail, Users, Check, AlertCircle, CircleCheck, Loader2, ExternalLink } from 'lucide-react';
 import { getPropertyContent } from '../data/propertyContent';
 import { getPropertyInfo, getAvailability, reserve, confirmUpiPayment } from '../services/directBooking';
 import DateRangePicker from '../components/booking/DateRangePicker';
@@ -59,6 +59,7 @@ export default function PropertyBookingPage() {
   const [checking, setChecking] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
+  const [idUploaded, setIdUploaded] = useState(false);
   const [reservation, setReservation] = useState(null);
   const [utr, setUtr] = useState('');
   const [confirmed, setConfirmed] = useState(false);
@@ -123,7 +124,7 @@ export default function PropertyBookingPage() {
       const result = await reserve(content.backendSlug, {
         rooms: info.has_rooms ? activeLines.map(([roomType, quantity]) => ({ room_type: roomType, quantity })) : undefined,
         partySize: info.has_rooms ? undefined : partySize,
-        checkIn, checkOut, guestName, guestPhone,
+        checkIn, checkOut, guestName, guestPhone, idUploaded,
       });
       setReservation(result);
     } catch (e) {
@@ -354,6 +355,32 @@ export default function PropertyBookingPage() {
                           <input placeholder="WhatsApp number" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)}
                             className={`flex-1 min-w-[140px] ${inputClass}`} />
                         </div>
+
+                        {info.id_upload_form_url && (
+                          <div className="rounded-lg border border-white/8 bg-surface2 px-4 py-3 mb-4">
+                            <a
+                              href={info.id_upload_form_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 text-sm text-brand hover:underline"
+                            >
+                              Upload your ID now (optional) <ExternalLink size={13} />
+                            </a>
+                            <p className="text-xs text-text-3 mt-1 mb-2">
+                              Saves time at check-in — or just bring it with you, no problem either way.
+                            </p>
+                            <label className="flex items-center gap-2 text-xs text-text-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={idUploaded}
+                                onChange={(e) => setIdUploaded(e.target.checked)}
+                                className="h-4 w-4 rounded border-white/25 bg-bg-app accent-brand"
+                              />
+                              I've uploaded my ID
+                            </label>
+                          </div>
+                        )}
+
                         <button onClick={handleReserve} disabled={busy} className={primaryButtonClass}>
                           {busy && <Loader2 size={15} className="animate-spin" />}
                           {busy ? 'Starting…' : 'Reserve & Pay'}
