@@ -10,6 +10,7 @@ export default function LeadCaptureBox({ sourcePage }) {
 
   const [name, setName]         = useState('');
   const [wa, setWa]             = useState('');
+  const [consent, setConsent]   = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted]   = useState(alreadyCaptured);
   const [error, setError]           = useState('');
@@ -19,6 +20,7 @@ export default function LeadCaptureBox({ sourcePage }) {
   async function handleSubmit() {
     if (!name.trim()) { setError('Please enter your name.'); return; }
     if (wa.replace(/\D/g, '').length < 10) { setError('Please enter a valid WhatsApp number.'); return; }
+    if (!consent) { setError('Please agree to be contacted on WhatsApp.'); return; }
     setSubmitting(true);
     setError('');
     try {
@@ -28,18 +30,17 @@ export default function LeadCaptureBox({ sourcePage }) {
         source_page: sourcePage,
         submitted_at: serverTimestamp(),
       });
-      const botToken  = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-      const adminChat = import.meta.env.VITE_TELEGRAM_ADMIN_CHAT_ID;
-      if (botToken && adminChat) {
-        const msg = `🔔 New Lead!\n\nName: ${name.trim()}\nWhatsApp: ${wa.trim()}\nSource: ${sourcePage}`;
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: adminChat, text: msg }),
-        }).catch(() => {});
-      }
-    } catch (_) {
+    } catch {
       // Firestore failure — still mark as captured so we don't keep pestering
+    }
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), whatsapp: wa.trim(), source_page: sourcePage }),
+      });
+    } catch {
+      // Backend unreachable — lead is still saved in Firestore above
     } finally {
       localStorage.setItem('chakrio_lead_captured', '1');
       setSubmitted(true);
@@ -97,11 +98,18 @@ export default function LeadCaptureBox({ sourcePage }) {
 
       {error && <p className="text-xs mt-2" style={{ color: '#e07070' }}>{error}</p>}
 
-      <p className="text-xs mt-3" style={{ color: '#56546a' }}>
-        By submitting you agree to our{' '}
-        <a href="/privacy" style={{ color: GOLD, textDecoration: 'underline' }}>Privacy Policy</a>.
-        We'll reach out on WhatsApp — no spam.
-      </p>
+      <label className="flex items-start gap-2 text-xs mt-3 cursor-pointer" style={{ color: '#56546a' }}>
+        <input
+          type="checkbox"
+          checked={consent}
+          onChange={e => setConsent(e.target.checked)}
+          className="mt-0.5"
+        />
+        <span>
+          I agree to be contacted on WhatsApp about Chakrio, per the{' '}
+          <a href="/privacy" style={{ color: GOLD, textDecoration: 'underline' }}>Privacy Policy</a>.
+        </span>
+      </label>
     </div>
   );
 }

@@ -205,6 +205,7 @@ export default function InvoiceGenerator() {
   const [leadName, setLeadName]           = useState('');
   const [leadWA, setLeadWA]               = useState('');
   const [leadProp, setLeadProp]           = useState('');
+  const [leadConsent, setLeadConsent]     = useState(false);
   const [submitting, setSubmitting]       = useState(false);
   const [leadError, setLeadError]         = useState('');
 
@@ -235,6 +236,7 @@ export default function InvoiceGenerator() {
     if (!leadName.trim()) { setLeadError('Please enter your name.'); return; }
     if (!leadWA.trim() || leadWA.replace(/\D/g, '').length < 10) { setLeadError('Please enter a valid WhatsApp number.'); return; }
     if (!leadProp.trim()) { setLeadError('Please enter your property name.'); return; }
+    if (!leadConsent) { setLeadError('Please agree to be contacted on WhatsApp.'); return; }
 
     setSubmitting(true);
     setLeadError('');
@@ -246,28 +248,26 @@ export default function InvoiceGenerator() {
         source_page: 'invoice-generator',
         submitted_at: serverTimestamp(),
       });
-
-      // Telegram notification to admin — fire and forget
-      const botToken  = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-      const adminChat = import.meta.env.VITE_TELEGRAM_ADMIN_CHAT_ID;
-      if (botToken && adminChat) {
-        const msg = `🔔 New Invoice Lead!\n\nName: ${leadName.trim()}\nWhatsApp: ${leadWA.trim()}\nProperty: ${leadProp.trim()}\nSource: Invoice Generator`;
-        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: adminChat, text: msg }),
-        }).catch(() => {}); // silent fail — never block PDF download
-      }
-
-      localStorage.setItem('chakrio_lead_captured', '1');
-      setShowModal(false);
-      generatePDF(buildInvoice());
-    } catch (e) {
-      // Still generate PDF even if Firestore write fails
-      localStorage.setItem('chakrio_lead_captured', '1');
-      setShowModal(false);
-      generatePDF(buildInvoice());
+    } catch {
+      // Firestore failure — still proceed to download, don't block the guest
+    }
+    try {
+      await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: leadName.trim(),
+          whatsapp: leadWA.trim(),
+          property_name: leadProp.trim(),
+          source_page: 'invoice-generator',
+        }),
+      });
+    } catch {
+      // Backend unreachable — lead is still saved in Firestore above
     } finally {
+      localStorage.setItem('chakrio_lead_captured', '1');
+      setShowModal(false);
+      generatePDF(buildInvoice());
       setSubmitting(false);
     }
   }
@@ -656,6 +656,16 @@ export default function InvoiceGenerator() {
                   onFocus={focusGold} onBlur={blurReset}
                 />
               </div>
+
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '11px', color: '#8c8a9e', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={leadConsent}
+                  onChange={e => setLeadConsent(e.target.checked)}
+                  style={{ marginTop: '2px' }}
+                />
+                <span>I agree to be contacted on WhatsApp about Chakrio.</span>
+              </label>
 
               {leadError && <p style={{ fontSize: '12px', color: '#e07070', margin: 0 }}>{leadError}</p>}
 
