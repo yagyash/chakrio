@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!firebaseUser) return;
     getIdToken(firebaseUser)
-      .then(t => fetch('/api/is-admin', { headers: { Authorization: `Bearer ${t}` } }))
+      .then(t => fetch('/api/admin-clients?action=whoami', { headers: { Authorization: `Bearer ${t}` } }))
       .then(r => r.json())
       .then(({ isAdmin: a }) => setIsAdmin(!!a))
       .catch(() => setIsAdmin(false));

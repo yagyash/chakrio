@@ -8,6 +8,8 @@
  * ?action=checklist&propertyId=UUID       → onboard status checklist for a property
  * ?action=campaigns&propertyId=UUID       → broadcast campaigns (manual + auto) for a property
  * ?action=stats                           → collected-this-month from payment_history
+ * ?action=whoami                          → { isAdmin } for the caller (200 even if not admin —
+ *                                            used to decide whether to show the admin UI at all)
  */
 
 import { createRemoteJWKSet, jwtVerify } from 'jose';
@@ -53,13 +55,17 @@ export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
   const isAdmin = await verifyAdmin(req);
+  const { action, propertyId } = req.query;
+
+  // whoami must return 200 even for non-admins — it's how the frontend decides
+  // whether to show the admin UI at all, not an admin-only data fetch.
+  if (action === 'whoami') return res.status(200).json({ isAdmin });
+
   if (!isAdmin) return res.status(403).json({ error: 'Forbidden' });
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const supaHeaders = { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}`, Accept: 'application/json' };
-
-  const { action, propertyId } = req.query;
 
   // ── token-history ──────────────────────────────────────────────────
   if (action === 'token-history') {
