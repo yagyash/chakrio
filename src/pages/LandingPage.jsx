@@ -393,8 +393,8 @@ function DirectBookingsSection() {
         <div className="reveal text-center mb-12">
           <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, fontWeight: 500, letterSpacing: '.16em', textTransform: 'uppercase', color: '#C9A24B', marginBottom: 12 }}>Direct bookings</p>
           <h2 className="font-display font-extrabold tracking-tight text-text-1" style={{ fontSize: 'clamp(26px,4vw,44px)', letterSpacing: '-.03em', marginBottom: 16 }}>
-            Your guests book you directly on WhatsApp —{' '}
-            <span style={{ color: '#25D366' }}>0% commission.</span>
+            How do guests book directly on WhatsApp with{' '}
+            <span style={{ color: '#25D366' }}>0% commission?</span>
           </h2>
           <p className="text-text-2 max-w-2xl mx-auto" style={{ fontSize: 16, lineHeight: 1.6 }}>
             Every property gets a shareable wa.me link and QR code — print it on your visiting card, add it to your Google Business profile, or put it in your Instagram bio.
@@ -443,6 +443,15 @@ function DirectBookingsSection() {
               </>
             )}
           </div>
+        </div>
+
+        <div className="reveal" style={{ borderTop: '1px solid rgba(255,255,255,.07)', paddingTop: 28 }}>
+          <h2 className="font-display font-extrabold text-text-1" style={{ fontSize: 'clamp(20px,3vw,28px)', letterSpacing: '-.02em', marginBottom: 10 }}>
+            Does Chakrio sync with Airbnb and Booking.com calendars?
+          </h2>
+          <p className="text-text-2" style={{ fontSize: 15, lineHeight: 1.6, maxWidth: 640 }}>
+            Yes — OTA bookings still sync automatically via iCal, so your availability stays accurate across every channel. Direct WhatsApp bookings just stop costing you the usual 15–20% OTA commission.
+          </p>
         </div>
       </div>
     </section>
@@ -707,7 +716,7 @@ export default function LandingPage() {
           <div className="reveal text-center mb-12">
             <p style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, fontWeight: 500, letterSpacing: '.16em', textTransform: 'uppercase', color: '#9a7d2e', marginBottom: 12 }}>How it works</p>
             <h2 className="font-display font-extrabold tracking-tight" style={{ fontSize: 'clamp(28px,4vw,48px)', letterSpacing: '-.03em', color: '#16121d' }}>
-              From WhatsApp message to recorded booking.
+              How does Chakrio turn a WhatsApp message into a recorded booking?
             </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-5">
@@ -751,7 +760,10 @@ export default function LandingPage() {
       <section className="max-w-5xl mx-auto px-6 py-20 w-full">
         <div className="reveal text-center mb-12">
           <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Everything you need</p>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 tracking-tight">One quiet app that runs the back office.</h2>
+          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 tracking-tight">What does Chakrio automate in the back office besides bookings?</h2>
+          <p className="text-text-2 max-w-2xl mx-auto mt-3" style={{ fontSize: 15, lineHeight: 1.6 }}>
+            Beyond booking records, Chakrio keeps your dashboard, calendar, and monthly P&L updated automatically, and logs every expense the moment you message it in.
+          </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {FEATURES.map((f, i) => (
