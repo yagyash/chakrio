@@ -10,6 +10,7 @@ import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import DemoBanner from '../../components/shared/DemoBanner';
 import GenericTable from '../../components/shared/GenericTable';
 import StatusBadge from '../../components/shared/StatusBadge';
+import GeoVisibilityTile from '../../components/shared/GeoVisibilityTile';
 import { formatDate, isDateCol } from '../../utils/formatDate';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
@@ -441,6 +442,9 @@ export default function HomestayDashboard() {
             <OccupancyCard rate={occupancy.rate} label={occupancy.label} isRoomBased={occupancy.isRoomBased} />
           </div>
         </div>
+
+        {/* ── Visibility (Sitrelio-backed, hidden entirely when not enabled) ── */}
+        <GeoVisibilityTile />
 
         {/* ── Numeric column totals — bookings ────────────────────────────── */}
         {bookingTotals.length > 0 && (
