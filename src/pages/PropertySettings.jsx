@@ -37,8 +37,7 @@ const OTA_OPTIONS = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 
 // owner. Lets a non-technical manager get a working form in two clicks
 // instead of building one, while uploads still land in the manager's own
 // Drive, never Chakrio's.
-// TODO(yagya): replace with the real /copy link once the template form is built.
-const ID_UPLOAD_TEMPLATE_LINK = 'https://docs.google.com/forms/d/PASTE_TEMPLATE_FORM_ID_HERE/copy';
+const ID_UPLOAD_TEMPLATE_LINK = 'https://docs.google.com/forms/d/1_baG3PNb68gIFEhpWEsD8KrMROvA2INEN6vRjjRJc88/copy';
 
 const PLAN_RANK = { starter: 0, lite: 1, growth: 2, pro: 3, advance: 4 };
 const atLeast = (plan, required) => (PLAN_RANK[plan] ?? 0) >= (PLAN_RANK[required] ?? 1);
