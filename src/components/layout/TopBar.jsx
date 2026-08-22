@@ -10,6 +10,7 @@ function getPageTitle(pathname) {
     '/expenses': 'Expenses',
     '/reports': 'Reports',
     '/sales': 'Sales',
+    '/campaigns': 'Marketing',
   };
   return map[pathname] ?? 'Dashboard';
 }
