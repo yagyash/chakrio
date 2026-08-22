@@ -31,6 +31,15 @@ const inputStyle = {
 
 const OTA_OPTIONS = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 'other'];
 
+// Google's "make a copy" link for Chakrio's guest-ID-upload template form --
+// opening this (signed into any Google account) copies the whole form,
+// file-upload question included, into the visitor's own Drive with them as
+// owner. Lets a non-technical manager get a working form in two clicks
+// instead of building one, while uploads still land in the manager's own
+// Drive, never Chakrio's.
+// TODO(yagya): replace with the real /copy link once the template form is built.
+const ID_UPLOAD_TEMPLATE_LINK = 'https://docs.google.com/forms/d/PASTE_TEMPLATE_FORM_ID_HERE/copy';
+
 const PLAN_RANK = { starter: 0, lite: 1, growth: 2, pro: 3, advance: 4 };
 const atLeast = (plan, required) => (PLAN_RANK[plan] ?? 0) >= (PLAN_RANK[required] ?? 1);
 
@@ -856,10 +865,22 @@ export default function PropertySettings() {
       {atLeast(plan, 'lite') && supabaseId && (
         <div style={{ background: '#16151f', borderRadius: '16px', padding: '28px', border: '1px solid rgba(255,255,255,0.06)', marginTop: '20px' }}>
           <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Guest ID Upload</h3>
+          <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
+            Guests booking direct can optionally upload their ID before arrival — it goes straight into
+            your own Google Drive, never through Chakrio. Don't have a form yet? Use our ready-made
+            template instead of building one from scratch:
+          </p>
+          <a
+            href={ID_UPLOAD_TEMPLATE_LINK}
+            target="_blank"
+            rel="noreferrer"
+            style={{ display: 'inline-block', margin: '0 0 16px', fontSize: '13px', color: '#a09bff', textDecoration: 'underline' }}
+          >
+            Open template → click "Make a copy" → it's now in your Drive
+          </a>
           <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
-            Paste the link to a Google Form with a file-upload question — guests booking direct can
-            optionally upload their ID before arrival, straight into your own Drive. Create one free at
-            forms.google.com. Leave blank to skip.
+            Then paste your copy's share link below (use the "Send" link, not the edit link — guests
+            need view access, not edit access). Leave blank to skip.
           </p>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <input
