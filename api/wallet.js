@@ -1,8 +1,14 @@
 /**
  * Vercel Serverless Function — /api/wallet
  *
- * GET  /api/wallet?propertyId=UUID        — wallet balance + last 20 transactions
- * POST /api/wallet                         — create topup (returns Razorpay payment_url)
+ * GET  /api/wallet?propertyId=UUID                    — wallet balance + last 20 transactions
+ * GET  /api/wallet?propertyId=UUID&action=geo-tile     — geo-grid + AI-citation dashboard data
+ * POST /api/wallet                                     — create topup (returns Razorpay payment_url)
+ *
+ * geo-tile shares this file rather than being its own function — Vercel's
+ * Hobby plan caps a deployment at 12 serverless functions (see
+ * admin-clients.js's `action` query param for the same pattern; this repo
+ * already hit that cap once before, see 489d6a8).
  *
  * Security:
  *   1. Verify Firebase ID token (server-side JWKS)
@@ -72,14 +78,27 @@ export default async function handler(req, res) {
   const secret   = process.env.ONBOARD_SECRET;
   if (!agentUrl || !secret) return res.status(503).json({ error: 'Wallet not configured' });
 
-  // ── GET — balance + transactions ────────────────────────────────
+  // ── GET — balance + transactions, or geo-tile data ───────────────
   if (req.method === 'GET') {
-    const { propertyId } = req.query;
+    const { propertyId, action } = req.query;
     if (!propertyId || !UUID_RE.test(propertyId)) {
       return res.status(400).json({ error: 'propertyId required' });
     }
     const ownedIds = await getOwnerPropertyIds(uid, token, projectId);
     if (!ownedIds.includes(propertyId)) return res.status(403).json({ error: 'Forbidden' });
+
+    if (action === 'geo-tile') {
+      try {
+        const upstream = await fetch(`${agentUrl}/properties/${propertyId}/geo-insights`, {
+          headers: { 'X-Onboard-Secret': secret },
+        });
+        const data = await upstream.json().catch(() => ({}));
+        if (!upstream.ok) return res.status(upstream.status).json({ error: data.detail ?? 'Failed' });
+        return res.status(200).json(data);
+      } catch {
+        return res.status(502).json({ error: 'Could not reach geo tile server' });
+      }
+    }
 
     try {
       const upstream = await fetch(`${agentUrl}/properties/${propertyId}/wallet`, {

@@ -4,7 +4,10 @@ import { auth } from '../services/firebase';
 import { useAuthContext } from '../context/AuthContext';
 
 /**
- * Fetches /api/geo-tile for the currently selected property.
+ * Fetches geo-tile data for the currently selected property via
+ * /api/wallet?action=geo-tile — folded into wallet.js rather than its own
+ * Vercel function to stay under the Hobby plan's 12-function cap (see
+ * wallet.js's header comment).
  *
  * The response shape is entitlement-driven server-side (see chakrio-agent's
  * routers/geo.py) — { enabled: false } for a property with the flag off,
@@ -28,7 +31,7 @@ export function useGeoTile() {
     setLoading(true);
     try {
       const token = await getIdToken(auth.currentUser);
-      const res = await fetch(`/api/geo-tile?propertyId=${propertyId}`, {
+      const res = await fetch(`/api/wallet?propertyId=${propertyId}&action=geo-tile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setData(res.ok ? await res.json() : null);
