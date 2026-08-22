@@ -5,9 +5,9 @@ import { useAuthContext } from '../context/AuthContext';
 
 /**
  * Fetches geo-tile data for the currently selected property via
- * /api/wallet?action=geo-tile — folded into wallet.js rather than its own
- * Vercel function to stay under the Hobby plan's 12-function cap (see
- * wallet.js's header comment).
+ * /api/marketing?action=geo-tile — folded into the merged campaigns+wallet
+ * function rather than its own Vercel function, to stay under the Hobby
+ * plan's 12-function cap (see api/marketing.js's header comment).
  *
  * The response shape is entitlement-driven server-side (see chakrio-agent's
  * routers/geo.py) — { enabled: false } for a property with the flag off,
@@ -31,7 +31,7 @@ export function useGeoTile() {
     setLoading(true);
     try {
       const token = await getIdToken(auth.currentUser);
-      const res = await fetch(`/api/wallet?propertyId=${propertyId}&action=geo-tile`, {
+      const res = await fetch(`/api/marketing?action=geo-tile&propertyId=${propertyId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setData(res.ok ? await res.json() : null);

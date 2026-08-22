@@ -126,8 +126,8 @@ export default function Campaigns() {
     if (!propertyId) return;
     try {
       const [campaignData, walletData] = await Promise.all([
-        apiFetch(`/api/campaigns?propertyId=${propertyId}`),
-        apiFetch(`/api/wallet?propertyId=${propertyId}`).catch(() => null),
+        apiFetch(`/api/marketing?action=campaigns&propertyId=${propertyId}`),
+        apiFetch(`/api/marketing?action=wallet&propertyId=${propertyId}`).catch(() => null),
       ]);
       setCampaigns(Array.isArray(campaignData) ? campaignData : []);
       if (walletData) setWallet(walletData);
@@ -159,7 +159,7 @@ export default function Campaigns() {
 
   const handlePause = async (campaignId) => {
     try {
-      await apiFetch(`/api/campaigns?campaignId=${campaignId}`, {
+      await apiFetch(`/api/marketing?campaignId=${campaignId}`, {
         method: 'PATCH',
         body: JSON.stringify({ action: 'pause' }),
       });
@@ -171,7 +171,7 @@ export default function Campaigns() {
 
   const handleResume = async (campaignId) => {
     try {
-      await apiFetch(`/api/campaigns?campaignId=${campaignId}`, {
+      await apiFetch(`/api/marketing?campaignId=${campaignId}`, {
         method: 'PATCH',
         body: JSON.stringify({ action: 'resume' }),
       });
@@ -389,7 +389,7 @@ function TopupModal({ propertyId, onClose, onSuccess }) {
     if (val > 10000)       { setError('Maximum topup is ₹10,000'); return; }
     setLoading(true); setError('');
     try {
-      const data = await apiFetch('/api/wallet', {
+      const data = await apiFetch('/api/marketing?action=topup', {
         method: 'POST',
         body: JSON.stringify({ property_uuid: propertyId, amount: val }),
       });
@@ -489,7 +489,7 @@ function NewCampaignModal({ propertyId, walletBalance, onClose, onLaunched }) {
   useEffect(() => {
     if (!selected) return;
     setRecipientCount(null);
-    apiFetch(`/api/campaigns?action=count&propertyId=${propertyId}`)
+    apiFetch(`/api/marketing?action=campaign-count&propertyId=${propertyId}`)
       .then(d => setRecipientCount(d.count ?? 0))
       .catch(() => setRecipientCount('—'));
   }, [selected, propertyId]);
@@ -508,7 +508,7 @@ function NewCampaignModal({ propertyId, walletBalance, onClose, onLaunched }) {
     setLaunching(true);
     setError('');
     try {
-      const data = await apiFetch('/api/campaigns', {
+      const data = await apiFetch('/api/marketing?action=launch-campaign', {
         method: 'POST',
         body: JSON.stringify({
           property_uuid:  propertyId,
