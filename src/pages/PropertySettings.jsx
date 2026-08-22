@@ -866,20 +866,32 @@ export default function PropertySettings() {
           <h3 style={{ margin: '0 0 6px', fontSize: '16px', fontWeight: 700, color: '#f0eee8' }}>Guest ID Upload</h3>
           <p style={{ margin: '0 0 10px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
             Guests booking direct can optionally upload their ID before arrival — it goes straight into
-            your own Google Drive, never through Chakrio. Don't have a form yet? Use our ready-made
-            template instead of building one from scratch:
+            your own Google Drive, never through Chakrio. Don't have a form yet, three steps:
           </p>
-          <a
-            href={ID_UPLOAD_TEMPLATE_LINK}
-            target="_blank"
-            rel="noreferrer"
-            style={{ display: 'inline-block', margin: '0 0 16px', fontSize: '13px', color: '#a09bff', textDecoration: 'underline' }}
-          >
-            Open template → click "Make a copy" → it's now in your Drive
-          </a>
+          <ol style={{ margin: '0 0 16px', paddingLeft: '20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.7' }}>
+            <li>
+              <a
+                href={ID_UPLOAD_TEMPLATE_LINK}
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: '#a09bff', textDecoration: 'underline' }}
+              >
+                Open our template
+              </a>{' '}
+              → click "Make a copy" — it's now in your Drive.
+            </li>
+            <li>
+              Click <strong style={{ color: '#c9c7d9' }}>Publish</strong> (top right of the form editor) —
+              Google forms don't accept responses until you do this, even though the questions are
+              already there.
+            </li>
+            <li>
+              Use the "Send" button to get your form's link (not the edit link — guests only need view
+              access) and paste it below.
+            </li>
+          </ol>
           <p style={{ margin: '0 0 20px', fontSize: '13px', color: '#8c8a9e', lineHeight: '1.5' }}>
-            Then paste your copy's share link below (use the "Send" link, not the edit link — guests
-            need view access, not edit access). Leave blank to skip.
+            Leave blank to skip.
           </p>
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
             <input
