@@ -3,6 +3,7 @@ import { getIdToken } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useAuthContext } from '../context/AuthContext';
 import { CAMPAIGN_COSTS } from '../config/campaignCosts';
+import GeoVisibilityTile from '../components/shared/GeoVisibilityTile';
 
 // ── Template definitions ──────────────────────────────────────────
 const TEMPLATES = {
@@ -218,6 +219,11 @@ export default function Campaigns() {
           >
             + New Campaign
           </button>
+      </div>
+
+      {/* Visibility — Sitrelio-backed, hidden entirely when not enabled for this property */}
+      <div style={{ marginBottom: '20px' }}>
+        <GeoVisibilityTile />
       </div>
 
       {/* Empty wallet notice */}
