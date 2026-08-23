@@ -39,11 +39,17 @@ export default function GeoVisibilityTile() {
         {/* Headline sentence */}
         {ai && (
           <p style={{ fontSize: '15px', color: '#f0eee8', margin: '0 0 20px', lineHeight: 1.5 }}>
-            In the last 30 days, AI assistants recommended your property{' '}
-            <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', color: '#a896f8' }}>
-              {ai.mentions_last_30_days}
-            </span>{' '}
-            time{ai.mentions_last_30_days === 1 ? '' : 's'}.
+            {ai.checked ? (
+              <>
+                In the last 30 days, AI assistants recommended your property{' '}
+                <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: '20px', color: '#a896f8' }}>
+                  {ai.mentions_last_30_days}
+                </span>{' '}
+                time{ai.mentions_last_30_days === 1 ? '' : 's'}.
+              </>
+            ) : (
+              'AI-mention tracking is still collecting data for your property — check back soon.'
+            )}
           </p>
         )}
 
@@ -73,7 +79,7 @@ export default function GeoVisibilityTile() {
           )}
 
           {/* AI mentions */}
-          {ai && (
+          {ai?.checked && (
             <div>
               <p style={{ fontSize: '13px', color: '#dfe9e4', margin: '0 0 10px', lineHeight: 1.5 }}>
                 <span style={{ fontWeight: 600, color: '#f0eee8' }}>{ai.mentions_this_month}</span> mention{ai.mentions_this_month === 1 ? '' : 's'} this month
