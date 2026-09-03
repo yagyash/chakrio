@@ -6,6 +6,7 @@ import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
 import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
+import { track } from '../../utils/analytics';
 
 const inputCls = 'w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors';
 
@@ -62,6 +63,7 @@ export default function WhatsappBookingConfirmation() {
     navigator.clipboard.writeText(buildMessage());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    track('tool_used', { tool: 'whatsapp-booking-confirmation' });
     if (typeof window.gtag === 'function') {
       window.gtag('event', 'cta_click', { tool_name: 'whatsapp-booking-confirmation' });
     }

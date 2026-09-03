@@ -6,6 +6,7 @@ import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
 import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
+import { track } from '../../utils/analytics';
 
 const DEFAULT_WINDOWS = [
   { days: 7, refund: 100 },
@@ -57,6 +58,7 @@ export default function CancellationPolicyGenerator() {
 
     setPolicy(lines.join('\n'));
     setCopied(false);
+    track('tool_used', { tool: 'cancellation-policy' });
   }
 
   function copyToClipboard() {

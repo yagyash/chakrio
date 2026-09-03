@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -9,6 +9,7 @@ import CTABox from '../../components/tools/CTABox';
 import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 import { db } from '../../services/firebase';
+import { track } from '../../utils/analytics';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -48,6 +49,7 @@ const GST_RATES = [0, 5, 18];
 // ---------------------------------------------------------------------------
 
 function generatePDF(inv) {
+  track('tool_used', { tool: 'invoice-generator' });
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
   const W = doc.internal.pageSize.getWidth();
   const margin = 48;
@@ -266,6 +268,7 @@ export default function InvoiceGenerator() {
       // Backend unreachable — lead is still saved in Firestore above
     } finally {
       localStorage.setItem('chakrio_lead_captured', '1');
+      track('lead_captured', { source_page: 'invoice-generator' });
       setShowModal(false);
       generatePDF(buildInvoice());
       setSubmitting(false);
@@ -282,26 +285,26 @@ export default function InvoiceGenerator() {
   return (
     <div className="min-h-screen bg-bg-app text-text-1 flex flex-col">
       <Helmet>
-        <title>Free Villa &amp; Homestay Invoice Generator — PDF | Chakrio</title>
-        <meta name="description" content="Generate a professional guest invoice for your villa, homestay, or guesthouse in seconds. GST support included. Free PDF download — no sign-up required." />
+        <title>Homestay &amp; Villa Invoice Generator — Free PDF | Chakrio</title>
+        <meta name="description" content="Create a homestay, villa, or guesthouse invoice in seconds. GST-ready, professional PDF, no sign-up. Free invoice format for Indian hosts and property managers." />
         <link rel="canonical" href="https://chakrio.com/tools/invoice-generator" />
-        <meta property="og:title" content="Free Villa & Homestay Invoice Generator — PDF | Chakrio" />
-        <meta property="og:description" content="Generate a professional guest invoice for your villa, homestay, or guesthouse in seconds. GST support included. Free PDF download — no sign-up required." />
+        <meta property="og:title" content="Homestay & Villa Invoice Generator — Free PDF | Chakrio" />
+        <meta property="og:description" content="Create a homestay, villa, or guesthouse invoice in seconds. GST-ready, professional PDF, no sign-up. Free invoice format for Indian hosts and property managers." />
         <meta property="og:url" content="https://chakrio.com/tools/invoice-generator" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://chakrio.com/og-image.png" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Free Villa & Homestay Invoice Generator — PDF | Chakrio" />
-        <meta name="twitter:description" content="Generate a professional guest invoice for your villa or homestay in seconds. GST support. Free PDF — no sign-up." />
+        <meta name="twitter:title" content="Homestay & Villa Invoice Generator — Free PDF | Chakrio" />
+        <meta name="twitter:description" content="Make a homestay or villa invoice in seconds. GST-ready PDF, no sign-up. Free for Indian hosts." />
         <meta name="twitter:image" content="https://chakrio.com/og-image.png" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebPage",
-          "name": "Free Villa & Homestay Invoice Generator — PDF | Chakrio",
+          "name": "Homestay & Villa Invoice Generator — Free PDF | Chakrio",
           "url": "https://chakrio.com/tools/invoice-generator",
-          "description": "Generate a professional guest invoice for your villa, homestay, or guesthouse in seconds. GST support included. Free PDF download — no sign-up required.",
+          "description": "Create a homestay, villa, or guesthouse invoice in seconds. GST-ready, professional PDF, no sign-up. Free invoice format for Indian hosts and property managers.",
           "datePublished": "2025-01-01",
-          "dateModified": "2026-04-05",
+          "dateModified": "2026-09-03",
           "author": { "@type": "Organization", "name": "Chakrio", "url": "https://chakrio.com" },
           "publisher": { "@type": "Organization", "name": "Chakrio", "logo": { "@type": "ImageObject", "url": "https://chakrio.com/og-image.png" } },
           "isPartOf": { "@type": "WebSite", "name": "Chakrio", "url": "https://chakrio.com" }
@@ -312,7 +315,7 @@ export default function InvoiceGenerator() {
           "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://chakrio.com/" },
             { "@type": "ListItem", "position": 2, "name": "Free Tools", "item": "https://chakrio.com/#tools" },
-            { "@type": "ListItem", "position": 3, "name": "Villa & Homestay Invoice Generator", "item": "https://chakrio.com/tools/invoice-generator" }
+            { "@type": "ListItem", "position": 3, "name": "Homestay & Villa Invoice Generator", "item": "https://chakrio.com/tools/invoice-generator" }
           ]
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
@@ -371,12 +374,12 @@ export default function InvoiceGenerator() {
         <div className="mb-10 text-center">
           <span className="inline-block text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: GOLD }}>Free Tool</span>
           <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3" style={{ letterSpacing: '-0.03em' }}>
-            Villa & Homestay Invoice Generator
+            Homestay & Villa Invoice Generator
           </h1>
           <p className="text-text-2 text-sm max-w-xl mx-auto">
             Fill in the stay details, preview the totals, and download a clean PDF invoice to share with your guest. No sign-up. No watermarks.
           </p>
-          <p className="text-text-3 text-xs mt-3">Page last updated: 5 April 2026</p>
+          <p className="text-text-3 text-xs mt-3">Page last updated: 3 September 2026</p>
         </div>
 
         <div className="rounded-2xl border p-6 sm:p-8 space-y-8" style={{ background: '#16151f', borderColor: 'rgba(255,255,255,0.07)' }}>

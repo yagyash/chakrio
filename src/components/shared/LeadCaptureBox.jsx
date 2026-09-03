@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../services/firebase';
+import { track } from '../../utils/analytics';
 
 const GOLD = '#c8a96e';
 const inputCls = 'w-full bg-[#0d0c18] border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors text-sm';
@@ -43,6 +44,7 @@ export default function LeadCaptureBox({ sourcePage }) {
       // Backend unreachable — lead is still saved in Firestore above
     } finally {
       localStorage.setItem('chakrio_lead_captured', '1');
+      track('lead_captured', { source_page: sourcePage });
       setSubmitted(true);
       setSubmitting(false);
     }

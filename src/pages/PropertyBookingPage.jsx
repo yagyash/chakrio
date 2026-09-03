@@ -14,6 +14,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { MapPin, Phone, Mail, Users, Check, AlertCircle, CircleCheck, Loader2, ExternalLink } from 'lucide-react';
 import { getPropertyContent } from '../data/propertyContent';
 import { getPropertyInfo, getAvailability, reserve, confirmUpiPayment } from '../services/directBooking';
+import { track } from '../utils/analytics';
 import DateRangePicker from '../components/booking/DateRangePicker';
 import Stepper from '../components/booking/Stepper';
 import GuestCountPicker from '../components/booking/GuestCountPicker';
@@ -67,6 +68,10 @@ export default function PropertyBookingPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
+    if (content) track('booking_page_view', { property: propertySlug });
+  }, [content, propertySlug]);
+
+  useEffect(() => {
     if (!content) return;
     getPropertyInfo(content.backendSlug)
       .then((data) => {
@@ -94,6 +99,7 @@ export default function PropertyBookingPage() {
     setChecking(true);
     setError('');
     setQuote(null);
+    track('booking_enquiry', { property: propertySlug, check_in: checkIn, check_out: checkOut });
     try {
       if (info.has_rooms) {
         const results = await Promise.all(

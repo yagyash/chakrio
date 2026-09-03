@@ -6,6 +6,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import ScrollToTop from './components/shared/ScrollToTop';
 import LoginPage from './components/auth/LoginPage';
 import AppShell from './AppShell';
+import { initAnalytics } from './utils/analytics';
 
 // Lighter guard for /admin — only requires Firebase auth, not a Firestore profile.
 // AdminDashboard handles its own is-admin check against the Supabase admins table.
@@ -41,6 +42,7 @@ function MetaPageView() {
 }
 
 export default function App() {
+  useEffect(() => { initAnalytics(); }, []);
   return (
     <HelmetProvider>
     <AuthProvider>

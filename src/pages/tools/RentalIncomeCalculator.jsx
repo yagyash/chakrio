@@ -6,6 +6,7 @@ import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
 import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
+import { track } from '../../utils/analytics';
 
 function fmt(n) {
   return '₹' + Math.round(n).toLocaleString('en-IN');
@@ -35,6 +36,7 @@ export default function RentalIncomeCalculator() {
     const gross = r * rt * (occ / 100) * d;
     const expenses = gross * (parseFloat(expensePct) / 100);
     setResult({ gross, expenses, net: gross - expenses });
+    track('tool_used', { tool: 'rental-income-calculator' });
   }
 
   function reset() {

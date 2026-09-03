@@ -6,6 +6,7 @@ import Footer from '../../components/marketing/Footer';
 import CTABox from '../../components/tools/CTABox';
 import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
+import { track } from '../../utils/analytics';
 
 const inputCls = 'w-full bg-surface2 border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors';
 const INR = n => '₹' + Math.round(n).toLocaleString('en-IN');
@@ -33,6 +34,7 @@ export default function GSTCalculator() {
     const gstAmount  = roomTotal * gstRate;
     const grandTotal = roomTotal + gstAmount;
     setResult({ roomTotal, gstRate: gstRate * 100, gstAmount, grandTotal, itcEligible, tariff: t, nights: n, rooms: r });
+    track('tool_used', { tool: 'gst-calculator-hotel' });
   }
 
   function reset() {

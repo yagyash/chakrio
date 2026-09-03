@@ -10,6 +10,7 @@ export default function PrivacyPolicy() {
       <Helmet>
         <title>Privacy Policy — Chakrio</title>
         <meta name="description" content="Chakrio's privacy policy. Learn how we collect, use, and protect your data." />
+        <link rel="canonical" href="https://chakrio.com/privacy" />
       </Helmet>
       <Navbar />
 
