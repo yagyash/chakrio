@@ -93,6 +93,18 @@ function daysInMonth(ym) {
   return new Date(y, mo, 0).getDate();
 }
 
+/** True when a YYYY-MM month is close enough to now to belong on the dashboard
+ *  charts (~2 years back, 1 year forward). Keeps the report focused on the
+ *  active operating window and stops one old or mis-dated row from stretching
+ *  the x-axis across empty years. Older rows still show on the Expenses page. */
+function monthInWindow(ym) {
+  if (!ym) return false;
+  const now = new Date();
+  const key = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+  return ym >= key(new Date(now.getFullYear(), now.getMonth() - 24, 1))
+      && ym <= key(new Date(now.getFullYear(), now.getMonth() + 12, 1));
+}
+
 // ── occupancy from bookings tab ───────────────────────────────────────────────
 
 /**
@@ -111,7 +123,7 @@ function computeOccupancy(bookings, totalRooms) {
   const monthMap = {};
   bookings.forEach((row) => {
     const ym = toYearMonth(String(row['Check-in'] ?? row['check_in'] ?? ''));
-    if (!ym) return;
+    if (!monthInWindow(ym)) return;
     const n = nightsCol ? Number(row[nightsCol] || 1) : 1;
     monthMap[ym] = (monthMap[ym] ?? 0) + n;
   });
@@ -148,6 +160,7 @@ export default function Reports() {
   // ── aggregate bookings + expenses by month ────────────────────────────────
   const monthlyData = useMemo(() => {
     const map = {};
+    const blank = () => ({ revenue: 0, expense: 0, construction: 0, equipment: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 });
 
     // Seed a rolling 6-month past + 3-month future window so charts always
     // show a continuous range even when there's no data for those months
@@ -156,21 +169,25 @@ export default function Reports() {
       d.setDate(1);
       d.setMonth(d.getMonth() + offset);
       const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      map[ym] = { revenue: 0, expense: 0, construction: 0, equipment: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
+      map[ym] = blank();
     }
 
+    // Bucket revenue + booking count by CHECK-OUT month — matches the bot's
+    // monthly P&L report and the on-demand summary, so the dashboard and the
+    // WhatsApp report the owner receives show the same number for a month.
+    // monthInWindow() keeps a stray mis-dated row from stretching the x-axis.
     bookings.forEach((r) => {
-      const ym = toYearMonth(String(r['Check-in'] ?? r['check_in'] ?? ''));
-      if (!ym) return;
-      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, equipment: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
+      const ym = toYearMonth(String(r['Check-out'] ?? r['check_out'] ?? r['Check-in'] ?? r['check_in'] ?? ''));
+      if (!monthInWindow(ym)) return;
+      if (!map[ym]) map[ym] = blank();
       map[ym].revenue += Number(r['Total_Amount'] ?? 0);
       map[ym].bookingCount += 1;
     });
 
     expenses.forEach((r) => {
       const ym = toYearMonth(String(r['Date'] ?? r['date'] ?? ''));
-      if (!ym) return;
-      if (!map[ym]) map[ym] = { revenue: 0, expense: 0, construction: 0, equipment: 0, ownerDrawing: 0, staff: 0, bookingCount: 0 };
+      if (!monthInWindow(ym)) return;
+      if (!map[ym]) map[ym] = blank();
       const cat = String(r['Category'] ?? r['category'] ?? '').toLowerCase().trim();
       const amt = Number(r['Amount'] ?? 0);
       if (cat === 'construction')       map[ym].construction += amt;

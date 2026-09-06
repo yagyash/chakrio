@@ -61,11 +61,43 @@ async function getOwnerPropertyIds(uid, token, projectId) {
 
 function supabaseQuery(tab, propertyId) {
   switch (tab) {
-    case 'bookings': return `/bookings?property_id=eq.${propertyId}&select=*&order=check_in.desc&limit=2000`;
-    case 'expenses': return `/expenses?property_id=eq.${propertyId}&select=*&order=date.desc&limit=2000`;
-    case 'summary':  return `/monthly_summary?property_id=eq.${propertyId}&select=*&order=year.desc,month.desc&limit=2000`;
-    case 'extras':   return `/booking_extras?property_id=eq.${propertyId}&select=*&order=created_at.desc&limit=2000`;
+    case 'bookings': return `/bookings?property_id=eq.${propertyId}&select=*&order=check_in.desc`;
+    case 'expenses': return `/expenses?property_id=eq.${propertyId}&select=*&order=date.desc`;
+    case 'summary':  return `/monthly_summary?property_id=eq.${propertyId}&select=*&order=year.desc,month.desc`;
+    case 'extras':   return `/booking_extras?property_id=eq.${propertyId}&select=*&order=created_at.desc`;
   }
+}
+
+// PostgREST silently caps every select at db-max-rows (1000 on Supabase's
+// default config) no matter what ?limit= says. A property past 1000 bookings
+// would lose its OLDEST rows — which quietly zeroed early-month revenue,
+// op. profit, op. expense and occupancy on the Reports page (they aggregate
+// the rows this route returns). Page through with Range headers until a
+// short page comes back so every month has its full booking set.
+// ponytail: returning every row is fine at a few thousand per property; if
+// one ever crosses ~10k bookings, make the Reports/Bookings pages request a
+// date range and filter it server-side here instead of shipping everything.
+const PAGE_SIZE = 1000;
+
+async function fetchAllRows(url, serviceKey) {
+  const rows = [];
+  for (let start = 0; ; start += PAGE_SIZE) {
+    const resp = await fetch(url, {
+      headers: {
+        apikey:        serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Range-Unit':  'items',
+        Range:         `${start}-${start + PAGE_SIZE - 1}`,
+      },
+    });
+    if (resp.status === 416) break;               // range starts past the last row
+    if (!resp.ok) throw new Error(`Supabase ${resp.status}`);
+    const page = await resp.json();
+    if (!Array.isArray(page)) throw new Error('Unexpected Supabase response');
+    rows.push(...page);
+    if (page.length < PAGE_SIZE) break;
+  }
+  return rows;
 }
 
 // ------------------------------------------------------------------
@@ -118,15 +150,7 @@ export default async function handler(req, res) {
 
   try {
     const url = `${supabaseUrl}/rest/v1${supabaseQuery(tab, propertyId)}`;
-    const supaRes = await fetch(url, {
-      headers: {
-        apikey:        serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-      },
-    });
-    if (!supaRes.ok) return res.status(502).json({ error: 'Failed to load data' });
-
-    return res.status(200).json(await supaRes.json());
+    return res.status(200).json(await fetchAllRows(url, serviceKey));
   } catch {
     return res.status(502).json({ error: 'Failed to load data' });
   }
