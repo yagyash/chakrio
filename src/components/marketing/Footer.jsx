@@ -18,6 +18,8 @@ export default function Footer() {
               <Link to="/tools/gst-calculator-hotel" className="text-sm text-text-2 hover:text-text-1 transition-colors">Hotel GST Calculator</Link>
             </div>
             <div className="flex flex-wrap gap-5 sm:justify-end">
+              <Link to="/whatsapp-channel-manager" className="text-sm text-text-2 hover:text-text-1 transition-colors">WhatsApp Channel Manager</Link>
+              <Link to="/compare/chakrio-vs-hostaway" className="text-sm text-text-2 hover:text-text-1 transition-colors">Compare</Link>
               <Link to="/dharmshala" className="text-sm text-text-2 hover:text-text-1 transition-colors">Dharmshalas</Link>
               <Link to="/privacy" className="text-sm text-text-2 hover:text-text-1 transition-colors">Privacy</Link>
               <Link to="/terms" className="text-sm text-text-2 hover:text-text-1 transition-colors">Terms</Link>

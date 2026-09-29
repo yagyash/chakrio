@@ -26,6 +26,10 @@ import CancellationPolicyGenerator from './pages/tools/CancellationPolicyGenerat
 import InvoiceGenerator from './pages/tools/InvoiceGenerator';
 import WhatsappBookingConfirmation from './pages/tools/WhatsappBookingConfirmation';
 import GSTCalculator from './pages/tools/GSTCalculator';
+import WhatsappChannelManager from './pages/WhatsappChannelManager';
+import ChakrioVsHostaway from './pages/compare/ChakrioVsHostaway';
+import ChakrioVsCloudbeds from './pages/compare/ChakrioVsCloudbeds';
+import ChakrioVsEzee from './pages/compare/ChakrioVsEzee';
 import MenuPage from './pages/MenuPage';
 import PropertyBookingPage from './pages/PropertyBookingPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -61,6 +65,10 @@ export default function App() {
           <Route path="/tools/invoice-generator" element={<InvoiceGenerator />} />
           <Route path="/tools/whatsapp-booking-confirmation" element={<WhatsappBookingConfirmation />} />
           <Route path="/tools/gst-calculator-hotel" element={<GSTCalculator />} />
+          <Route path="/whatsapp-channel-manager" element={<WhatsappChannelManager />} />
+          <Route path="/compare/chakrio-vs-hostaway" element={<ChakrioVsHostaway />} />
+          <Route path="/compare/chakrio-vs-cloudbeds" element={<ChakrioVsCloudbeds />} />
+          <Route path="/compare/chakrio-vs-ezee" element={<ChakrioVsEzee />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/dharmshala" element={<DharmshaPage />} />
           <Route path="/terms" element={<Terms />} />

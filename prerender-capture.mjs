@@ -34,6 +34,10 @@ const ROUTES = [
   ['/tools/invoice-generator', 'tools/invoice-generator/index.html'],
   ['/tools/whatsapp-booking-confirmation', 'tools/whatsapp-booking-confirmation/index.html'],
   ['/tools/gst-calculator-hotel', 'tools/gst-calculator-hotel/index.html'],
+  ['/whatsapp-channel-manager', 'whatsapp-channel-manager/index.html'],
+  ['/compare/chakrio-vs-hostaway', 'compare/chakrio-vs-hostaway/index.html'],
+  ['/compare/chakrio-vs-cloudbeds', 'compare/chakrio-vs-cloudbeds/index.html'],
+  ['/compare/chakrio-vs-ezee', 'compare/chakrio-vs-ezee/index.html'],
   ['/book/niva-the-rooted-heaven-udaipur', 'book/niva-the-rooted-heaven-udaipur/index.html'],
   ['/', 'index.html'],
 ];
