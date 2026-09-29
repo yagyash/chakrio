@@ -1,32 +1,81 @@
 import { Link } from 'react-router-dom';
 
+// Grouped columns rather than one long wrapping row. The flat version orphaned
+// whatever link fell past the wrap point onto its own right-aligned line, and
+// it gave a reader no way to tell a calculator from a legal page. Columns also
+// mean a new link lengthens one list instead of reflowing the whole block.
+const COLUMNS = [
+  {
+    heading: 'Product',
+    links: [
+      { to: '/whatsapp-channel-manager', label: 'WhatsApp Channel Manager' },
+      { to: '/dharmshala', label: 'For Dharmshalas' },
+    ],
+  },
+  {
+    heading: 'Compare',
+    links: [
+      { to: '/compare/chakrio-vs-hostaway', label: 'vs Hostaway' },
+      { to: '/compare/chakrio-vs-cloudbeds', label: 'vs Cloudbeds' },
+      { to: '/compare/chakrio-vs-ezee', label: 'vs eZee' },
+    ],
+  },
+  {
+    heading: 'Free Tools',
+    links: [
+      { to: '/tools/occupancy-calculator', label: 'Occupancy Calculator' },
+      { to: '/tools/rental-income-calculator', label: 'Rental Income Calculator' },
+      { to: '/tools/gst-calculator-hotel', label: 'Hotel GST Calculator' },
+      { to: '/tools/invoice-generator', label: 'Invoice Generator' },
+      { to: '/tools/cancellation-policy', label: 'Cancellation Policy' },
+      { to: '/tools/whatsapp-booking-confirmation', label: 'WA Booking Confirmation' },
+    ],
+  },
+  {
+    heading: 'Company',
+    links: [
+      { to: '/privacy', label: 'Privacy' },
+      { to: '/terms', label: 'Terms' },
+      { to: '/refund-policy', label: 'Refund Policy' },
+    ],
+  },
+];
+
+const linkCls = 'text-sm text-text-2 hover:text-text-1 transition-colors';
+
 export default function Footer() {
   return (
     <footer className="bg-sidebar border-t border-surface3">
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="sm:col-span-2 lg:col-span-1">
+            <p className="font-display font-extrabold text-text-1 text-lg tracking-tight">Chakrio</p>
+            <p className="text-text-3 text-sm mt-2 leading-relaxed max-w-[30ch]">
+              Booking automation over WhatsApp for villas, homestays, dharmshalas and small hotels.
+            </p>
+          </div>
+
+          {COLUMNS.map(({ heading, links }) => (
+            <nav key={heading} aria-label={heading}>
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-text-3 mb-3">
+                {heading}
+              </p>
+              <ul className="space-y-2.5">
+                {links.map(({ to, label }) => (
+                  <li key={to}>
+                    <Link to={to} className={linkCls}>{label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        <div className="mt-10 pt-6 border-t border-surface3 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <p className="text-text-3 text-sm">
             © {new Date().getFullYear()} Chakrio. All rights reserved.
           </p>
-          <div className="flex flex-col gap-4 items-start sm:items-end">
-            <div className="flex flex-wrap gap-x-5 gap-y-2 sm:justify-end">
-              <Link to="/tools/occupancy-calculator" className="text-sm text-text-2 hover:text-text-1 transition-colors">Occupancy Calculator</Link>
-              <Link to="/tools/rental-income-calculator" className="text-sm text-text-2 hover:text-text-1 transition-colors">Rental Income Calculator</Link>
-              <Link to="/tools/cancellation-policy" className="text-sm text-text-2 hover:text-text-1 transition-colors">Cancellation Policy</Link>
-              <Link to="/tools/invoice-generator" className="text-sm text-text-2 hover:text-text-1 transition-colors">Invoice Generator</Link>
-              <Link to="/tools/whatsapp-booking-confirmation" className="text-sm text-text-2 hover:text-text-1 transition-colors">WA Booking Confirmation</Link>
-              <Link to="/tools/gst-calculator-hotel" className="text-sm text-text-2 hover:text-text-1 transition-colors">Hotel GST Calculator</Link>
-            </div>
-            <div className="flex flex-wrap gap-5 sm:justify-end">
-              <Link to="/whatsapp-channel-manager" className="text-sm text-text-2 hover:text-text-1 transition-colors">WhatsApp Channel Manager</Link>
-              <Link to="/compare/chakrio-vs-hostaway" className="text-sm text-text-2 hover:text-text-1 transition-colors">Compare</Link>
-              <Link to="/dharmshala" className="text-sm text-text-2 hover:text-text-1 transition-colors">Dharmshalas</Link>
-              <Link to="/privacy" className="text-sm text-text-2 hover:text-text-1 transition-colors">Privacy</Link>
-              <Link to="/terms" className="text-sm text-text-2 hover:text-text-1 transition-colors">Terms</Link>
-              <Link to="/refund-policy" className="text-sm text-text-2 hover:text-text-1 transition-colors">Refund Policy</Link>
-              <Link to="/login" className="text-sm text-text-2 hover:text-text-1 transition-colors">Login</Link>
-            </div>
-          </div>
+          <Link to="/login" className={linkCls}>Sign in</Link>
         </div>
       </div>
     </footer>
