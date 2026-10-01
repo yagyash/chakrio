@@ -257,13 +257,19 @@ export default function Reports() {
   );
 
   // ── selected month table row ──────────────────────────────────────────────
+  // Same fields as the P&L cards above — this row is also the CSV export.
   const tableRows = useMemo(() => [{
-    Month:        formatMonthLabel(activeMonth),
-    Revenue:      plData.revenue,
-    Expenses:     plData.expense,
-    'Net Profit': plData.profit,
-    Bookings:     plData.bookingCount,
-  }], [activeMonth, plData]);
+    Month:            formatMonthLabel(activeMonth),
+    Revenue:          plData.revenue,
+    'Op. Expenses':   plData.expense,
+    'Op. Profit':     plData.profit,
+    Construction:     plData.construction ?? 0,
+    Equipment:        plData.equipment ?? 0,
+    'Owner Drawings': plData.ownerDrawing ?? 0,
+    Staff:            plData.staff ?? 0,
+    'Food Revenue':   (extrasMonthly[activeMonth] ?? {}).food ?? 0,
+    Bookings:         plData.bookingCount,
+  }], [activeMonth, plData, extrasMonthly]);
 
   // ── loading / error ───────────────────────────────────────────────────────
   if (bLoading || eLoading) {
@@ -502,13 +508,13 @@ export default function Reports() {
             data={tableRows}
             downloadFileName="monthly_report"
             formatCell={(col, val) => {
-              if (col === 'Net Profit') {
+              if (col === 'Op. Profit') {
                 const num = Number(val);
                 if (num < 0) return <span style={{ color: '#e07070', fontWeight: 600 }}>₹{fmt(Math.abs(num))}</span>;
                 if (num > 0) return <span style={{ color: '#5cb88a', fontWeight: 600 }}>₹{fmt(num)}</span>;
                 return <span style={{ color: '#8c8a9e' }}>₹0</span>;
               }
-              if (col === 'Revenue' || col === 'Expenses') return `₹${fmt(val)}`;
+              if (col !== 'Month' && col !== 'Bookings') return `₹${fmt(val)}`;
               return val;
             }}
           />
