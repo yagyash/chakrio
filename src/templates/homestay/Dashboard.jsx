@@ -152,9 +152,15 @@ function groupByMonth(data, dateCol, valueCols) {
   return Object.values(map).sort((a, b) => a.label.localeCompare(b.label));
 }
 
+/** Bookings bucket by Check-out (a guest who arrived last month and leaves this
+ *  month belongs to this month) — same as Reports and the bot's monthly P&L. */
+function monthCol(data) {
+  return data.length && 'Check-out' in data[0] ? 'Check-out' : detectDateCol(data);
+}
+
 /** Keep only rows in the current month or future. Rows with no detectable date pass through. */
 function filterCurrentAndFuture(data, currentYM) {
-  const dc = detectDateCol(data);
+  const dc = monthCol(data);
   if (!dc) return data; // can't filter — show all
   return data.filter((row) => {
     const ym = toYearMonth(row[dc]);
@@ -164,7 +170,7 @@ function filterCurrentAndFuture(data, currentYM) {
 
 /** Keep only rows in the current month. Rows with no detectable date pass through. */
 function filterCurrentMonth(data, currentYM) {
-  const dc = detectDateCol(data);
+  const dc = monthCol(data);
   if (!dc) return data;
   return data.filter((row) => {
     const ym = toYearMonth(row[dc]);
@@ -237,21 +243,19 @@ export default function HomestayDashboard() {
       return cols[0] ?? null;
     };
     const revCol = pickCol(activeBookings, ['total_amount', 'booking_amount', 'total', 'revenue', 'amount']);
-    const balCol = pickCol(activeBookings, ['balance_amount', 'balance']);
     const expCol = pickCol(activeExpenses,  ['amount', 'total', 'expense']);
+    // Same definition as Reports: full Total_Amount of bookings checking out
+    // THIS month (was: collected-so-far across every future booking).
+    const monthBookings = filterCurrentMonth(activeBookings, currentYM);
     const revenue = revCol
-      ? activeBookings.reduce((s, r) => {
-          const total   = Number(r[revCol] || 0);
-          const balance = balCol ? Number(r[balCol] || 0) : 0;
-          return s + (total - balance);
-        }, 0)
+      ? monthBookings.reduce((s, r) => s + Number(r[revCol] || 0), 0)
       : 0;
     const _NON_OP = new Set(['construction', 'equipment', 'owner drawing']);
     const catCol = Object.keys(activeExpenses[0] || {}).find(k => k.toLowerCase() === 'category') ?? 'Category';
     const opExpenses = activeExpenses.filter(r => !_NON_OP.has(String(r[catCol] || '').toLowerCase().trim()));
     const expense = expCol ? opExpenses.reduce((s, r) => s + Number(r[expCol] || 0), 0) : 0;
     return revenue - expense;
-  }, [activeBookings, activeExpenses]);
+  }, [activeBookings, activeExpenses, currentYM]);
 
   // ── occupancy rate (current month only) ──────────────────────────────────
   const occupancy = useMemo(() => {
@@ -655,10 +659,10 @@ function NetProfitCard({ value }) {
             {positive ? '+' : '−'} ₹{fmt(Math.abs(value))}
           </p>
           <span style={{ fontSize: '11px', fontWeight: 500, padding: '3px 8px', borderRadius: '20px', background: 'rgba(92,184,138,0.1)', color: '#5cb88a', whiteSpace: 'nowrap' }}>
-            {positive ? '↑ this period' : '↓ this period'}
+            {positive ? '↑ this month' : '↓ this month'}
           </span>
         </div>
-        <p style={{ fontSize: '11px', color: '#56546a', margin: '6px 0 0' }}>Op. Profit (current &amp; upcoming)</p>
+        <p style={{ fontSize: '11px', color: '#56546a', margin: '6px 0 0' }}>Op. Profit (this month)</p>
       </div>
     </div>
   );
