@@ -127,7 +127,8 @@ export default function Bookings() {
           data={dataWithExtras}
           title={bookingsTab}
           downloadFileName={bookingsTab}
-          showMonthFilter
+          // Check-out month, same as Reports, Dashboard and the bot's monthly P&L
+          showMonthFilter="Check-out"
           hideCols={HIDDEN_COLS}
           formatHeader={formatHeader}
           formatCell={formatCell}

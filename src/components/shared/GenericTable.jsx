@@ -42,7 +42,8 @@ function detectDateCol(data) {
  *
  * Props:
  *  - downloadFileName  show CSV download button; filename = `${downloadFileName}_${month}.csv`
- *  - showMonthFilter   auto-detect date column and show a month picker in the header
+ *  - showMonthFilter   show a month picker in the header; true = auto-detect the date
+ *                      column, a string = filter on that column (e.g. 'Check-out')
  *  - maxRows           cap the number of rows shown
  */
 export default function GenericTable({ data, title, maxRows, downloadFileName, showMonthFilter, getRowClassName, formatCell, hideCols, formatHeader }) {
@@ -59,11 +60,12 @@ export default function GenericTable({ data, title, maxRows, downloadFileName, s
     return all.filter((c) => !hidden.includes(c.toLowerCase()));
   }, [data, hideCols]);
 
-  // detect date column when month filter is enabled
-  const dateCol = useMemo(
-    () => (showMonthFilter ? detectDateCol(data) : null),
-    [data, showMonthFilter],
-  );
+  // detect date column when month filter is enabled (a string names the column)
+  const dateCol = useMemo(() => {
+    if (!showMonthFilter) return null;
+    if (typeof showMonthFilter === 'string' && data.length && showMonthFilter in data[0]) return showMonthFilter;
+    return detectDateCol(data);
+  }, [data, showMonthFilter]);
 
   // unique sorted months derived from the date column
   const monthOptions = useMemo(() => {
