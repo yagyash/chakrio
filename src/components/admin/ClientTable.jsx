@@ -229,6 +229,61 @@ function CampaignSummary({ rows, onPauseResume }) {
   );
 }
 
+function ChannelSyncForm({ propertyId, onSubmit, onCancel }) {
+  const [beds24PropertyId, setBeds24PropertyId] = useState('');
+  const [beds24RoomId, setBeds24RoomId]         = useState('');
+  const inputStyle = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '6px 10px', color: '#f0eee8', fontSize: 12, outline: 'none', width: '100%' };
+  return (
+    <div style={{ marginTop: 10, background: 'rgba(72,199,142,0.06)', border: '1px solid rgba(72,199,142,0.2)', borderRadius: 8, padding: '12px 14px' }}>
+      <div style={{ fontSize: 11, color: '#48c78e', fontWeight: 600, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Connect to Beds24</div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <div style={{ flex: 1, minWidth: 140 }}>
+          <div style={{ fontSize: 11, color: '#56546a', marginBottom: 4 }}>Beds24 Property ID</div>
+          <input type="number" value={beds24PropertyId} onChange={e => setBeds24PropertyId(e.target.value)} placeholder="e.g. 353381" style={inputStyle} />
+        </div>
+        <div style={{ flex: 1, minWidth: 140 }}>
+          <div style={{ fontSize: 11, color: '#56546a', marginBottom: 4 }}>Room ID (optional)</div>
+          <input type="number" value={beds24RoomId} onChange={e => setBeds24RoomId(e.target.value)} placeholder="auto if only 1 room" style={inputStyle} />
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <ActionBtn primary onClick={() => {
+            if (!beds24PropertyId) return;
+            onSubmit(propertyId, 'enable_channel_manager', { beds24PropertyId, beds24RoomId: beds24RoomId || null });
+          }}>Connect</ActionBtn>
+          <ActionBtn onClick={onCancel}>Cancel</ActionBtn>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ChannelSyncStatus({ cm, onResync, onDisable }) {
+  if (!cm?.is_channel_manager_enabled) return null;
+  const conn = cm.connection;
+  return (
+    <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
+      <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Channel Sync — Beds24</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', fontSize: 12, color: '#8c8a9e' }}>
+        <StatusDot active={conn?.is_active} />
+        <span>{conn?.is_active ? 'Connected' : 'Disconnected'}</span>
+        {conn?.beds24_property_id && (
+          <span style={{ fontFamily: 'monospace', color: '#56546a' }}>
+            #{conn.beds24_property_id}{conn.beds24_room_id ? ` / room #${conn.beds24_room_id}` : ''}
+          </span>
+        )}
+        {cm.ota_markup_pct != null && <span>OTA markup: +{cm.ota_markup_pct}%</span>}
+      </div>
+      <div style={{ marginTop: 2, fontSize: 11, color: '#56546a' }}>
+        Last OTA booking poll: {conn?.last_polled_at ? fmtDate(conn.last_polled_at) : 'never yet'}
+      </div>
+      <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
+        <ActionBtn small onClick={onResync}>Resync Now</ActionBtn>
+        <ActionBtn small danger onClick={onDisable}>Disable Sync</ActionBtn>
+      </div>
+    </div>
+  );
+}
+
 function OnboardChecklist({ status }) {
   if (!status) return null;
   const items = [
@@ -257,6 +312,7 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
   const [paymentOpen, setPaymentOpen]   = useState(null);
   const [planOpen, setPlanOpen]         = useState(null);
   const [sendMsgProp, setSendMsgProp]   = useState(null);
+  const [channelSyncOpen, setChannelSyncOpen] = useState(null);
 
   // Per-property lazy data: { [propertyId]: { tokenHistory, paymentHistory, checklist, loading } }
   const [propData, setPropData] = useState({});
@@ -264,13 +320,14 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
   const loadPropertyData = useCallback(async (propertyId) => {
     if (!fetchPropertyData || propData[propertyId]) return;
     setPropData(prev => ({ ...prev, [propertyId]: { loading: true } }));
-    const [tokenHistory, paymentHistory, checklist, campaigns] = await Promise.all([
+    const [tokenHistory, paymentHistory, checklist, campaigns, channelManager] = await Promise.all([
       fetchPropertyData(propertyId, 'token-history'),
       fetchPropertyData(propertyId, 'payment-history'),
       fetchPropertyData(propertyId, 'checklist'),
       fetchPropertyData(propertyId, 'campaigns'),
+      fetchPropertyData(propertyId, 'channel-manager'),
     ]);
-    setPropData(prev => ({ ...prev, [propertyId]: { tokenHistory, paymentHistory, checklist, campaigns, loading: false } }));
+    setPropData(prev => ({ ...prev, [propertyId]: { tokenHistory, paymentHistory, checklist, campaigns, channelManager, loading: false } }));
   }, [fetchPropertyData, propData]);
 
   const handleCampaignAction = useCallback(async (propertyId, campaignId, action) => {
@@ -322,10 +379,13 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
 
   const handleAction = async (propertyId, action, extra = {}) => {
     if (action === 'delete' && !window.confirm('Permanently delete this property? This cannot be undone.')) return;
-    setPaymentOpen(null); setPlanOpen(null);
+    setPaymentOpen(null); setPlanOpen(null); setChannelSyncOpen(null);
     await onPropertyAction(propertyId, action, extra);
     // Bust cached property data on state-changing actions
-    if (['payment', 'activate', 'deactivate', 'delete', 'change_plan'].includes(action)) {
+    if ([
+      'payment', 'activate', 'deactivate', 'delete', 'change_plan',
+      'enable_channel_manager', 'disable_channel_manager', 'beds24_resync',
+    ].includes(action)) {
       setPropData(prev => { const n = { ...prev }; delete n[propertyId]; return n; });
     }
   };
@@ -498,12 +558,29 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
                                     {paymentOpen === p.id ? 'Cancel Payment' : 'Mark Payment'}
                                   </ActionBtn>
                                   <ActionBtn primary onClick={() => setSendMsgProp(p)}>Send Msg</ActionBtn>
+                                  {!pd?.channelManager?.is_channel_manager_enabled && (
+                                    <ActionBtn onClick={() => setChannelSyncOpen(channelSyncOpen === p.id ? null : p.id)}>
+                                      {channelSyncOpen === p.id ? 'Cancel' : 'Connect Channel Sync'}
+                                    </ActionBtn>
+                                  )}
                                   <ActionBtn danger onClick={() => handleAction(p.id, 'delete')}>Delete</ActionBtn>
                                 </div>
 
                                 {/* Payment form */}
                                 {paymentOpen === p.id && (
                                   <PaymentForm propertyId={p.id} onSubmit={handleAction} onCancel={() => setPaymentOpen(null)} />
+                                )}
+
+                                {/* Channel sync — connect form or live status */}
+                                {channelSyncOpen === p.id && (
+                                  <ChannelSyncForm propertyId={p.id} onSubmit={handleAction} onCancel={() => setChannelSyncOpen(null)} />
+                                )}
+                                {!pd?.loading && pd?.channelManager && (
+                                  <ChannelSyncStatus
+                                    cm={pd.channelManager}
+                                    onResync={() => handleAction(p.id, 'beds24_resync')}
+                                    onDisable={() => { if (window.confirm('Disable channel sync? This opens every date on every connected OTA.')) handleAction(p.id, 'disable_channel_manager'); }}
+                                  />
                                 )}
 
                                 {/* Payment history (item 4) */}

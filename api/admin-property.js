@@ -277,6 +277,136 @@ export default async function handler(req, res) {
     });
     return res.status(200).json({ ok: true, ...(syncWarning && { warning: syncWarning }) });
 
+  } else if (action === 'enable_channel_manager') {
+    const { beds24PropertyId, beds24RoomId } = req.body ?? {};
+    if (!beds24PropertyId) return res.status(400).json({ error: 'beds24PropertyId is required' });
+
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (!agentUrl || !secret) return res.status(500).json({ error: 'Agent not configured' });
+
+    const propName = await getPropertyName(supabaseUrl, supabaseKey, propertyId);
+
+    // 1. Connect to Beds24 first (validates the Beds24 property/room actually
+    // exist) — only flip the Supabase flags once that's confirmed.
+    let connectData;
+    try {
+      const connectRes = await fetch(`${agentUrl}/beds24/connect`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+        body: JSON.stringify({
+          property_id:        propertyId,
+          beds24_property_id: Number(beds24PropertyId),
+          ...(beds24RoomId != null && beds24RoomId !== '' ? { beds24_room_id: Number(beds24RoomId) } : {}),
+        }),
+      });
+      connectData = await connectRes.json().catch(() => ({}));
+      if (!connectRes.ok) {
+        return res.status(connectRes.status).json({ error: connectData.detail || 'Beds24 connect failed' });
+      }
+    } catch (e) {
+      return res.status(502).json({ error: `Could not reach agent: ${e.message}` });
+    }
+
+    const r = await fetch(`${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}`, {
+      method: 'PATCH', headers,
+      body: JSON.stringify({ is_channel_manager_enabled: true, channel_manager_provider: 'beds24' }),
+    });
+    if (!r.ok) return res.status(502).json({ error: 'Update failed' });
+
+    // 2. Push the first sync now, so the admin sees it working immediately
+    // instead of waiting for the 3 AM resync. A failure here (e.g. no
+    // villa rate set yet) doesn't undo the connection -- it's surfaced as
+    // a warning so the admin knows exactly what to fix, same pattern as
+    // change_plan's Firestore-sync warning above.
+    let syncWarning = null;
+    try {
+      const resyncRes = await fetch(`${agentUrl}/beds24/resync`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+        body:    JSON.stringify({ property_id: propertyId }),
+      });
+      if (!resyncRes.ok) {
+        const d = await resyncRes.json().catch(() => ({}));
+        syncWarning = d.detail || `Initial sync failed (${resyncRes.status})`;
+      }
+    } catch (e) {
+      syncWarning = `Initial sync unreachable: ${e.message}`;
+    }
+
+    await logAction(supabaseUrl, supabaseKey, {
+      actionType:  'enable_channel_manager',
+      description: `Channel sync enabled for ${propName ?? propertyId} (Beds24 property ${beds24PropertyId})${syncWarning ? ` — warning: ${syncWarning}` : ''}`,
+      propertyName: propName,
+      performedBy: adminEmail,
+    });
+    return res.status(200).json({ ok: true, connection: connectData, ...(syncWarning && { warning: syncWarning }) });
+
+  } else if (action === 'disable_channel_manager') {
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (!agentUrl || !secret) return res.status(500).json({ error: 'Agent not configured' });
+
+    const propName = await getPropertyName(supabaseUrl, supabaseKey, propertyId);
+
+    // 1. Push all-open + deactivate BEFORE flipping the Supabase flag, so a
+    // crash here leaves channel sync still enabled (safe, retryable) rather
+    // than disabled with a stale-closed calendar nobody is updating anymore.
+    try {
+      const disconnectRes = await fetch(`${agentUrl}/beds24/disconnect`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+        body:    JSON.stringify({ property_id: propertyId }),
+      });
+      if (!disconnectRes.ok) {
+        const d = await disconnectRes.json().catch(() => ({}));
+        return res.status(disconnectRes.status).json({ error: d.detail || 'Beds24 disconnect failed' });
+      }
+    } catch (e) {
+      return res.status(502).json({ error: `Could not reach agent: ${e.message}` });
+    }
+
+    const r = await fetch(`${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}`, {
+      method: 'PATCH', headers,
+      body: JSON.stringify({ is_channel_manager_enabled: false, channel_manager_provider: null }),
+    });
+    if (!r.ok) return res.status(502).json({ error: 'Update failed' });
+
+    await logAction(supabaseUrl, supabaseKey, {
+      actionType:  'disable_channel_manager',
+      description: `Channel sync disabled for ${propName ?? propertyId}`,
+      propertyName: propName,
+      performedBy: adminEmail,
+    });
+    return res.status(200).json({ ok: true });
+
+  } else if (action === 'beds24_resync') {
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret   = process.env.ONBOARD_SECRET;
+    if (!agentUrl || !secret) return res.status(500).json({ error: 'Agent not configured' });
+
+    const propName = await getPropertyName(supabaseUrl, supabaseKey, propertyId);
+    let data;
+    try {
+      const resyncRes = await fetch(`${agentUrl}/beds24/resync`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Onboard-Secret': secret },
+        body:    JSON.stringify({ property_id: propertyId }),
+      });
+      data = await resyncRes.json().catch(() => ({}));
+      if (!resyncRes.ok) return res.status(resyncRes.status).json({ error: data.detail || 'Resync failed' });
+    } catch (e) {
+      return res.status(502).json({ error: `Could not reach agent: ${e.message}` });
+    }
+
+    await logAction(supabaseUrl, supabaseKey, {
+      actionType:  'beds24_resync',
+      description: `Beds24 resync triggered for ${propName ?? propertyId}`,
+      propertyName: propName,
+      performedBy: adminEmail,
+    });
+    return res.status(200).json({ ok: true, ...data });
+
   } else if (action === 'pause_campaign' || action === 'resume_campaign') {
     if (!campaignId) return res.status(400).json({ error: 'campaignId is required' });
     const campaignAction = action === 'pause_campaign' ? 'pause' : 'resume';

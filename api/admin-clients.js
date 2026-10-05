@@ -7,6 +7,7 @@
  * ?action=payment-history&propertyId=UUID → payment history for a property
  * ?action=checklist&propertyId=UUID       → onboard status checklist for a property
  * ?action=campaigns&propertyId=UUID       → broadcast campaigns (manual + auto) for a property
+ * ?action=channel-manager&propertyId=UUID → Beds24 connection status for a property
  * ?action=stats                           → collected-this-month from payment_history
  * ?action=whoami                          → { isAdmin } for the caller (200 even if not admin —
  *                                            used to decide whether to show the admin UI at all)
@@ -123,6 +124,35 @@ export default async function handler(req, res) {
     );
     if (!r.ok) return res.status(502).json({ error: 'Query failed' });
     return res.status(200).json(await r.json());
+  }
+
+  // ── channel-manager (Beds24 connection status) ───────────────────────
+  if (action === 'channel-manager') {
+    if (!propertyId) return res.status(400).json({ error: 'propertyId required' });
+
+    const propRes = await fetch(
+      `${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}&select=is_channel_manager_enabled,channel_manager_provider,ota_markup_pct,ota_rack_rate`,
+      { headers: supaHeaders }
+    );
+    const propRows = propRes.ok ? await propRes.json().catch(() => []) : [];
+
+    const connRes = await fetch(
+      `${supabaseUrl}/rest/v1/channel_manager_connections?property_id=eq.${propertyId}&provider=eq.beds24` +
+      `&select=id,beds24_property_id,beds24_room_id,is_active,last_polled_at,created_at&order=created_at.desc&limit=1`,
+      { headers: supaHeaders }
+    );
+    const connRows = connRes.ok ? await connRes.json().catch(() => []) : [];
+
+    // ponytail: no live Beds24 call here (unmatched-booking count etc.) --
+    // that's the nightly reconcile job's job, already alerting to Telegram.
+    // This endpoint only surfaces what's cheaply available from Supabase.
+    return res.status(200).json({
+      is_channel_manager_enabled: propRows[0]?.is_channel_manager_enabled ?? false,
+      channel_manager_provider:   propRows[0]?.channel_manager_provider ?? null,
+      ota_markup_pct:             propRows[0]?.ota_markup_pct ?? null,
+      ota_rack_rate:              propRows[0]?.ota_rack_rate ?? null,
+      connection:                 connRows[0] ?? null,
+    });
   }
 
   // ── stats (collected this month) ───────────────────────────────────
