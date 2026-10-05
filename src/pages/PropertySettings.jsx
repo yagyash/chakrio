@@ -86,6 +86,7 @@ export default function PropertySettings() {
   const [addingFeed, setAddingFeed]     = useState(false);
   const [addError, setAddError]         = useState('');
   const [removingId, setRemovingId]     = useState(null);
+  const [channelManager, setChannelManager] = useState(null);
 
   // UPI ID state
   const [upiId, setUpiId]               = useState('');
@@ -168,6 +169,7 @@ export default function PropertySettings() {
       if (data.ok) {
         setFeeds(data.feeds || []);
         setOutboundUrl(data.outbound_url || '');
+        setChannelManager(data.channel_manager || null);
       }
     } catch { /* silent */ }
     finally { setIcalLoading(false); }
@@ -517,8 +519,38 @@ export default function PropertySettings() {
           color: '#f0eee8',
           marginBottom: '4px',
         }}>
-          OTA Channel Sync
+          Channel Sync
         </h2>
+
+        {channelManager?.enabled ? (
+          <>
+            <p style={{ fontSize: '12px', color: '#8c8a9e', marginBottom: '16px' }}>
+              Your calendar, prices, and bookings sync automatically with every connected OTA —
+              no manual feed setup needed.
+            </p>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '10px',
+              background: 'rgba(76,175,80,0.08)', border: '1px solid rgba(76,175,80,0.2)',
+              borderRadius: '10px', padding: '14px 16px',
+            }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#4CAF50', flexShrink: 0 }} />
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0eee8' }}>
+                  Connected via {channelManager.provider === 'beds24' ? 'Beds24' : channelManager.provider}
+                </div>
+                <div style={{ fontSize: '11px', color: '#8c8a9e', marginTop: '2px' }}>
+                  {channelManager.last_polled_at
+                    ? `Last checked for new OTA bookings ${new Date(channelManager.last_polled_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}`
+                    : 'Waiting for the first sync…'}
+                </div>
+              </div>
+            </div>
+            <p style={{ fontSize: '11px', color: '#56546a', marginTop: '12px' }}>
+              To connect or disconnect an OTA channel, contact Chakrio support.
+            </p>
+          </>
+        ) : (<>
+
         <p style={{ fontSize: '12px', color: '#8c8a9e', marginBottom: '20px' }}>
           Two-way iCal sync. Subscribe OTAs to your outbound feed so they auto-block direct bookings.
           Add inbound feeds to pull OTA bookings into Chakrio every 30 minutes.
@@ -696,6 +728,7 @@ export default function PropertySettings() {
         {addError && (
           <p style={{ fontSize: '12px', color: '#e07070', marginTop: '8px' }}>{addError}</p>
         )}
+        </>)}
       </div>}
 
       {/* WhatsApp Booking Link Card */}
