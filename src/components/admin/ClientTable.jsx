@@ -257,9 +257,21 @@ function ChannelSyncForm({ propertyId, onSubmit, onCancel }) {
   );
 }
 
-function ChannelSyncStatus({ cm, onResync, onDisable }) {
+function ChannelSyncStatus({ cm, onResync, onDisable, onUpdateMarkup }) {
+  const [editingMarkup, setEditingMarkup] = useState(false);
+  const [markupInput, setMarkupInput]     = useState('');
+
   if (!cm?.is_channel_manager_enabled) return null;
   const conn = cm.connection;
+  const inputStyle = { width: 60, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, padding: '3px 6px', color: '#f0eee8', fontSize: 12, outline: 'none' };
+
+  const startEdit = () => { setMarkupInput(String(cm.ota_markup_pct ?? 20)); setEditingMarkup(true); };
+  const saveMarkup = () => {
+    const pct = Number(markupInput);
+    if (Number.isFinite(pct) && pct >= 0 && pct <= 100) onUpdateMarkup(pct);
+    setEditingMarkup(false);
+  };
+
   return (
     <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
       <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Channel Sync — Beds24</div>
@@ -271,7 +283,21 @@ function ChannelSyncStatus({ cm, onResync, onDisable }) {
             #{conn.beds24_property_id}{conn.beds24_room_id ? ` / room #${conn.beds24_room_id}` : ''}
           </span>
         )}
-        {cm.ota_markup_pct != null && <span>OTA markup: +{cm.ota_markup_pct}%</span>}
+        {editingMarkup ? (
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            OTA markup: +
+            <input type="number" value={markupInput} onChange={e => setMarkupInput(e.target.value)}
+              style={inputStyle} autoFocus onKeyDown={e => { if (e.key === 'Enter') saveMarkup(); if (e.key === 'Escape') setEditingMarkup(false); }} />
+            %
+            <ActionBtn small primary onClick={saveMarkup}>Save</ActionBtn>
+            <ActionBtn small onClick={() => setEditingMarkup(false)}>Cancel</ActionBtn>
+          </span>
+        ) : (
+          <span style={{ cursor: 'pointer', textDecoration: 'underline', textDecorationStyle: 'dotted' }}
+            onClick={startEdit} title="Click to change">
+            OTA markup: +{cm.ota_markup_pct ?? 20}%
+          </span>
+        )}
       </div>
       <div style={{ marginTop: 2, fontSize: 11, color: '#56546a' }}>
         Last OTA booking poll: {conn?.last_polled_at ? fmtDate(conn.last_polled_at) : 'never yet'}
@@ -384,7 +410,7 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
     // Bust cached property data on state-changing actions
     if ([
       'payment', 'activate', 'deactivate', 'delete', 'change_plan',
-      'enable_channel_manager', 'disable_channel_manager', 'beds24_resync',
+      'enable_channel_manager', 'disable_channel_manager', 'beds24_resync', 'set_ota_markup',
     ].includes(action)) {
       setPropData(prev => { const n = { ...prev }; delete n[propertyId]; return n; });
     }
@@ -580,6 +606,7 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
                                     cm={pd.channelManager}
                                     onResync={() => handleAction(p.id, 'beds24_resync')}
                                     onDisable={() => { if (window.confirm('Disable channel sync? This opens every date on every connected OTA.')) handleAction(p.id, 'disable_channel_manager'); }}
+                                    onUpdateMarkup={(pct) => handleAction(p.id, 'set_ota_markup', { otaMarkupPct: pct })}
                                   />
                                 )}
 

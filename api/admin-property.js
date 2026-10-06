@@ -407,6 +407,29 @@ export default async function handler(req, res) {
     });
     return res.status(200).json({ ok: true, ...data });
 
+  } else if (action === 'set_ota_markup') {
+    const { otaMarkupPct } = req.body ?? {};
+    const pct = Number(otaMarkupPct);
+    if (!Number.isFinite(pct) || pct < 0 || pct > 100) {
+      return res.status(400).json({ error: 'otaMarkupPct must be a number between 0 and 100' });
+    }
+
+    const propName = await getPropertyName(supabaseUrl, supabaseKey, propertyId);
+    const r = await fetch(`${supabaseUrl}/rest/v1/properties?id=eq.${propertyId}`, {
+      method: 'PATCH', headers, body: JSON.stringify({ ota_markup_pct: pct }),
+    });
+    if (!r.ok) return res.status(502).json({ error: 'Update failed' });
+
+    // Takes effect on the next push (60s flush or 3 AM resync) -- no live
+    // Beds24 call needed here, same as any other rate-table edit.
+    await logAction(supabaseUrl, supabaseKey, {
+      actionType:  'set_ota_markup',
+      description: `OTA markup set to ${pct}% for ${propName ?? propertyId}`,
+      propertyName: propName,
+      performedBy: adminEmail,
+    });
+    return res.status(200).json({ ok: true });
+
   } else if (action === 'pause_campaign' || action === 'resume_campaign') {
     if (!campaignId) return res.status(400).json({ error: 'campaignId is required' });
     const campaignAction = action === 'pause_campaign' ? 'pause' : 'resume';

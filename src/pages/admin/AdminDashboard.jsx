@@ -97,7 +97,7 @@ export default function AdminDashboard() {
         send_message: 'Message sent to manager.',
         pause_campaign: 'Campaign paused.', resume_campaign: 'Campaign resumed.',
         enable_channel_manager: 'Channel sync enabled.', disable_channel_manager: 'Channel sync disabled.',
-        beds24_resync: 'Beds24 resync triggered.',
+        beds24_resync: 'Beds24 resync triggered.', set_ota_markup: 'OTA markup updated.',
       };
       setActionMsg(d.warning ? `${labels[action] ?? 'Done.'} ⚠️ ${d.warning}` : (labels[action] ?? 'Done.'));
       if (action !== 'send_message') await loadClients();
