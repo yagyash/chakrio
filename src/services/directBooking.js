@@ -44,13 +44,18 @@ export function getAvailability(propertySlug, { roomType, partySize, checkIn, ch
   return request(`/book/${propertySlug}/availability?${params}`);
 }
 
-/** {group_id, payment_method: 'upi'|'razorpay', upi_uri?, payment_url?, amount, expires_at} */
-export function reserve(propertySlug, { rooms, partySize, checkIn, checkOut, guestName, guestPhone, idUploaded }) {
+/**
+ * {group_id, payment_method: 'upi'|'razorpay', upi_uri?, payment_url?, amount, expires_at}
+ * idempotencyKey: one per submit of the same details — a double-click or retry
+ * gets the same hold and payment link back instead of a second hold.
+ */
+export function reserve(propertySlug, { rooms, partySize, checkIn, checkOut, guestName, guestPhone, idUploaded, idempotencyKey }) {
   return request(`/book/${propertySlug}/reserve`, {
     method: 'POST',
     body: JSON.stringify({
       rooms, party_size: partySize, check_in: checkIn, check_out: checkOut,
       guest_name: guestName, guest_phone: guestPhone, id_uploaded: idUploaded,
+      idempotency_key: idempotencyKey,
     }),
   });
 }
