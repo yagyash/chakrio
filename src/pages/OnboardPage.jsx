@@ -5,7 +5,7 @@ import { CheckCircle, ChevronRight, ChevronLeft, Upload, X, Download } from 'luc
 const STEPS = ['Business', 'Property', 'Rooms', 'Review'];
 
 const PROPERTY_TYPES = ['homestay', 'villa', 'hotel', 'resort', 'dharamshala'];
-const PLANS          = ['starter', 'lite', 'growth', 'pro', 'advance'];
+const PLANS          = ['lite', 'growth', 'pro', 'advance'];   // ₹499 Starter is no longer sold
 const PLAN_LABELS    = {
   starter: 'Starter — ≤4 rooms · ₹499/mo',
   lite:    'Lite — ≤8 rooms · ₹999/mo',
@@ -588,7 +588,7 @@ export default function OnboardPage() {
   const [submitError, setSubmitError] = useState('');
   const [done, setDone] = useState(false);
 
-  const [client, setClient] = useState({ name: '', plan: 'starter', email: '', phone: '' });
+  const [client, setClient] = useState({ name: '', plan: 'lite', email: '', phone: '' });
   const [property, setProperty] = useState({
     property_name: '', property_id: '', short_name: '', property_type: 'homestay',
     notification_channel: 'telegram', telegram_chat_id: '', manager_whatsapp: '',

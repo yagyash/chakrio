@@ -157,36 +157,22 @@ const TRUST_STATS = [
 
 const PRICING_TIERS = [
   {
-    key: 'starter',
-    name: 'Starter',
-    price: '₹499',
-    sub: 'Up to 4 rooms · small villas & homestays',
-    featured: false,
-    features: [
-      'WhatsApp or Telegram bot',
-      'Bookings — add / update / cancel / settle',
-      'Expenses — 10 auto-categories',
-      'Monthly P&L report (auto + on-demand)',
-      'GST invoice PDF via bot',
-      'Web dashboard',
-      'Visibility Basic — AI mention + local rank tracking (3 keywords), free',
-      'Visibility Pro add-on available',
-    ],
-  },
-  {
     key: 'lite',
     name: 'Lite',
     price: '₹999',
     sub: 'Up to 8 rooms · growing homestays',
     featured: false,
     features: [
-      'Everything in Starter, plus:',
+      'WhatsApp or Telegram bot',
+      'Bookings, expenses (10 auto-categories) and monthly P&L',
+      'GST invoice PDF via bot + web dashboard',
       'Guest experience layer (pre / mid / post-stay)',
       'Direct booking link + QR code',
       'UPI advance payment link to guest',
       'Guest CRM — VIP / DND flags',
       'OTA iCal sync (Airbnb, Booking.com)',
       'Marketing campaigns — 60/mo',
+      'Visibility Basic — AI mention + local rank tracking (3 keywords), free',
     ],
   },
   {
@@ -470,7 +456,7 @@ function PricingSection() {
         <p className="text-text-2 mt-2 max-w-xl mx-auto">14-day free trial on all plans. Real prices, per property. Cancel anytime.</p>
       </div>
 
-      <div className="reveal grid sm:grid-cols-2 xl:grid-cols-5 gap-4 items-stretch">
+      <div className="reveal grid sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
         {PRICING_TIERS.map((tier) => {
           return (
             <div key={tier.key} style={{
@@ -558,7 +544,7 @@ function PricingSection() {
         <p className="text-center text-sm text-text-2 mb-1">
           <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee: ₹999–₹2,999</span> — waived for launch &amp; reference properties
         </p>
-        <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Visibility Pro ₹999/property/mo (up to 15 rooms) or ₹1,999/property/mo (16+ rooms) · Marketing overage ₹1/delivered msg</p>
+        <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Visibility Pro ₹999/property/mo (up to 15 rooms) or ₹1,999/property/mo (16+ rooms) · Marketing campaigns ₹1.25/delivered msg</p>
       </div>
     </section>
   );

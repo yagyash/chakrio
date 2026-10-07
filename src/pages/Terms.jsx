@@ -56,7 +56,7 @@ export default function Terms() {
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">5. Add-ons & Usage-Based Charges</h2>
             <ul className="list-disc list-inside space-y-2">
               <li><strong style={{ color: '#F4F1EA' }}>OTA Calendar Sync:</strong> ₹5,000/month, billed monthly. Syncs blocked dates (not rates or listing content) with Airbnb, Booking.com, MakeMyTrip, and other iCal-compatible OTAs.</li>
-              <li><strong style={{ color: '#F4F1EA' }}>Guest Campaigns:</strong> ₹1 per delivered WhatsApp message (₹0.83 Meta rate + ₹0.17 Chakrio fee). Charges are deducted from your marketing wallet balance at delivery confirmation.</li>
+              <li><strong style={{ color: '#F4F1EA' }}>Guest Campaigns:</strong> ₹1.25 per delivered WhatsApp message, which covers Meta's per-message charge. Charges are deducted from your marketing wallet balance at delivery confirmation.</li>
               <li><strong style={{ color: '#F4F1EA' }}>Additional Rooms:</strong> ₹100/room/month beyond the plan's included room count.</li>
             </ul>
           </section>
