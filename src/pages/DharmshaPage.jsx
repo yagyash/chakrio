@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
+import { DEMO_PREFILL_DHARMSHALA_HI, demoHref } from '../config/demo';
 
 const DHARMSHALA_FAQS = [
   {
@@ -73,7 +74,7 @@ export default function DharmshaPage() {
           Group arrivals, festival rush, bulk bookings in Hindi or English — log everything by WhatsApp message. No register, no spreadsheet.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+dharmshala" target="_blank" rel="noopener noreferrer" style={{
+          <a href={demoHref(DEMO_PREFILL_DHARMSHALA_HI)} data-demo="dharmshala" target="_blank" rel="noopener noreferrer" style={{
             background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
