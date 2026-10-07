@@ -32,6 +32,7 @@ import ChakrioVsCloudbeds from './pages/compare/ChakrioVsCloudbeds';
 import ChakrioVsEzee from './pages/compare/ChakrioVsEzee';
 import MenuPage from './pages/MenuPage';
 import PropertyBookingPage from './pages/PropertyBookingPage';
+import TrusteeReportPage from './pages/TrusteeReportPage';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import DharmshaPage from './pages/DharmshaPage';
 import Terms from './pages/Terms';
@@ -75,6 +76,7 @@ export default function App() {
           <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/menu/:propertyId" element={<MenuPage />} />
           <Route path="/book/:propertySlug" element={<PropertyBookingPage />} />
+          <Route path="/r/:token" element={<TrusteeReportPage />} />
 
           {/* Admin — only requires Firebase auth, not Firestore profile */}
           <Route
