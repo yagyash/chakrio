@@ -10,6 +10,7 @@ import ToolConversionHook from '../../components/tools/ToolConversionHook';
 import LeadCaptureBox from '../../components/shared/LeadCaptureBox';
 import { db } from '../../services/firebase';
 import { track } from '../../utils/analytics';
+import { firstTouch } from '../../utils/attribution';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -262,6 +263,7 @@ export default function InvoiceGenerator() {
           whatsapp: leadWA.trim(),
           property_name: leadProp.trim(),
           source_page: 'invoice-generator',
+          utm: firstTouch(),
         }),
       });
     } catch {
