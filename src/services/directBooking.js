@@ -72,3 +72,12 @@ export function confirmUpiPayment(propertySlug, groupId, utr) {
     body: JSON.stringify({ group_id: groupId, utr }),
   });
 }
+
+/**
+ * Trustee daily report for chakrio.com/r/:token (agent GET /reports/daily).
+ * The token is the signed link from the WhatsApp report: one property, one
+ * day, valid 7 days. 403 -> invalid or expired.
+ */
+export function getDailyReport(token) {
+  return request(`/reports/daily?token=${encodeURIComponent(token)}`);
+}
