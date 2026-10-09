@@ -4,6 +4,7 @@ import { getIdToken } from 'firebase/auth';
 import { ChevronLeft, Download } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 import ClientTable from '../../components/admin/ClientTable';
+import plans, { TIER_COLORS } from '../../data/plans';
 
 function downloadCSV(clients) {
   const rows = [['Client', 'Email', 'Plan', 'Property', 'Type', 'Status', 'Sub Status', 'Due Date', 'Joined']];
@@ -156,7 +157,7 @@ export default function AdminDashboard() {
   const allProperties = clients.flatMap(c => (c.properties ?? []).map(p => ({ ...p, clientName: c.name })));
   const totalProperties = allProperties.length;
   const pendingActivation = allProperties.filter(p => !p.is_active).length;
-  const activePlans = { starter: 0, lite: 0, growth: 0, pro: 0, advance: 0 };
+  const activePlans = Object.fromEntries(plans.map((p) => [p.key, 0]));
   clients.forEach(c => { if (activePlans[c.plan] !== undefined) activePlans[c.plan]++; });
 
   const mrr = allProperties.reduce((s, p) =>
@@ -236,11 +237,9 @@ export default function AdminDashboard() {
             <div style={{ fontSize: 22, fontWeight: 700, color: pendingActivation > 0 ? '#FFC107' : '#56546a' }}>{pendingActivation}</div>
             <div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>Pending Activation</div>
           </div>
-          <div style={cardStyle}><div style={{ fontSize: 22, fontWeight: 700, color: '#8c8a9e' }}>{activePlans.starter}</div><div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>Starter</div></div>
-          <div style={cardStyle}><div style={{ fontSize: 22, fontWeight: 700, color: '#00D4FF' }}>{activePlans.lite}</div><div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>Lite</div></div>
-          <div style={cardStyle}><div style={{ fontSize: 22, fontWeight: 700, color: '#48c78e' }}>{activePlans.growth}</div><div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>Growth</div></div>
-          <div style={cardStyle}><div style={{ fontSize: 22, fontWeight: 700, color: '#a89ef5' }}>{activePlans.pro}</div><div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>Pro</div></div>
-          <div style={cardStyle}><div style={{ fontSize: 22, fontWeight: 700, color: '#C9A24B' }}>{activePlans.advance}</div><div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>Advance</div></div>
+          {plans.filter((p) => p.is_public || activePlans[p.key]).map((p) => (
+            <div key={p.key} style={cardStyle}><div style={{ fontSize: 22, fontWeight: 700, color: TIER_COLORS[p.tier].text }}>{activePlans[p.key]}</div><div style={{ fontSize: 12, color: '#56546a', marginTop: 4 }}>{p.name}</div></div>
+          ))}
         </div>
 
         {/* Expiry Dashboard (item 2) */}

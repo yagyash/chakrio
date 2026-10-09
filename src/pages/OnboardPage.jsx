@@ -1,18 +1,15 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle, ChevronRight, ChevronLeft, Upload, X, Download } from 'lucide-react';
+import { publicPlans, roomsLabel, inr } from '../data/plans';
 
 const STEPS = ['Business', 'Property', 'Rooms', 'Review'];
 
 const PROPERTY_TYPES = ['homestay', 'villa', 'hotel', 'resort', 'dharamshala'];
-const PLANS          = ['starter', 'lite', 'growth', 'pro', 'advance'];
-const PLAN_LABELS    = {
-  starter: 'Starter — ≤4 rooms · ₹499/mo',
-  lite:    'Lite — ≤8 rooms · ₹999/mo',
-  growth:  'Growth — ≤15 rooms · ₹2,199/mo',
-  pro:     'Pro — ≤30 rooms · ₹3,999/mo',
-  advance: 'Advance — 30+ rooms · from ₹4,999/mo',
-};
+// Only public plans are sold (₹499 Starter is not). Prices come from plans.json.
+const PLANS          = publicPlans().map((p) => p.key);
+const PLAN_LABELS    = Object.fromEntries(publicPlans().map((p) => [p.key,
+  `${p.name} (${p.segment === 'dharmshala' ? 'dharmshala' : 'hotel / villa / homestay'}) — ${roomsLabel(p)} · ${p.price_is_from ? 'from ' : ''}${inr(p.monthly_inr)}/mo`]));
 const ROOM_TYPES     = ['standard', 'vip', 'family', 'group', 'dorm'];
 const HOTEL_TYPES    = new Set(['hotel', 'resort', 'dharamshala']);
 const OTA_NAMES      = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 'other'];

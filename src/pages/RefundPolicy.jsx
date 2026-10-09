@@ -53,7 +53,7 @@ export default function RefundPolicy() {
 
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">Marketing Wallet &amp; Campaign Charges</h2>
-            <p className="mb-3">Campaign charges (₹1 per delivered message) are non-refundable once messages have been sent and delivery has been confirmed by Meta's WhatsApp Business API.</p>
+            <p className="mb-3">Campaign charges (₹1.25 per delivered message) are non-refundable once messages have been sent and delivery has been confirmed by Meta's WhatsApp Business API.</p>
             <p>Unspent marketing wallet balance is refundable upon written request. Contact us on WhatsApp with your registered phone number and the amount to refund. Refunds are processed within 7 business days to the original payment method.</p>
           </section>
 
