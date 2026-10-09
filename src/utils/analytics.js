@@ -8,12 +8,14 @@
  *   tool_used         — a free tool's primary action ran (calculate / generate / download)
  *   lead_captured     — a WhatsApp number was submitted   ← mark as KEY EVENT in GA4
  *   whatsapp_click    — any wa.me / WhatsApp link clicked (auto-tracked, see initAnalytics)
- *   demo_started      — message sent to the demo number   ← PENDING: no demo number exists yet (plan Phase 1.4)
+ *   demo_requested    — a "Book a demo" link (data-demo) clicked, with first-touch UTM ← mark as KEY EVENT in GA4
  *   booking_page_view — a /book/* page was viewed
  *   booking_enquiry   — availability checked on a /book/* page   ← mark as KEY EVENT in GA4
  *
  * Marking key events is a GA4 dashboard action (Admin → Events), not code.
  */
+import { captureFirstTouch, firstTouch } from './attribution';
+
 export function track(name, params = {}) {
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
     window.gtag('event', name, params);
@@ -28,6 +30,7 @@ export function track(name, params = {}) {
 export function initAnalytics() {
   if (typeof document === 'undefined' || document.__chakrioAnalyticsInit) return;
   document.__chakrioAnalyticsInit = true;
+  captureFirstTouch();
 
   document.addEventListener(
     'click',
@@ -40,6 +43,9 @@ export function initAnalytics() {
           link_url: href,
           link_text: (a.textContent || '').trim().slice(0, 80),
         });
+      }
+      if (a.dataset && a.dataset.demo) {
+        track('demo_requested', { demo: a.dataset.demo, page: window.location.pathname, ...firstTouch() });
       }
     },
     true, // capture — fire even if a handler below calls stopPropagation
