@@ -239,8 +239,11 @@ export default async function handler(req, res) {
 
   } else if (action === 'change_plan') {
     if (!clientId || !plan) return res.status(400).json({ error: 'clientId and plan are required' });
-    const allowed = ['starter', 'lite', 'growth', 'pro', 'advance'];
-    if (!allowed.includes(plan)) return res.status(400).json({ error: 'Invalid plan' });
+    // Valid plans live in the plans table (same source the agent checks).
+    const known = await fetch(`${supabaseUrl}/rest/v1/plans?key=eq.${encodeURIComponent(plan)}&select=key`, { headers })
+      .then((x) => (x.ok ? x.json() : []))
+      .catch(() => []);
+    if (!known.length) return res.status(400).json({ error: `Invalid plan: ${plan}` });
 
     // 1. Update Supabase clients.plan
     const r = await fetch(`${supabaseUrl}/rest/v1/clients?id=eq.${clientId}`, {
