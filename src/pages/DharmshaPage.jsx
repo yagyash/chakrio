@@ -128,7 +128,7 @@ export default function DharmshaPage() {
           {[
             { title: 'Group & bulk bookings', body: 'Log a group of 20 pilgrims in one message — name, room type, dates, advance. No separate entries per person.' },
             { title: 'Hindi-friendly natural language', body: 'Type as you speak — Hindi, English, or mixed. The AI understands context and extracts booking details correctly.' },
-            { title: 'Festival-season campaigns', body: 'Send a WhatsApp broadcast to previous guests ahead of Holi, Diwali, or Janmashtami. Personalised, tracked, and ₹1/message.' },
+            { title: 'Festival-season campaigns', body: 'Send a WhatsApp broadcast to previous guests ahead of Holi, Diwali, or Janmashtami. Personalised, tracked, and ₹1.25 per delivered message.' },
             { title: 'Monthly P&L reports', body: 'On the 1st of each month, get a full P&L on WhatsApp — total revenue, expenses by category, and net surplus. Auto-sent.' },
             { title: 'Google review funnel', body: 'After checkout, Chakrio sends a polite message asking guests to leave a review. No manual follow-up required.' },
             { title: 'Expense tracking for all costs', body: 'Log maintenance costs, prasad expenses, and repair bills in one WhatsApp message. Categorised automatically in your monthly P&L.' },
