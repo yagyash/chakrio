@@ -174,6 +174,7 @@ const PRICING_TIERS = [
       'OTA iCal sync (Airbnb, Booking.com)',
       'Marketing campaigns — 60/mo',
       'Visibility Basic — AI mention + local rank tracking (3 keywords), free',
+      'Channel Manager add-on available',
     ],
   },
   {
@@ -186,7 +187,6 @@ const PRICING_TIERS = [
       'Everything in Lite, plus:',
       'Enquiry tracking + auto follow-up nudge',
       'Marketing campaigns — 125/mo',
-      'Channel Manager add-on available',
     ],
   },
   {
@@ -547,7 +547,7 @@ function PricingSection() {
         <p className="text-center text-sm text-text-2 mb-1">
           <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee = 2 months of your plan</span> — shown on each plan above
         </p>
-        <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Visibility Pro ₹999/property/mo (up to 15 rooms) or ₹1,999/property/mo (16+ rooms) · Marketing campaigns ₹1.25/delivered msg</p>
+        <p className="text-center text-xs text-text-3 mt-1">Add-ons on every plan: Channel Manager ₹2,000/property/mo · Marketing campaigns ₹1.25/delivered msg</p>
       </div>
     </section>
   );
@@ -597,7 +597,7 @@ export default function LandingPage() {
           "applicationCategory": "BusinessApplication",
           "operatingSystem": "Web",
           "url": "https://chakrio.com",
-          "featureList": "Instant booking records via WhatsApp, Expense logging, Monthly P&L reports, Guest experience automation, OTA Calendar Sync (add-on), Direct WhatsApp guest booking with hold and manager approval, Guest re-engagement campaigns, AI visibility and local rank tracking (Visibility Pro add-on)",
+          "featureList": "Instant booking records via WhatsApp, Expense logging, Monthly P&L reports, Guest experience automation, OTA Calendar Sync (add-on), Direct WhatsApp guest booking with hold and manager approval, Guest re-engagement campaigns, AI visibility and local rank tracking",
           "offers": { "@type": "Offer", "price": "0", "description": "14-day free trial" },
         })}</script>
         <script type="application/ld+json">{JSON.stringify({
