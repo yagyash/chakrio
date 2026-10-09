@@ -19,10 +19,17 @@ export function roomsLabel(p) {
   return p.rooms_min <= 1 ? `Up to ${p.rooms_max} rooms` : `${p.rooms_min}–${p.rooms_max} rooms`;
 }
 
-/** "₹21,990/yr (2 months free) · one-time setup ₹4,399" */
-export function termsLine(p) {
+/** Headline price for the Monthly / Yearly switch. Plans without a fixed yearly
+ *  price (Advance, Dham) keep showing their monthly price. */
+export function priceFor(p, yearly) {
+  if (yearly && p.annual_inr) return { amount: inr(p.annual_inr), unit: '/yr' };
+  return { amount: `${p.price_is_from ? 'From ' : ''}${inr(p.monthly_inr)}`, unit: '/mo' };
+}
+
+/** Yearly: "2 months free · save ₹4,398 · one-time setup ₹4,399"; monthly: setup only. */
+export function termsLine(p, yearly = false) {
   const parts = [];
-  if (p.annual_inr) parts.push(`${inr(p.annual_inr)}/yr (2 months free)`);
+  if (yearly) parts.push(p.annual_inr ? `2 months free · save ${inr(p.monthly_inr * 12 - p.annual_inr)}` : 'yearly price on request');
   if (p.setup_inr) parts.push(`one-time setup ${p.price_is_from ? 'from ' : ''}${inr(p.setup_inr)}`);
   return parts.join(' · ');
 }

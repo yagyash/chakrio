@@ -8,7 +8,8 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
-import { planByKey, inr, termsLine } from '../data/plans';
+import { planByKey, priceFor, termsLine } from '../data/plans';
+import BillingToggle from '../components/marketing/BillingToggle';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -444,6 +445,7 @@ function DirectBookingsSection() {
 }
 
 function PricingSection() {
+  const [yearly, setYearly] = useState(false);
 
   return (
     <section id="pricing" className="max-w-6xl mx-auto px-6 py-20">
@@ -451,11 +453,13 @@ function PricingSection() {
         <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Pricing</p>
         <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight">Simple, transparent pricing.</h2>
         <p className="text-text-2 mt-2 max-w-xl mx-auto">14-day free trial on all plans. Real prices, per property. Cancel anytime.</p>
+        <div className="mt-6"><BillingToggle yearly={yearly} onChange={setYearly} /></div>
       </div>
 
       <div className="reveal grid sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
         {PRICING_TIERS.map((tier) => {
           const plan = planByKey(tier.key);
+          const price = priceFor(plan, yearly);
           return (
             <div key={tier.key} style={{
               border: tier.featured ? '1.5px solid #C9A24B' : '1px solid rgba(255,255,255,.1)',
@@ -481,12 +485,12 @@ function PricingSection() {
               {/* Price */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 2 }}>
                 <span className="font-display font-extrabold" style={{ fontSize: 36, letterSpacing: '-.03em', color: '#F4F1EA', lineHeight: 1 }}>
-                  {plan.price_is_from ? 'From ' : ''}{inr(plan.monthly_inr)}
+                  {price.amount}
                 </span>
-                <span style={{ fontSize: 14, color: '#9D98AC' }}>/mo</span>
+                <span style={{ fontSize: 14, color: '#9D98AC' }}>{price.unit}</span>
               </div>
               <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 4 }}>{tier.sub}</div>
-              <div style={{ fontSize: 12, color: '#6F6A80', marginBottom: 22 }}>{termsLine(plan)}</div>
+              <div style={{ fontSize: 12, color: '#6F6A80', marginBottom: 22 }}>{termsLine(plan, yearly)}</div>
 
               {/* CTA — fixed-height zone so features start at same vertical position across all cards */}
               <div style={{ marginBottom: 20 }}>
@@ -541,7 +545,7 @@ function PricingSection() {
       {/* Setup fee note */}
       <div className="reveal mt-8 rounded-xl p-5" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.08)' }}>
         <p className="text-center text-sm text-text-2 mb-1">
-          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee: 2 months of your plan</span> — waived for launch &amp; reference properties
+          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee = 2 months of your plan</span> — shown on each plan above
         </p>
         <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Visibility Pro ₹999/property/mo (up to 15 rooms) or ₹1,999/property/mo (16+ rooms) · Marketing campaigns ₹1.25/delivered msg</p>
       </div>

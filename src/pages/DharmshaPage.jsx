@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
-import { publicPlans, roomsLabel, inr, termsLine } from '../data/plans';
+import { publicPlans, roomsLabel, priceFor, termsLine } from '../data/plans';
+import BillingToggle from '../components/marketing/BillingToggle';
 
 const DHARMSHALA_FAQS = [
   {
@@ -24,6 +26,7 @@ const DHARMSHALA_FAQS = [
 ];
 
 export default function DharmshaPage() {
+  const [yearly, setYearly] = useState(false);
   return (
     <div className="min-h-screen text-text-1 flex flex-col" style={{ background: '#0E0B14' }}>
       <Helmet>
@@ -142,18 +145,69 @@ export default function DharmshaPage() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="max-w-4xl mx-auto px-6 pb-20 w-full">
-        <h2 className="font-display font-extrabold text-2xl text-text-1 mb-2 tracking-tight text-center">Dharmshala pricing</h2>
-        <p className="text-text-3 text-sm text-center mb-8">Priced by room count. Dorms can be billed as rooms or per bed. Every plan includes everything above.</p>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {publicPlans('dharmshala').map((p) => (
-            <div key={p.key} className="rounded-2xl border p-6" style={{ background: 'rgba(255,255,255,.025)', borderColor: 'rgba(255,255,255,.09)' }}>
-              <div className="text-text-2 text-sm font-semibold mb-2">{p.name}</div>
-              <div className="font-display font-extrabold text-text-1 text-2xl">{inr(p.monthly_inr)}<span className="text-text-3 text-sm font-normal">/mo</span></div>
-              <div className="text-text-2 text-sm mt-1">{roomsLabel(p)}</div>
-              <div className="text-text-3 text-xs mt-3 leading-relaxed">{termsLine(p)}</div>
-            </div>
-          ))}
+      <section id="pricing" className="max-w-6xl mx-auto px-6 pb-20 w-full">
+        <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2 text-center" style={{ color: '#C9A24B' }}>Pricing</p>
+        <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight text-center">Dharmshala pricing</h2>
+        <p className="text-text-2 text-center max-w-xl mx-auto mb-6">Priced by room count. Dorms can be billed as rooms or per bed. 14-day free trial, every plan includes everything above.</p>
+        <div className="text-center mb-10"><BillingToggle yearly={yearly} onChange={setYearly} /></div>
+        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
+          {publicPlans('dharmshala').map((p) => {
+            const featured = p.key === 'seva';
+            const price = priceFor(p, yearly);
+            return (
+              <div key={p.key} style={{
+                border: featured ? '1.5px solid #C9A24B' : '1px solid rgba(255,255,255,.1)',
+                background: featured
+                  ? 'linear-gradient(180deg,rgba(201,162,75,.1),rgba(255,255,255,.02))'
+                  : 'rgba(255,255,255,.025)',
+                borderRadius: 18, padding: 24, position: 'relative',
+                boxShadow: featured ? '0 30px 70px -34px #C9A24B' : 'none',
+                display: 'flex', flexDirection: 'column',
+              }}>
+                {featured && (
+                  <div style={{
+                    position: 'absolute', top: -13, left: 34,
+                    background: '#C9A24B', color: '#0E0B14',
+                    font: "700 11px 'Hanken Grotesk', sans-serif",
+                    padding: '5px 11px', borderRadius: 7, whiteSpace: 'nowrap',
+                  }}>
+                    ★ Most popular
+                  </div>
+                )}
+                <div style={{ fontWeight: 600, color: featured ? '#C9A24B' : '#CFCAD9', fontSize: 15, marginBottom: 14 }}>{p.name}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 2 }}>
+                  <span className="font-display font-extrabold" style={{ fontSize: 36, letterSpacing: '-.03em', color: '#F4F1EA', lineHeight: 1 }}>
+                    {price.amount}
+                  </span>
+                  <span style={{ fontSize: 14, color: '#9D98AC' }}>{price.unit}</span>
+                </div>
+                <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 4 }}>{roomsLabel(p)}</div>
+                <div style={{ fontSize: 12, color: '#6F6A80', marginBottom: 22, flex: 1 }}>{termsLine(p, yearly)}</div>
+                <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+dharmshala" target="_blank" rel="noopener noreferrer" style={{
+                  display: 'block', textAlign: 'center', width: '100%',
+                  padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
+                  fontFamily: "'Hanken Grotesk', sans-serif",
+                  background: '#C9A24B', color: '#0E0B14', marginBottom: 8,
+                }}>
+                  Chat with us on WhatsApp
+                </a>
+                <Link to="/onboard" style={{
+                  display: 'block', textAlign: 'center', width: '100%',
+                  padding: '11px 0', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none',
+                  fontFamily: "'Hanken Grotesk', sans-serif",
+                  background: 'transparent', color: '#9D98AC',
+                  border: '1px solid rgba(255,255,255,.12)',
+                }}>
+                  Start 14-day Free Trial →
+                </Link>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-8 rounded-xl p-5" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.08)' }}>
+          <p className="text-center text-sm text-text-2">
+            <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee = 2 months of your plan</span> — shown on each plan above · Festival campaigns ₹1.25/delivered msg
+          </p>
         </div>
       </section>
 
