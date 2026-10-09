@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthContext } from './context/AuthContext';
+import { planTier } from './data/plans';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import PropertyPicker from './components/shared/PropertyPicker';
@@ -35,8 +36,7 @@ export default function AppShell() {
   const PROPERTY_TYPES = ['homestay', 'hotel', 'villa', 'dharmshala'];
   const resolvedType = PROPERTY_TYPES.includes(businessType) ? 'homestay' : businessType;
 
-  const PLAN_RANK = { starter: 0, lite: 1, growth: 2, pro: 3, advance: 4 };
-  const canAccess = (minPlan) => (PLAN_RANK[plan] ?? 0) >= (PLAN_RANK[minPlan] ?? 0);
+  const canAccess = (minPlan) => planTier(plan) >= planTier(minPlan);
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);

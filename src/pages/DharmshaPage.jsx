@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
+import { publicPlans, roomsLabel, inr, termsLine } from '../data/plans';
 
 const DHARMSHALA_FAQS = [
   {
@@ -135,6 +136,22 @@ export default function DharmshaPage() {
             <div key={f.title} className="rounded-2xl border p-6" style={{ background: 'rgba(255,255,255,.025)', borderColor: 'rgba(255,255,255,.09)' }}>
               <h3 className="font-display font-extrabold text-text-1 text-base mb-2">{f.title}</h3>
               <p className="text-text-2 text-sm leading-relaxed">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="max-w-4xl mx-auto px-6 pb-20 w-full">
+        <h2 className="font-display font-extrabold text-2xl text-text-1 mb-2 tracking-tight text-center">Dharmshala pricing</h2>
+        <p className="text-text-3 text-sm text-center mb-8">Priced by room count. Dorms can be billed as rooms or per bed. Every plan includes everything above.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {publicPlans('dharmshala').map((p) => (
+            <div key={p.key} className="rounded-2xl border p-6" style={{ background: 'rgba(255,255,255,.025)', borderColor: 'rgba(255,255,255,.09)' }}>
+              <div className="text-text-2 text-sm font-semibold mb-2">{p.name}</div>
+              <div className="font-display font-extrabold text-text-1 text-2xl">{inr(p.monthly_inr)}<span className="text-text-3 text-sm font-normal">/mo</span></div>
+              <div className="text-text-2 text-sm mt-1">{roomsLabel(p)}</div>
+              <div className="text-text-3 text-xs mt-3 leading-relaxed">{termsLine(p)}</div>
             </div>
           ))}
         </div>

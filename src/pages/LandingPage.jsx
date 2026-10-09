@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
+import { planByKey, inr, termsLine } from '../data/plans';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -176,8 +177,7 @@ const PRICING_TIERS = [
   {
     key: 'lite',
     name: 'Lite',
-    price: '₹999',
-    sub: 'Up to 8 rooms · growing homestays',
+    sub: 'Up to 8 rooms · homestays & villas',
     featured: false,
     features: [
       'Everything in Starter, plus:',
@@ -192,8 +192,7 @@ const PRICING_TIERS = [
   {
     key: 'growth',
     name: 'Growth',
-    price: '₹2,199',
-    sub: 'Up to 15 rooms · boutique hotels & homestays',
+    sub: '9–15 rooms · boutique hotels & homestays',
     badge: '★ Most popular',
     featured: true,
     features: [
@@ -206,8 +205,7 @@ const PRICING_TIERS = [
   {
     key: 'pro',
     name: 'Pro',
-    price: '₹3,999',
-    sub: 'Up to 30 rooms · hotels & dharamshalas',
+    sub: '16–30 rooms · hotels',
     featured: false,
     features: [
       'Everything in Growth, plus:',
@@ -221,8 +219,7 @@ const PRICING_TIERS = [
   {
     key: 'advance',
     name: 'Advance',
-    price: 'From ₹4,999',
-    sub: '30+ rooms · large hotels & multi-property groups',
+    sub: '31+ rooms · large hotels & multi-property groups',
     cta: 'Contact for quote →',
     ctaHref: 'https://wa.me/919461888529',
     ctaExternal: true,
@@ -472,6 +469,7 @@ function PricingSection() {
 
       <div className="reveal grid sm:grid-cols-2 xl:grid-cols-5 gap-4 items-stretch">
         {PRICING_TIERS.map((tier) => {
+          const plan = planByKey(tier.key);
           return (
             <div key={tier.key} style={{
               border: tier.featured ? '1.5px solid #C9A24B' : '1px solid rgba(255,255,255,.1)',
@@ -497,11 +495,12 @@ function PricingSection() {
               {/* Price */}
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 2 }}>
                 <span className="font-display font-extrabold" style={{ fontSize: 36, letterSpacing: '-.03em', color: '#F4F1EA', lineHeight: 1 }}>
-                  {tier.price}
+                  {plan.price_is_from ? 'From ' : ''}{inr(plan.monthly_inr)}
                 </span>
                 <span style={{ fontSize: 14, color: '#9D98AC' }}>/mo</span>
               </div>
-              <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 22 }}>{tier.sub}</div>
+              <div style={{ fontSize: 13, color: '#9D98AC', marginBottom: 4 }}>{tier.sub}</div>
+              <div style={{ fontSize: 12, color: '#6F6A80', marginBottom: 22 }}>{termsLine(plan)}</div>
 
               {/* CTA — fixed-height zone so features start at same vertical position across all cards */}
               <div style={{ marginBottom: 20 }}>
@@ -556,7 +555,7 @@ function PricingSection() {
       {/* Setup fee note */}
       <div className="reveal mt-8 rounded-xl p-5" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.08)' }}>
         <p className="text-center text-sm text-text-2 mb-1">
-          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee: ₹999–₹2,999</span> — waived for launch &amp; reference properties
+          <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee: 2 months of your plan</span> — waived for launch &amp; reference properties
         </p>
         <p className="text-center text-xs text-text-3 mt-1">Add-ons: Channel Manager ₹2,000/property/mo (Growth &amp; Pro) · Visibility Pro ₹999/property/mo (up to 15 rooms) or ₹1,999/property/mo (16+ rooms) · Marketing overage ₹1/delivered msg</p>
       </div>

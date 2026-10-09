@@ -1,23 +1,11 @@
 import { useState, useCallback } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import plans, { TIER_COLORS, planTier, roomsLabel } from '../../data/plans';
 
-const PLAN_COLORS = {
-  starter: { bg: 'rgba(255,255,255,0.06)', text: '#8c8a9e' },
-  lite:    { bg: 'rgba(0,212,255,0.12)',   text: '#00D4FF' },
-  growth:  { bg: 'rgba(72,199,142,0.15)',  text: '#48c78e' },
-  pro:     { bg: 'rgba(108,99,255,0.18)',  text: '#a89ef5' },
-  advance: { bg: 'rgba(201,162,75,0.15)',  text: '#C9A24B' },
-};
 const CHANNEL_LABEL = { telegram: '📱 Telegram', whatsapp: '💬 WhatsApp' };
-const PLANS = ['starter', 'lite', 'growth', 'pro', 'advance'];
-const PLAN_LABELS = {
-  starter: 'Starter — ≤4 rooms',
-  lite:    'Lite — ≤8 rooms',
-  growth:  'Growth — ≤15 rooms',
-  pro:     'Pro — ≤30 rooms',
-  advance: 'Advance — 30+ rooms',
-};
+const PLANS = plans.map((p) => p.key);
+const PLAN_LABELS = Object.fromEntries(plans.map((p) => [p.key, `${p.name} — ${roomsLabel(p)}`]));
 
 function fmtDate(iso) {
   if (!iso) return '—';
@@ -25,7 +13,7 @@ function fmtDate(iso) {
 }
 
 function PlanBadge({ plan }) {
-  const c = PLAN_COLORS[plan] || PLAN_COLORS.starter;
+  const c = TIER_COLORS[planTier(plan)];
   return <span style={{ background: c.bg, color: c.text, fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4, textTransform: 'capitalize' }}>{plan || 'starter'}</span>;
 }
 
@@ -441,11 +429,7 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
         <select value={planFilter} onChange={e => setPlanFilter(e.target.value)}
           style={{ background: '#1e1c2a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '9px 14px', color: '#f0eee8', fontSize: 13, outline: 'none' }}>
           <option value="all">All Plans</option>
-          <option value="starter">Starter</option>
-          <option value="lite">Lite</option>
-          <option value="growth">Growth</option>
-          <option value="pro">Pro</option>
-          <option value="advance">Advance</option>
+          {plans.map((p) => <option key={p.key} value={p.key}>{p.name}</option>)}
         </select>
       </div>
 
