@@ -7,7 +7,7 @@
  * handles both a single room (or a villa's single unit) and multiple rooms
  * of mixed types in one request — see services/directBooking.js.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { QRCodeSVG } from 'qrcode.react';
@@ -51,6 +51,7 @@ export default function PropertyBookingPage() {
   const content = getPropertyContent(propertySlug);
 
   const [info, setInfo] = useState(null);
+  const idemRef = useRef({ signature: '', key: '' });   // one Idempotency-Key per submit of the same details
   const [infoError, setInfoError] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -126,12 +127,18 @@ export default function PropertyBookingPage() {
     }
     setBusy(true);
     setError('');
+    const details = {
+      rooms: info.has_rooms ? activeLines.map(([roomType, quantity]) => ({ room_type: roomType, quantity })) : undefined,
+      partySize: info.has_rooms ? undefined : partySize,
+      checkIn, checkOut, guestName, guestPhone, idUploaded,
+    };
+    // Same details -> same key, so a retry reuses the hold; changed details -> new key.
+    const signature = JSON.stringify(details);
+    if (idemRef.current.signature !== signature) {
+      idemRef.current = { signature, key: crypto.randomUUID() };
+    }
     try {
-      const result = await reserve(content.backendSlug, {
-        rooms: info.has_rooms ? activeLines.map(([roomType, quantity]) => ({ room_type: roomType, quantity })) : undefined,
-        partySize: info.has_rooms ? undefined : partySize,
-        checkIn, checkOut, guestName, guestPhone, idUploaded,
-      });
+      const result = await reserve(content.backendSlug, { ...details, idempotencyKey: idemRef.current.key });
       setReservation(result);
     } catch (e) {
       setError(e.message || 'Could not start your reservation. Please try again.');
