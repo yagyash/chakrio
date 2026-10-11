@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { track } from '../../utils/analytics';
+import { firstTouch } from '../../utils/attribution';
 
 const GOLD = '#c8a96e';
 const inputCls = 'w-full bg-[#0d0c18] border border-surface3 rounded-lg px-4 py-3 text-text-1 placeholder-text-3 focus:outline-none transition-colors text-sm';
@@ -29,6 +30,7 @@ export default function LeadCaptureBox({ sourcePage }) {
         name: name.trim(),
         whatsapp: wa.trim(),
         source_page: sourcePage,
+        utm: firstTouch(),
         submitted_at: serverTimestamp(),
       });
     } catch {
@@ -38,7 +40,7 @@ export default function LeadCaptureBox({ sourcePage }) {
       await fetch('/api/leads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), whatsapp: wa.trim(), source_page: sourcePage }),
+        body: JSON.stringify({ name: name.trim(), whatsapp: wa.trim(), source_page: sourcePage, utm: firstTouch() }),
       });
     } catch {
       // Backend unreachable — lead is still saved in Firestore above

@@ -10,6 +10,7 @@ import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
 import { planByKey, priceFor, termsLine } from '../data/plans';
 import BillingToggle from '../components/marketing/BillingToggle';
+import { DEMO_PREFILL_PROPERTY, demoHref } from '../config/demo';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -509,7 +510,7 @@ function PricingSection() {
                   </>
                 ) : (
                   <>
-                    <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+                    <a href={demoHref(DEMO_PREFILL_PROPERTY)} data-demo="property" target="_blank" rel="noopener noreferrer" style={{
                       display: 'block', textAlign: 'center', width: '100%',
                       padding: '13px 0', borderRadius: 10, fontSize: 15, fontWeight: 600, textDecoration: 'none',
                       fontFamily: "'Hanken Grotesk', sans-serif",
@@ -634,7 +635,7 @@ export default function LandingPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-          <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+          <a href={demoHref(DEMO_PREFILL_PROPERTY)} data-demo="property" target="_blank" rel="noopener noreferrer" style={{
             background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
@@ -934,7 +935,7 @@ export default function LandingPage() {
             No setup forms, no waiting room. Book a 20-minute call and we'll have your bookings flowing through WhatsApp the same week.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="https://wa.me/919461888529?text=Hi%2C+I+want+to+see+Chakrio+for+my+property" target="_blank" rel="noopener noreferrer" style={{
+            <a href={demoHref(DEMO_PREFILL_PROPERTY)} data-demo="property" target="_blank" rel="noopener noreferrer" style={{
               background: '#C9A24B', color: '#0E0B14', border: 'none', borderRadius: 11,
               padding: '16px 32px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
               fontFamily: "'Hanken Grotesk', sans-serif",
