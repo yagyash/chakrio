@@ -105,6 +105,15 @@ export default async function handler(req, res) {
   // ── checklist ──────────────────────────────────────────────────────
   if (action === 'checklist') {
     if (!propertyId) return res.status(400).json({ error: 'propertyId required' });
+    // E09 go-live checklist (8 items) from the agent; the old 2-signal RPC is the fallback.
+    const agentUrl = process.env.CHAKRIO_AGENT_URL;
+    const secret = process.env.ONBOARD_SECRET;
+    if (agentUrl && secret) {
+      const a = await fetch(`${agentUrl}/admin/onboarding/${encodeURIComponent(propertyId)}`, {
+        headers: { 'X-Onboard-Secret': secret },
+      }).catch(() => null);
+      if (a?.ok) return res.status(200).json(await a.json());
+    }
     const r = await fetch(`${supabaseUrl}/rest/v1/rpc/get_onboard_status`, {
       method: 'POST',
       headers: { ...supaHeaders, 'Content-Type': 'application/json' },

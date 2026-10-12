@@ -300,6 +300,22 @@ function ChannelSyncStatus({ cm, onResync, onDisable, onUpdateMarkup }) {
 
 function OnboardChecklist({ status }) {
   if (!status) return null;
+  if (Array.isArray(status.items)) {          // E09 go-live checklist from the agent
+    return (
+      <div style={{ marginTop: 8 }}>
+        <div style={{ fontSize: 12, color: status.ready ? '#4CAF50' : '#C9A24B', fontWeight: 600, marginBottom: 6 }}>
+          {status.ready ? 'Ready to go live' : `Go-live: ${status.done} / ${status.total}`}
+        </div>
+        {status.items.map((i) => (
+          <div key={i.key} style={{ display: 'flex', alignItems: 'baseline', gap: 8, fontSize: 12, color: i.done ? '#4CAF50' : '#8c8a9e', marginBottom: 3 }}>
+            <span>{i.done ? '✅' : '⬜'}</span>
+            <span>{i.label}</span>
+            {i.detail && <span style={{ color: '#56546a', fontSize: 11 }}>· {i.detail}</span>}
+          </div>
+        ))}
+      </div>
+    );
+  }
   const items = [
     { label: 'Property created',       done: true },
     { label: 'Firebase account',       done: true },
@@ -552,7 +568,7 @@ export default function ClientTable({ clients, onPropertyAction, fetchPropertyDa
                                 {/* Onboarding checklist (item 10) */}
                                 {!pd?.loading && pd?.checklist && (
                                   <div style={{ marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
-                                    <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Onboarding</div>
+                                    <div style={{ fontSize: 11, color: '#56546a', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: 6 }}>Go-live checklist</div>
                                     <OnboardChecklist status={pd.checklist} />
                                   </div>
                                 )}
