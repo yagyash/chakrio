@@ -1,5 +1,6 @@
 /**
- * /r/:token — the trustee's evening report in full (chakrio-agent plan E05).
+ * /r/:token — the trustee's daily report in full (chakrio-agent plan E05). It covers
+ * the previous day and arrives each morning (changed 20 Oct), so labels don't say "today".
  * Opened from the WhatsApp report's button; read-only, no login. The token is
  * signed by the agent (one property, one day, 7 days) and the agent refuses
  * anything else. noindex: these pages must never reach a search engine.
@@ -73,7 +74,7 @@ function Shell({ children }) {
   return (
     <div style={{ background: C.canvas, minHeight: '100vh', color: C.ink, fontFamily: SANS, lineHeight: 1.6 }}>
       <Helmet>
-        <title>आज का हिसाब · Chakrio</title>
+        <title>दिन का हिसाब · Chakrio</title>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
       <main style={{ maxWidth: 560, margin: '0 auto', padding: '32px 16px 48px' }}>{children}</main>
@@ -96,7 +97,7 @@ export default function TrusteeReportPage() {
         <Card>
           <div style={{ fontFamily: SERIF, fontSize: 26, lineHeight: 1.2 }}>यह लिंक अब नहीं खुलता</div>
           <p style={{ color: C.muted, marginTop: 8 }}>
-            This report link is invalid or more than 7 days old. Today&apos;s report arrives on WhatsApp every evening.
+            This report link is invalid or more than 7 days old. A new report arrives on WhatsApp every morning.
           </p>
         </Card>
       </Shell>
@@ -114,7 +115,7 @@ export default function TrusteeReportPage() {
   return (
     <Shell>
       <header style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 13, color: C.muted, letterSpacing: '0.05em' }}>आज का हिसाब · DAILY REPORT</div>
+        <div style={{ fontSize: 13, color: C.muted, letterSpacing: '0.05em' }}>दिन का हिसाब · DAILY REPORT</div>
         <h1 style={{ fontFamily: SERIF, fontSize: 36, fontWeight: 400, letterSpacing: '-0.03em', lineHeight: 1.1, margin: '6px 0 4px' }}>
           {report.property}
         </h1>
@@ -123,7 +124,7 @@ export default function TrusteeReportPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 12, marginBottom: 12 }}>
         <Stat hi="कमरे भरे" en="Occupied" value={`${o.pct}%`} sub={`${o.rooms_used} / ${o.rooms} कमरे`} />
-        <Stat hi="आज जमा" en="Collected" value={rupees(collected)} sub={m.refunds ? `वापसी ${rupees(m.refunds)}` : null} />
+        <Stat hi="जमा" en="Collected" value={rupees(collected)} sub={m.refunds ? `वापसी ${rupees(m.refunds)}` : null} />
         <Stat hi="नई बुकिंग" en="New bookings" value={b.new_bookings} sub={rupees(b.new_value)} />
         <Stat hi="खर्च" en="Expenses" value={rupees(expenses)} />
       </div>
@@ -132,7 +133,7 @@ export default function TrusteeReportPage() {
         <Label hi="पैसा किस तरह आया" en="How money came in" />
         <div style={{ marginTop: 8 }}>
           {Object.entries(m.by_method).map(([k, v]) => <Row key={k} left={METHOD_LABEL[k] || k} right={rupees(v)} />)}
-          {Object.keys(m.by_method).length === 0 && <Row left="आज कुछ जमा नहीं · Nothing collected" right="—" />}
+          {Object.keys(m.by_method).length === 0 && <Row left="कुछ जमा नहीं · Nothing collected" right="—" />}
           {Object.entries(m.expenses).map(([k, v]) => (
             <Row key={`e-${k}`} left={`खर्च (${METHOD_LABEL[k] || k})`} right={`− ${rupees(v)}`} />
           ))}
@@ -143,8 +144,8 @@ export default function TrusteeReportPage() {
       <Card style={{ marginBottom: 12 }}>
         <Label hi="आना-जाना" en="Arrivals and departures" />
         <div style={{ marginTop: 8 }}>
-          <Row left="आज आए · Arrived" right={o.arrivals} />
-          <Row left="आज गए · Left" right={o.departures} />
+          <Row left="आए · Arrived" right={o.arrivals} />
+          <Row left="गए · Left" right={o.departures} />
           <Row left="रुके हुए · Staying" right={o.in_house} />
         </div>
       </Card>
@@ -169,7 +170,7 @@ export default function TrusteeReportPage() {
           <Tag tone={flags.length ? 'red' : 'green'}>{flags.length || 'ठीक है'}</Tag>
         </div>
         <div style={{ marginTop: 8 }}>
-          {flags.length === 0 && <p style={{ color: C.muted, margin: '8px 0 0' }}>आज कोई गड़बड़ नहीं दिखी. Nothing unusual today.</p>}
+          {flags.length === 0 && <p style={{ color: C.muted, margin: '8px 0 0' }}>कोई गड़बड़ नहीं दिखी. Nothing unusual that day.</p>}
           {flags.map((f, i) => (
             <div key={i} style={{ padding: '10px 0', borderBottom: `1px solid ${C.border}` }}>
               <Tag tone="red">{FLAG_LABEL[f.kind] || f.kind}</Tag>
