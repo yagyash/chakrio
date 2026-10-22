@@ -17,7 +17,6 @@ import { getPropertyInfo, getAvailability, reserve, confirmUpiPayment } from '..
 import { track } from '../utils/analytics';
 import DateRangePicker from '../components/booking/DateRangePicker';
 import Stepper from '../components/booking/Stepper';
-import GuestCountPicker from '../components/booking/GuestCountPicker';
 import PhotoGallery from '../components/booking/PhotoGallery';
 
 function todayStr() {
@@ -77,9 +76,6 @@ export default function PropertyBookingPage() {
     getPropertyInfo(content.backendSlug)
       .then((data) => {
         setInfo(data);
-        if (!data.has_rooms && data.rates[0]) {
-          setPartySize(data.rates[0].guest_count);
-        }
       })
       .catch(() => setInfoError('Could not load this property right now. Please try again shortly.'));
   }, [content]);
@@ -93,6 +89,22 @@ export default function PropertyBookingPage() {
     if (!info?.rates?.length) return null;
     return Math.min(...info.rates.map((r) => r.price_per_night));
   }, [info]);
+
+  // Villa guest counts come from the property's own data: every count that has a
+  // rate, capped at its max capacity. Prices are not shown here because they can
+  // depend on the dates (festival rates); the quote below shows the real price.
+  const guestOptions = useMemo(() => {
+    if (!info || info.has_rooms) return [];
+    return info.rates
+      .map((r) => r.guest_count)
+      .filter((n) => !info.max_capacity || n <= info.max_capacity)
+      .sort((a, b) => a - b);
+  }, [info]);
+
+  // A quote belongs to the dates and party it was checked for.
+  useEffect(() => {
+    setQuote(null);
+  }, [checkIn, checkOut, partySize, quantities]);
 
   async function handleCheckAvailability() {
     if (!checkIn || !checkOut) return;
@@ -111,7 +123,7 @@ export default function PropertyBookingPage() {
         setQuote({ allAvailable, total, nights: results[0]?.nights || 0 });
       } else {
         const r = await getAvailability(content.backendSlug, { partySize, checkIn, checkOut });
-        setQuote({ allAvailable: r.available, total: r.total_price, nights: r.nights });
+        setQuote({ allAvailable: r.available, total: r.total_price, nights: r.nights, perNight: r.price_per_night });
       }
     } catch {
       setError('Could not check availability. Please try again.');
@@ -339,9 +351,19 @@ export default function PropertyBookingPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="mb-5">
-                    <p className="text-xs font-medium text-text-3 mb-2">Guests</p>
-                    <GuestCountPicker options={info.rates} value={partySize} onChange={setPartySize} />
+                  <div className="mb-5 max-w-xs">
+                    <label htmlFor="guest-count" className="block text-xs font-medium text-text-3 mb-1.5">No. of guests</label>
+                    <select
+                      id="guest-count"
+                      value={partySize ?? ''}
+                      onChange={(e) => setPartySize(e.target.value ? Number(e.target.value) : null)}
+                      className={`${inputClass} [color-scheme:dark]`}
+                    >
+                      <option value="" disabled>Select guests</option>
+                      {guestOptions.map((n) => (
+                        <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>
+                      ))}
+                    </select>
                   </div>
                 )}
 
@@ -360,7 +382,10 @@ export default function PropertyBookingPage() {
                       <>
                         <p className="text-2xl font-bold tabular-nums m-0 mb-4">
                           ₹{quote.total.toLocaleString('en-IN')}{' '}
-                          <span className="text-sm font-medium text-text-3">for {quote.nights} night{quote.nights > 1 ? 's' : ''}</span>
+                          <span className="text-sm font-medium text-text-3">
+                            for {quote.nights} night{quote.nights > 1 ? 's' : ''}
+                            {quote.perNight ? ` (₹${quote.perNight.toLocaleString('en-IN')}/night)` : ''}
+                          </span>
                         </p>
                         <div className="flex gap-3 flex-wrap mb-4">
                           <input placeholder="Your name" value={guestName} onChange={(e) => setGuestName(e.target.value)}
