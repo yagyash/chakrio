@@ -17,7 +17,6 @@ import { getPropertyInfo, getAvailability, reserve, confirmUpiPayment } from '..
 import { track } from '../utils/analytics';
 import DateRangePicker from '../components/booking/DateRangePicker';
 import Stepper from '../components/booking/Stepper';
-import GuestCountPicker from '../components/booking/GuestCountPicker';
 import PhotoGallery from '../components/booking/PhotoGallery';
 
 function todayStr() {
@@ -77,9 +76,6 @@ export default function PropertyBookingPage() {
     getPropertyInfo(content.backendSlug)
       .then((data) => {
         setInfo(data);
-        if (!data.has_rooms && data.rates[0]) {
-          setPartySize(data.rates[0].guest_count);
-        }
       })
       .catch(() => setInfoError('Could not load this property right now. Please try again shortly.'));
   }, [content]);
@@ -94,29 +90,65 @@ export default function PropertyBookingPage() {
     return Math.min(...info.rates.map((r) => r.price_per_night));
   }, [info]);
 
+  // Villa guest counts come from the property's own data: every count that has a
+  // rate, capped at its max capacity. Prices are not shown here because they can
+  // depend on the dates (festival rates); the quote below shows the real price.
+  const guestOptions = useMemo(() => {
+    if (!info || info.has_rooms) return [];
+    return info.rates
+      .map((r) => r.guest_count)
+      .filter((n) => !info.max_capacity || n <= info.max_capacity)
+      .sort((a, b) => a - b);
+  }, [info]);
+
+  // The price follows the dates and party: once both are chosen, any change
+  // re-checks it, so the total updates instead of going stale. The previous
+  // total stays on screen while checking and Reserve waits for the new one.
+  const quoteSeq = useRef(0);
+  const enquiryTracked = useRef(false);
+  useEffect(() => {
+    if (!info || !checkIn || !checkOut || (info.has_rooms ? activeLines.length === 0 : !partySize)) {
+      quoteSeq.current += 1;          // drop any check still in flight
+      setQuote(null);
+      setChecking(false);
+      return undefined;
+    }
+    const t = setTimeout(handleCheckAvailability, 250);   // stepper clicks settle into one check
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [info, checkIn, checkOut, partySize, quantities]);
+
   async function handleCheckAvailability() {
     if (!checkIn || !checkOut) return;
     if (info.has_rooms ? activeLines.length === 0 : !partySize) return;
+    const seq = ++quoteSeq.current;    // only the latest check may set the quote
     setChecking(true);
     setError('');
-    setQuote(null);
-    track('booking_enquiry', { property: propertySlug, check_in: checkIn, check_out: checkOut });
+    if (!enquiryTracked.current) {     // one enquiry per page view, not one per change
+      enquiryTracked.current = true;
+      track('booking_enquiry', { property: propertySlug, check_in: checkIn, check_out: checkOut });
+    }
     try {
+      let next;
       if (info.has_rooms) {
         const results = await Promise.all(
           activeLines.map(([roomType]) => getAvailability(content.backendSlug, { roomType, checkIn, checkOut })),
         );
         const allAvailable = results.every((r, i) => r.available_count >= activeLines[i][1]);
         const total = results.reduce((sum, r, i) => sum + r.price_per_night * r.nights * activeLines[i][1], 0);
-        setQuote({ allAvailable, total, nights: results[0]?.nights || 0 });
+        next = { allAvailable, total, nights: results[0]?.nights || 0 };
       } else {
         const r = await getAvailability(content.backendSlug, { partySize, checkIn, checkOut });
-        setQuote({ allAvailable: r.available, total: r.total_price, nights: r.nights });
+        next = { allAvailable: r.available, total: r.total_price, nights: r.nights, perNight: r.price_per_night };
       }
+      if (seq === quoteSeq.current) setQuote(next);
     } catch {
-      setError('Could not check availability. Please try again.');
+      if (seq === quoteSeq.current) {
+        setQuote(null);
+        setError('Could not check availability. Please try again.');
+      }
     } finally {
-      setChecking(false);
+      if (seq === quoteSeq.current) setChecking(false);
     }
   }
 
@@ -339,9 +371,19 @@ export default function PropertyBookingPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="mb-5">
-                    <p className="text-xs font-medium text-text-3 mb-2">Guests</p>
-                    <GuestCountPicker options={info.rates} value={partySize} onChange={setPartySize} />
+                  <div className="mb-5 max-w-xs">
+                    <label htmlFor="guest-count" className="block text-xs font-medium text-text-3 mb-1.5">No. of guests</label>
+                    <select
+                      id="guest-count"
+                      value={partySize ?? ''}
+                      onChange={(e) => setPartySize(e.target.value ? Number(e.target.value) : null)}
+                      className={`${inputClass} [color-scheme:dark]`}
+                    >
+                      <option value="" disabled>Select guests</option>
+                      {guestOptions.map((n) => (
+                        <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>
+                      ))}
+                    </select>
                   </div>
                 )}
 
@@ -358,9 +400,16 @@ export default function PropertyBookingPage() {
                   <div className="mt-5">
                     {quote.allAvailable ? (
                       <>
-                        <p className="text-2xl font-bold tabular-nums m-0 mb-4">
+                        <p
+                          className={`text-2xl font-bold tabular-nums m-0 mb-4 transition-opacity duration-200 ${checking ? 'opacity-50' : ''}`}
+                          aria-live="polite"
+                          aria-busy={checking}
+                        >
                           ₹{quote.total.toLocaleString('en-IN')}{' '}
-                          <span className="text-sm font-medium text-text-3">for {quote.nights} night{quote.nights > 1 ? 's' : ''}</span>
+                          <span className="text-sm font-medium text-text-3">
+                            for {quote.nights} night{quote.nights > 1 ? 's' : ''}
+                            {quote.perNight ? ` (₹${quote.perNight.toLocaleString('en-IN')}/night)` : ''}
+                          </span>
                         </p>
                         <div className="flex gap-3 flex-wrap mb-4">
                           <input placeholder="Your name" value={guestName} onChange={(e) => setGuestName(e.target.value)}
@@ -394,7 +443,7 @@ export default function PropertyBookingPage() {
                           </div>
                         )}
 
-                        <button onClick={handleReserve} disabled={busy} className={primaryButtonClass}>
+                        <button onClick={handleReserve} disabled={busy || checking} className={primaryButtonClass}>
                           {busy && <Loader2 size={15} className="animate-spin" />}
                           {busy ? 'Starting…' : 'Reserve & Pay'}
                         </button>
