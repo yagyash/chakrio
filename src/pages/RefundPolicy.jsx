@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
 
-const LAST_UPDATED = '4 July 2026';
+const LAST_UPDATED = '30 October 2026';
 
 export default function RefundPolicy() {
   return (
@@ -31,8 +31,9 @@ export default function RefundPolicy() {
         <div className="space-y-10 text-text-2 text-sm leading-relaxed">
 
           <section>
-            <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">Free Trial</h2>
-            <p>All plans include a 14-day free trial. You will not be charged during the trial period. If you cancel before day 14, no charge is applied and no refund is due. The trial begins when your onboarding is complete.</p>
+            <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">Free Trial and Dharmshala Pilot</h2>
+            <p className="mb-3">Hospitality plans include a 14-day free trial. You will not be charged during the trial period. If you cancel before day 14, no charge is applied and no refund is due. The trial begins when your onboarding is complete.</p>
+            <p>Dharmshala plans start with a paid 30-day pilot instead of a free trial. The setup fee paid for the pilot is non-refundable once onboarding has commenced, as below. If you choose an annual plan within 30 days of the pilot ending, that fee is deducted from your first annual payment.</p>
           </section>
 
           <section>

@@ -24,6 +24,10 @@ const DHARMSHALA_FAQS = [
     q: 'Can I track prasad and maintenance expenses?',
     a: 'Yes. Type any expense in WhatsApp — prasad, maintenance, repairs — and Chakrio records it instantly. Your monthly P&L report breaks it down by category.',
   },
+  {
+    q: 'Is there a free trial?',
+    a: 'Dharmshalas start with a paid 30-day pilot instead. You pay the one-time setup fee for your plan; we load your rooms, set up the bot and train your manager, and you run live on real bookings for 30 days. Switch to a yearly plan within 30 days of the pilot ending and the setup fee comes off your first year.',
+  },
 ];
 
 export default function DharmshaPage() {
@@ -86,14 +90,14 @@ export default function DharmshaPage() {
           }}>
             Chat with us on WhatsApp
           </a>
-          <Link to="/onboard" style={{
+          <a href="#pricing" style={{
             background: 'rgba(255,255,255,.06)', color: '#F4F1EA',
             border: '1px solid rgba(255,255,255,.14)', borderRadius: 11,
             padding: '15px 28px', fontWeight: 600, fontSize: 16, textDecoration: 'none',
             fontFamily: "'Hanken Grotesk', sans-serif",
           }}>
-            Start Free Trial →
-          </Link>
+            See pricing &amp; the 30-day pilot ↓
+          </a>
         </div>
       </header>
 
@@ -149,7 +153,7 @@ export default function DharmshaPage() {
       <section id="pricing" className="max-w-6xl mx-auto px-6 pb-20 w-full">
         <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2 text-center" style={{ color: '#C9A24B' }}>Pricing</p>
         <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight text-center">Dharmshala pricing</h2>
-        <p className="text-text-2 text-center max-w-xl mx-auto mb-6">Priced by room count. Dorms can be billed as rooms or per bed. 14-day free trial, every plan includes everything above.</p>
+        <p className="text-text-2 text-center max-w-xl mx-auto mb-6">Priced by room count. Dorms can be billed as rooms or per bed. Every plan includes everything above and starts with a paid 30-day pilot.</p>
         <div className="text-center mb-10"><BillingToggle yearly={yearly} onChange={setYearly} /></div>
         <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 items-stretch">
           {publicPlans('dharmshala').map((p) => {
@@ -192,22 +196,16 @@ export default function DharmshaPage() {
                 }}>
                   Chat with us on WhatsApp
                 </a>
-                <Link to="/onboard" style={{
-                  display: 'block', textAlign: 'center', width: '100%',
-                  padding: '11px 0', borderRadius: 10, fontSize: 14, fontWeight: 600, textDecoration: 'none',
-                  fontFamily: "'Hanken Grotesk', sans-serif",
-                  background: 'transparent', color: '#9D98AC',
-                  border: '1px solid rgba(255,255,255,.12)',
-                }}>
-                  Start 14-day Free Trial →
-                </Link>
               </div>
             );
           })}
         </div>
         <div className="mt-8 rounded-xl p-5" style={{ background: 'rgba(255,255,255,.025)', border: '1px solid rgba(255,255,255,.08)' }}>
+          <p className="text-center text-sm text-text-2 mb-1">
+            <span style={{ color: '#C9A24B', fontWeight: 600 }}>How the 30-day pilot works</span> — you pay the one-time setup fee shown on your plan (2 months of the plan). We load your rooms, set up the bot and train your manager, then you run live for 30 days.
+          </p>
           <p className="text-center text-sm text-text-2">
-            <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee = 2 months of your plan</span> — shown on each plan above · Festival campaigns ₹1.25/delivered msg
+            Switch to yearly within 30 days of the pilot ending and the setup fee comes off your first year · Festival campaigns ₹1.25/delivered msg
           </p>
         </div>
       </section>

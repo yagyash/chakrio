@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/marketing/Navbar';
 import Footer from '../components/marketing/Footer';
 
-const LAST_UPDATED = '4 July 2026';
+const LAST_UPDATED = '30 October 2026';
 
 export default function Terms() {
   return (
@@ -44,7 +44,8 @@ export default function Terms() {
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">3. Subscriptions</h2>
             <p className="mb-3">Chakrio is offered as a monthly or annual subscription per the Pricing page. You will be billed at the start of each billing period.</p>
             <p className="mb-3">You may cancel your subscription at any time via WhatsApp or email. Cancellation takes effect immediately. Your access continues until the end of the already-paid billing period. No pro-rata refund is issued for unused days.</p>
-            <p>A 14-day free trial is included on all plans. No credit card is required during the trial. If you do not cancel before day 14, you will be charged the plan rate for the first billing period.</p>
+            <p className="mb-3">Hospitality plans (villas, homestays, guesthouses and hotels) include a 14-day free trial. No credit card is required during the trial. If you do not cancel before day 14, you will be charged the plan rate for the first billing period.</p>
+            <p>Dharmshala plans have no free trial. They start with a paid 30-day pilot: you pay the plan's one-time setup fee, and the pilot runs for 30 days from the day you go live. At the end of the pilot you choose a monthly or annual plan, or the Service stops. If you choose an annual plan within 30 days of the pilot ending, the setup fee you paid is deducted from the first annual payment.</p>
           </section>
 
           <section>
