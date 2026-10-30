@@ -453,7 +453,7 @@ function PricingSection() {
       <div className="reveal text-center mb-10">
         <p className="text-xs font-mono font-medium uppercase tracking-widest mb-2" style={{ color: '#C9A24B' }}>Pricing</p>
         <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-text-1 mb-3 tracking-tight">Simple, transparent pricing.</h2>
-        <p className="text-text-2 mt-2 max-w-xl mx-auto">14-day free trial on all plans. Real prices, per property. Cancel anytime.</p>
+        <p className="text-text-2 mt-2 max-w-xl mx-auto">14-day free trial on every plan below. Real prices, per property. Cancel anytime. Dharmshala plans start with a <Link to="/dharmshala" style={{ color: '#C9A24B', textDecoration: 'underline' }}>30-day pilot</Link>.</p>
         <div className="mt-6"><BillingToggle yearly={yearly} onChange={setYearly} /></div>
       </div>
 
@@ -570,10 +570,10 @@ export default function LandingPage() {
     <div className="min-h-screen text-text-1 flex flex-col" style={{ background: '#0E0B14' }}>
       <Helmet>
         <title>Chakrio — WhatsApp Booking Automation for Dharmshalas, Villas &amp; Homestays</title>
-        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial." />
+        <meta name="description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels. Auto-send guest confirmations, payment reminders, and re-engagement campaigns. Setup in 24 hours. Free 14-day trial for villas and homestays." />
         <link rel="canonical" href="https://chakrio.com/" />
         <meta property="og:title" content="Chakrio — WhatsApp Booking Automation for Dharmshalas, Villas &amp; Homestays" />
-        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels. Setup in 24 hours. Free 14-day trial." />
+        <meta property="og:description" content="Automate bookings, track expenses, and manage room availability by WhatsApp or Telegram. Built for dharmshalas, villas, and boutique hotels. Setup in 24 hours. Free 14-day trial for villas and homestays." />
         <meta property="og:url" content="https://chakrio.com/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://chakrio.com/og-image.png" />
