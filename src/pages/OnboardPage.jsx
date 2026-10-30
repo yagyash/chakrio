@@ -9,7 +9,7 @@ const PROPERTY_TYPES = ['homestay', 'villa', 'hotel', 'resort', 'dharamshala'];
 // Only public plans are sold (₹499 Starter is not). Prices come from plans.json.
 const PLANS          = publicPlans().map((p) => p.key);
 const PLAN_LABELS    = Object.fromEntries(publicPlans().map((p) => [p.key,
-  `${p.name} (${p.segment === 'dharmshala' ? 'dharmshala' : 'hotel / villa / homestay'}) — ${roomsLabel(p)} · ${p.price_is_from ? 'from ' : ''}${inr(p.monthly_inr)}/mo`]));
+  `${p.name} (${p.segment === 'dharmshala' ? 'dharmshala' : 'hotel / villa / homestay'}) — ${roomsLabel(p)} · ${p.price_is_from ? 'from ' : ''}${inr(p.monthly_inr)}/mo + GST`]));
 const ROOM_TYPES     = ['standard', 'vip', 'family', 'group', 'dorm'];
 const HOTEL_TYPES    = new Set(['hotel', 'resort', 'dharamshala']);
 const OTA_NAMES      = ['airbnb', 'booking.com', 'makemytrip', 'goibibo', 'agoda', 'other'];

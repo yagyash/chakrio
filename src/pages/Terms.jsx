@@ -43,6 +43,7 @@ export default function Terms() {
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">3. Subscriptions</h2>
             <p className="mb-3">Chakrio is offered as a monthly or annual subscription per the Pricing page. You will be billed at the start of each billing period.</p>
+            <p className="mb-3">All prices on chakrio.com, including plans, setup fees, add-ons and campaign charges, exclude GST. GST at 18% is added to every bill and payment link.</p>
             <p className="mb-3">You may cancel your subscription at any time via WhatsApp or email. Cancellation takes effect immediately. Your access continues until the end of the already-paid billing period. No pro-rata refund is issued for unused days.</p>
             <p className="mb-3">Hospitality plans (villas, homestays, guesthouses and hotels) include a 14-day free trial. No credit card is required during the trial. If you do not cancel before day 14, you will be charged the plan rate for the first billing period.</p>
             <p>Dharmshala plans have no free trial. They start with a paid 30-day pilot: you pay the plan's one-time setup fee, and the pilot runs for 30 days from the day you go live. At the end of the pilot you choose a monthly or annual plan, or the Service stops. If you choose an annual plan within 30 days of the pilot ending, the setup fee you paid is deducted from the first annual payment.</p>
@@ -64,7 +65,7 @@ export default function Terms() {
 
           <section>
             <h2 className="font-display font-extrabold text-text-1 text-lg mb-3">6. Marketing Wallet</h2>
-            <p>Campaign charges are pre-loaded into a marketing wallet (Razorpay). Wallet credits are consumed per delivered message. Unspent wallet balance is refundable upon written request. Refunds are processed within 7 business days to the original payment method.</p>
+            <p>Campaign charges are pre-loaded into a marketing wallet (Razorpay). A top-up of ₹X adds ₹X of wallet credit; the payment is ₹X plus 18% GST. Wallet credits are consumed per delivered message. Unspent wallet balance is refundable upon written request. Refunds are processed within 7 business days to the original payment method.</p>
           </section>
 
           <section>

@@ -205,7 +205,7 @@ export default function DharmshaPage() {
             <span style={{ color: '#C9A24B', fontWeight: 600 }}>How the 30-day pilot works</span> — you pay the one-time setup fee shown on your plan (2 months of the plan). We load your rooms, set up the bot and train your manager, then you run live for 30 days.
           </p>
           <p className="text-center text-sm text-text-2">
-            Switch to yearly within 30 days of the pilot ending and the setup fee comes off your first year · Festival campaigns ₹1.25/delivered msg · Prices exclude GST
+            Switch to yearly within 30 days of the pilot ending and the setup fee comes off your first year · Festival campaigns ₹1.25/delivered msg · Prices exclude GST (18% added to the bill)
           </p>
           <p className="text-center text-sm mt-3">
             <a href="/chakrio-dharmshala-price-list.pdf" download data-price-list="dharmshala" style={{ color: '#C9A24B', fontWeight: 600, textDecoration: 'underline' }}>
