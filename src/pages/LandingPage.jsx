@@ -548,7 +548,7 @@ function PricingSection() {
         <p className="text-center text-sm text-text-2 mb-1">
           <span style={{ color: '#C9A24B', fontWeight: 600 }}>One-time setup fee = 2 months of your plan</span> — shown on each plan above
         </p>
-        <p className="text-center text-xs text-text-3 mt-1">Add-ons on every plan: Channel Manager ₹2,000/property/mo · Marketing campaigns ₹1.25/delivered msg</p>
+        <p className="text-center text-xs text-text-3 mt-1">Add-ons on every plan: Channel Manager ₹2,000/property/mo · Marketing campaigns ₹1.25/delivered msg · All prices exclude GST (18% added to the bill)</p>
       </div>
     </section>
   );

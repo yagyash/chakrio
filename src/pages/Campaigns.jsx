@@ -233,7 +233,7 @@ export default function Campaigns() {
           <div>
             <div style={{ fontSize: '13px', color: '#f0eee8', fontWeight: 500 }}>Top up your marketing wallet to launch campaigns</div>
             <div style={{ fontSize: '12px', color: '#56546a', marginTop: '2px' }}>
-              ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)} per delivered message · ₹{CAMPAIGN_COSTS.metaFee.toFixed(2)} WhatsApp fee + ₹{CAMPAIGN_COSTS.chakrioFee.toFixed(2)} service fee
+              ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)} per delivered message · 18% GST is added when you top up
             </div>
           </div>
           <button style={{ ...btnPrimary, marginLeft: 'auto', whiteSpace: 'nowrap' }} onClick={() => setShowTopup(true)}>
@@ -425,8 +425,7 @@ function TopupModal({ propertyId, onClose, onSuccess }) {
         </div>
 
         <p style={{ fontSize: '12px', color: '#56546a', margin: '0 0 16px' }}>
-          ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)}/message ·{' '}
-          ₹{CAMPAIGN_COSTS.metaFee.toFixed(2)} WhatsApp fee + ₹{CAMPAIGN_COSTS.chakrioFee.toFixed(2)} Chakrio fee
+          ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)} per delivered message · 18% GST is added to the payment
         </p>
 
         {!payUrl ? (
@@ -445,7 +444,7 @@ function TopupModal({ propertyId, onClose, onSuccess }) {
             />
             {amount && parseFloat(amount) >= 10 && (
               <div style={{ fontSize: '12px', color: '#56546a', marginBottom: '12px' }}>
-                ≈ {Math.floor(parseFloat(amount) / CAMPAIGN_COSTS.totalPerMessage)} messages
+                ≈ {Math.floor(parseFloat(amount) / CAMPAIGN_COSTS.totalPerMessage)} messages · you pay ₹{(parseFloat(amount) * (1 + CAMPAIGN_COSTS.gstRate)).toLocaleString('en-IN', { maximumFractionDigits: 2 })} incl. GST
               </div>
             )}
             {error && <div style={{ fontSize: '12px', color: '#f87171', marginBottom: '12px' }}>{error}</div>}
@@ -637,7 +636,7 @@ function NewCampaignModal({ propertyId, walletBalance, onClose, onLaunched }) {
 
               {/* Cost tooltip */}
               <div style={{ fontSize: '10px', color: '#56546a', marginTop: '8px', lineHeight: 1.5 }}>
-                ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)}/message = ₹{CAMPAIGN_COSTS.metaFee.toFixed(2)} WhatsApp delivery + ₹{CAMPAIGN_COSTS.chakrioFee.toFixed(2)} service fee.
+                ₹{CAMPAIGN_COSTS.totalPerMessage.toFixed(2)}/message, WhatsApp delivery included.
                 Wallet is charged only on delivery, not on send.
               </div>
             </div>
