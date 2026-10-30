@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build && node prerender.mjs && node generate-sitemap.mjs",
     "prerender:capture": "node prerender-capture.mjs",
+    "price-list": "node scripts/build-price-list.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
