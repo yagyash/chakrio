@@ -9,6 +9,7 @@
  *   lead_captured     — a WhatsApp number was submitted   ← mark as KEY EVENT in GA4
  *   whatsapp_click    — any wa.me / WhatsApp link clicked (auto-tracked, see initAnalytics)
  *   demo_requested    — a "Book a demo" link (data-demo) clicked, with first-touch UTM ← mark as KEY EVENT in GA4
+ *   price_list_download — a price-list PDF link (data-price-list) clicked, with first-touch UTM
  *   booking_page_view — a /book/* page was viewed
  *   booking_enquiry   — availability checked on a /book/* page   ← mark as KEY EVENT in GA4
  *
@@ -46,6 +47,9 @@ export function initAnalytics() {
       }
       if (a.dataset && a.dataset.demo) {
         track('demo_requested', { demo: a.dataset.demo, page: window.location.pathname, ...firstTouch() });
+      }
+      if (a.dataset && a.dataset.priceList) {
+        track('price_list_download', { file: a.dataset.priceList, page: window.location.pathname, ...firstTouch() });
       }
     },
     true, // capture — fire even if a handler below calls stopPropagation

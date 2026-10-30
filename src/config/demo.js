@@ -8,6 +8,7 @@
 // ponytail: still the sales phone a person answers. Switch to the Chakrio bot
 // number (919929895703) only once A04's inbound qualifier is live (planned
 // 21 Nov 2026); before that, the bot would treat a prospect as a guest.
+// The price-list PDF prints this number: after changing it, run `npm run price-list`.
 export const DEMO_WA_NUMBER = '919461888529';
 
 export const DEMO_PREFILL_DHARMSHALA_HI = 'नमस्ते, Chakrio डेमो चाहिए – धर्मशाला';
